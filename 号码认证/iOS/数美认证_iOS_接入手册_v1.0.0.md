@@ -149,11 +149,10 @@ model.authPageBackgroundImage = [UIImage imageNamed:@"tooopen_sy_122409821526"];
 // model.numberSize = 10;
 // model.navReturnImg = [UIImage imageNamed:@"tooopen_sy_122409821526"];
 // model.logBtnImgs = @[[UIImage imageNamed:@"12341553737084_.pic_hd"],[UIImage
-imageNamed:@"12341553737084_.pic_hd"],[UIImage imageNamed:@"12341553737084_.pic_hd"]];
+// imageNamed:@"12341553737084_.pic_hd"],[UIImage imageNamed:@"12341553737084_.pic_hd"]];
 // model.logBtnImgs = []
 // model.authViewBlock = ^(UIView *customView) {
-// UIImageView *ima = [[UIImageView alloc]initWithImage:[UIImage
-imageNamed:@"tooopen_sy_122409821526"]];
+// UIImageView *ima = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"tooopen_sy_122409821526"]];
 // ima.frame = customView.bounds;
 // [customView addSubview:ima];
 // };
@@ -166,11 +165,10 @@ _Nonnull sender) {
 // NSMutableDictionary *result = [sender mutableCopy];
 // result[@"duration"] = delta;
 // [self displayObject:result withTitle:@"一键登录"
-  alertActionHandler:^(UIAlertAction * _Nonnull action) {
-  // [self dismissViewControllerAnimated:YES completion:nil];
-  [self displayObject:sender];
-
-  // }];
+  [alertActionHandler:^(UIAlertAction * _Nonnull action) {
+  //  [self dismissViewControllerAnimated:YES completion:nil];
+  		[self displayObject:sender];
+ 	}];
 }];
 ```
 
@@ -196,9 +194,10 @@ _Nonnull sender) {
 ### 2.4.2 Model属性
 
 通过 model 属性，可以实现：
-1 、可以允许开发者在授权页面上添加自定义的控件；
 
-2 、设置授权页面的元素控件的布局
+1. 可以允许开发者在授权页面上添加自定义的控件；
+
+2. 设置授权页面的元素控件的布局
 
 
 
@@ -208,7 +207,7 @@ _Nonnull sender) {
 @property (nonatomic,strong) UIViewController *currentVC;
 ```
 
-**授权界面自定义控件 View 的 Block **
+**授权界面自定义控件 View 的 Block**
 
 | model属性 | 值类型 | 属性说明 |
 | ---- | ---- | ---- |
@@ -217,9 +216,8 @@ _Nonnull sender) {
 示例：
 ```objective-c
 UIImageView *ima = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"tooopen_sy_122409821526"]];
-        ima.frame = customView.bounds;
-        [customView addSubview:ima];
-};
+ima.frame = customView.bounds;
+[customView addSubview:ima];
 ```
 
 **授权界面动画效果**
@@ -267,7 +265,7 @@ UIImageView *ima = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"tooop
 |model属性|值类型|属性说明|
 |----|----|----|
 |appPrivacy|NSArray (NSAttributedString)|APP自定义隐私条款:数组(务必按顺序)要设置 NSLinkAttributeName属性可以跳转协议 比 如:@[NSAttributedString对象,...]|
-|appPrivacyDemo|NSAttributedString|设置隐私的内容模板，也可以设置文本的居中或 居左。<br />1、全句可自定义但必须保留"&&默认 &&"字段表明SDK默认协议,否则设置不生效 <br />2、 协议1和协议2的名称要与数组 NSAttributedString1 和 NSAttributedString2 ... 里的名称 一样  <br />3、必设置项(参考SDK的demo) appPrivacyDemo设置内容: 登录并同意中国移动条款协议|
+|appPrivacyDemo|NSAttributedString|设置隐私的内容模板，也可以设置文本的居中或 居左。<br />1. 全句可自定义但必须保留"&&默认 &&"字段表明SDK默认协议,否则设置不生效 <br />2. 协议1和协议2的名称要与数组 NSAttributedString1 和 NSAttributedString2 ... 里的名称 一样  <br />3. 必设置项(参考SDK的demo) appPrivacyDemo设置内容: 登录并同意中国移动条款协议|
 |privacySymbol|BOOL|设置协议是否有书名号|
 |uncheckedImg|UIImage|设置复选框未选中时图片|
 |checkedImg|UIImage|设置复选框选中时图片|
@@ -318,8 +316,7 @@ UIImageView *ima = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"tooop
 
 
 ```objective-c
-- (void)ua_dismissViewControllerAnimated: (BOOL)flag completion: (void (^ __nullable)
-(void))completion;
+- (void)ua_dismissViewControllerAnimated: (BOOL)flag completion: (void (^ __nullable) (void))completion;
 ```
 
 **代码示例**
