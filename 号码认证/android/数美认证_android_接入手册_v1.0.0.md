@@ -164,7 +164,7 @@ mListener = new TokenListener() {
 
 ```java
 public void getPhoneInfo(final String appId, 
-												 final String appKey, 
+                         final String appKey, 
                          final TokenListener listener, 
                          final int requestCode)
 ```
@@ -218,7 +218,7 @@ mSmAuthHelper.getPhoneInfo(APP_ID, APP_KEY, mListener, requestCode);
 
 ```java
 public void loginAuth(final String appId, 
-										  final String appKey, 
+                      final String appKey, 
                       final TokenListener listener,
                       final int requestCode)
 ```
