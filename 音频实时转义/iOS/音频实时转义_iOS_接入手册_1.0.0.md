@@ -97,7 +97,7 @@
 
       其中 `matchedResults` 包含的 key 值和 value 类型如下：
 
-      ```json
+      ```txt
       [{
         // 命中的匹配内容，String 类型
         "hitItemContent": "你好", // 数字等于匹配此字段值为数字字符串，如"123"	
@@ -111,7 +111,7 @@
 
       `numbers `包含的 key 值和 value 类型如下：
 
-      ```objective-c
+      ```txt
       [{
         // 提取的数字，整数型
         "number": 123,	
