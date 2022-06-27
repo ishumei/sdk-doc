@@ -10,7 +10,7 @@ keywords:
 - 数美科技
 ---
 
-## 接入文档
+## 接入手册
 ### 浏览器兼容性说明
 
 Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iOS 及 Android 上的内嵌 Webview。
