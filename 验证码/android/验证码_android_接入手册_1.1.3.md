@@ -42,8 +42,9 @@
        Log.d(TAG, "onSuccess rid:" + rid + " pass:" + pass);
      }
    };
-       // 初始化验证码WebView
-       SmCaptchaWebView.SmOption option = new SmCaptchaWebView.SmOption();
+   
+   // 初始化验证码WebView
+   SmCaptchaWebView.SmOption option = new SmCaptchaWebView.SmOption();
    option.setOrganization("xxxxx");     // 必填，组织标识
    option.setAppId("xxxx");                 // 必填，应用标识
    
