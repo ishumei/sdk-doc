@@ -1,16 +1,5 @@
----
-title: 智能验证码_开发文档_WEB SDK_数美科技
-sidebar_label: WEB SDK
-hide_title: true
-description: 数美科技智能验证码WEB SDK，包含数美科技智能验证码WEB SDK的接入说明及数美科技智能验证码WEB SDK的相关注意事项等。
-keywords: 
-- 智能验证码
-- 开发文档
-- WEB SDK
-- 数美科技
----
+## 验证码web-sdk接入手册
 
-## 接入手册
 ### 浏览器兼容性说明
 
 Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iOS 及 Android 上的内嵌 Webview。
@@ -18,6 +7,9 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
 ### 嵌入SDK的详细步骤
 
 **1. 引入初始化js** 
+
+引入最新版js入口文件，版本是：1.0.4
+
 ```js
     // 连接北京机房配置项，无特殊海外业务客户均选用此机房的js
     <script src="https://castatic.fengkongcloud.cn/pr/v1.0.4/smcp.min.js"></script>
@@ -29,8 +21,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
     // <script src="https://castatic-fjny.fengkongcloud.com/pr/v1.0.4/smcp.min.js"></script>
 ```
 
- 
-**2. 初始化**
+**2. 初始化方法**
 ```js
     initSMCaptcha({
         organization: 'xxxx', // 数美后台可以查看公司标识
@@ -48,7 +39,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
     });
 ```
 
-初始化参数配置如下表所示：
+初始化参数如下表所示：
 
 | **字段** | **参数类型**  | **是否必填** | **默认值** | **字段说明** |
 | -- | -- | -- | -- | -- |
@@ -322,7 +313,7 @@ initSMCaptcha({
 | 2004   | 初始化异常 |
 | 2005   | 网络超时   |
 
-**5. 代码示例**
+**5. 完整代码示例**
 
 ```html
 <!DOCTYPE html>
@@ -438,10 +429,6 @@ initSMCaptcha({
 ```
  
 
-**6. Web验证码更多Demo**
+**6. web验证码更多Demo**
 
-在线体验地址  https://castatic.fengkongcloud.cn/pr/v1.0.4/demo.html 
-
-import Meta from '../../common/trial/Meta.jsx';
-
-<Meta />
+在线体验地址：https://castatic.fengkongcloud.cn/pr/v1.0.4/demo.html

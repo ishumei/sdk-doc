@@ -1,18 +1,4 @@
----
-title: 智能验证码_开发文档_WEAPP SDK_数美科技
-sidebar_label: WEAPP SDK
-hide_title: true
-description: 数美科技智能验证码WEAPP SDK，包含数美科技智能验证码WEAPP SDK的接入说明及数美科技智能验证码WEAPP SDK的相关注意事项等。
-keywords: 
-- 智能验证码
-- 开发文档
-- WEAPP SDK
-- 数美科技
-
----
-
-
-## 接入手册
+## 验证码webapp-sdk接入手册
 
 ### 支持的小程序
 
@@ -139,7 +125,3 @@ Page({
 | tipsMessage.sliderPlaceholder | string  | 否  | 向右滑动滑块填充拼图 | 自定义滑块样式，仅滑块验证支持自定义设置 |
 | disabled | boolean | 否  | false | 初始状态是否禁用 |
 | width | string  | 否  | 100% | 验证码宽度，单位支持rpx、%、px。验证码最小宽度200px，最大宽度600px |
-
-import Meta from '../../common/trial/Meta.jsx';
-
-<Meta />
