@@ -109,11 +109,11 @@
 
    
 
-   1. 继承ServerSmidProtocol接口：如 @interface ViewController () <ServerSmidProtocol> 
+   1. 继承ServerSmidProtocol接口：如 `@interface ViewController () <ServerSmidProtocol>`
 
    2. 实现接口的smOnSuccess和smOnError方法,如下：
 
-      ```
+      ```objective-c
       - (void)smOnSuccess:(NSString*) serverId {
           NSLog(@"serverId is : %@", serverId);
       }
