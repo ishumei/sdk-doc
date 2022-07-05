@@ -8,7 +8,7 @@
 
    新增[Allow Arbitrary Loads]配置。如下图所示：
 
-   <img src="./res/res_001.png">
+   <img src="./res/res_001.png" />
 
 3. **初始化数美SDK中WebView控件类**
 

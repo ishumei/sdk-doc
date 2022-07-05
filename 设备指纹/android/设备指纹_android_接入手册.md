@@ -6,7 +6,7 @@
 
    1. 将smsdk-x.x.x-release.aar拷贝到Module的libs目录下，如下图所示：
 
-      <img src="./res/res_001.png">
+      <img src="./res/res_001.png" />
 
    2. 在build.gradle中增加依赖配置，配置如下所示：
  ```groovy
