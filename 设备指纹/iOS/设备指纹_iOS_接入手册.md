@@ -6,17 +6,17 @@
 
    在工程下导入include文件夹和libsmantifraud.a静态库，如下图所示：
 
-   <img src="./res/res_001.png">
+   ![](./res/res_001.png)
 
 2. **添加SDK依赖**
 
    在target下导入如下依赖库：`SystemConfiguration.framework`、`Security.framework`、`AdSupport.framework`、`libresolv.tbd`、`libz.tbd`、`libsqlite3.0.tbd`、`CoreMotion.framework`、`libsmantifraud.a`静态库。如下图所示：
 
-   <img src="./res/res_002.png">
+   ![](./res/res_002.png)
 
 3. **修改Info.plist， 新增`[Allow Arbitrary Loads]`配置。如下图所示**：
 
-   <img src="./res/res_003.png">
+   ![](./res/res_003.png)
 
 4.  **初始化SDK**
 
@@ -101,7 +101,7 @@
 
      勾选后示例如下图所示：
 
-     <img src="./res/res_004.png">
+     ![](./res/res_004.png)
 
 6.  **回调方式获取deviceId，方法如下**
 
