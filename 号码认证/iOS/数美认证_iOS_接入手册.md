@@ -37,7 +37,7 @@ iOS 13 上已完成双卡适配，SDK 通过苹果提供的方法获取运营商
 4. 资源文件:在 Xcode 中务必导入 TYRZResource.bundle 到项目中，否则授权界面显示异常（不显示默
 认图片）。 TARGETS-->Build Phases-->Copy Bundle Resources-> 点击 "+" --> Add
 Other --> SmAuth.xcframework --> ios-arm64_armv7 -->SmAuth.framework -->TYRZResource.bundle --> Open
-5. 导入sdk语句：#import <SmAuth/SmAuth.h>，导入后才能调用 SDK 的方法
+5. 导入sdk语句：`#import <SmAuth/SmAuth.h>`，导入后才能调用 SDK 的方法
 6. 在 info.plist 文件中添加一个子项目 App Transport Security Settings，然后在其中添加一个 key：Allow
 Arbitrary Loads，其值为 YES 。修改后其他运营商才能使用一键登录。
 7. 添加依赖库，在项目设置 TARGETS -> 选项卡Build Phase -> Linked
@@ -203,7 +203,7 @@ _Nonnull sender) {
 
 **当前 VC，注意：使用一键登录服务时，这个值必传**
 
-```
+```objective-c
 @property (nonatomic,strong) UIViewController *currentVC;
 ```
 
@@ -244,7 +244,7 @@ ima.frame = customView.bounds;
 
 |model属性|值类型|属性说明|
 |------|------|------|
-|numberText|NSDictionary<NSAttributedStringKey,id>|手机号码富文本设置（字体大小、颜色）|
+|numberText|`NSDictionary<NSAttributedStringKey,id>`|手机号码富文本设置（字体大小、颜色）|
 |numberOffsetY|CGFloat|号码栏Y相对于界面上边缘y 偏移(优先级比setY_B高)|
 |numberOffsetY_B|CGFloat|号码栏Y相对于界面下边缘y偏移|
 |numberOffsetX|NSNumber|号码栏X相对于默认值的左右偏移|
@@ -283,7 +283,7 @@ ima.frame = customView.bounds;
 | model**属性**    | **值类型**                              | **属性说明**                                                 |
 | ---------------- | --------------------------------------- | ------------------------------------------------------------ |
 | webNavColor      | UIColor                                 | 设置标题栏颜色                                               |
-| webNavTitleAttrs | NSDictionary<NSAttributedStringKey, id> | 设置协议页标题栏字体大小、颜色 (协议页标题，sdk通过读取HTML 的title获取，默认使用"服务条款"作 为标题) |
+| webNavTitleAttrs | `NSDictionary<NSAttributedStringKey, id>` | 设置协议页标题栏字体大小、颜色 (协议页标题，sdk通过读取HTML 的title获取，默认使用"服务条款"作 为标题) |
 | webNavReturnImg  | UIImage                                 | 设置标题栏返回按钮图标                                       |
 
 **横竖屏**
