@@ -47,7 +47,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
 | appId | string | 否 | default | 应用标识，区分不同应用，数美后台可以管理 |
 | channel | string | 否 | default | 推广渠道，可自定义 |
 | product | string | 否 | embed（嵌入式）| 展现形式，支持：embed（嵌入式）、float（浮动式）、popup（弹出层） |
-| mode | string  | 否 | slide | 模式：支持slide（滑动验证码）、select（文字点选验证码）、 icon_select（图标点选验证码）、  seq_select（成语语序验证码）、spatial_select（空间逻辑） |
+| mode | string  | 否 | slide | 模式：支持slide（滑动验证码）、auto_slide（无图片滑动验证码）、select（文字点选验证码）、 icon_select（图标点选验证码）、  seq_select（成语语序验证码）、spatial_select（空间逻辑） |
 | appendTo  | string  | 是 | 无  | 验证码dom元素的id。embed（嵌入式）、float（浮动式）必须配置，popup（弹出层）不需要 |
 | lang | string | 否 | zh-cn（简体中文） | 模式：支持zh-cn（简体中文）、en（英文）、ph（菲律宾语）、ina（印尼语）、tha（泰语）、vn（越南语）、mys（马来语）、jp（日语）及kr(韩语) |
 | useBrowserLang | boolean | 否 | false | 是否高优使用浏览器设置的语言作为验证码的语言 |
@@ -199,7 +199,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
         SMCaptcha.reset();
     });
 ```
-3.12 自定义样式，注意：当时只支持mode是slide两种模式，具体详见下面注释说明
+3.12 自定义样式，注意：当前只支持mode是 slide 和 auto_slide 两种模式，具体详见下面注释说明
 ```js
     initSMCaptcha({
         organization: 'xxxx', //数美后台查看
