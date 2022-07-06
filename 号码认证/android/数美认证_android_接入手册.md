@@ -15,7 +15,7 @@ SDK 支持版本：Android 4.0 及以上
 
 1. 将 `smauth-${verison}.aar` 拷贝到 app  Module 的 libs 目录，如图所示
 
-   <img src="./res/image-20211211111544037.png" alt="image-20211211111544037" style="zoom:100%;" align="left"/>
+   ![](./res/image-20211211111544037.png)
 
    `smauth-x.x.x.aar` 名称中的 `x.x.x` 代表版本号，如 `smauth-1.0.0.aar`
 
@@ -137,7 +137,7 @@ mListener = new TokenListener() {
 
 ### 2.1 使用流程说明
 
-<img src="./res/image-20211211115919958.png" alt="image-20211211115919958" style="zoom:50%;" />
+![](./res/image-20211211115919958.png)
 
 ### 2.2 取号请求
 

@@ -8,13 +8,13 @@
 
    3. 在 Frameworks 中，选择 `Frameworks,Libraries,and Embedded Content` 中，点击 `+` 号  -> Add Other  -> ad d Files -> 选择 `SmRtAsr.xcframework`。如下：
 
-      <img src="./res/res_002.png">
+      ![](./res/res_002.png)
 
-      <img src="./res/res_003.png">
+      ![](./res/res_003.png)
 
    4. 在 target 的 `Build Phases` 的 `Embed Frameworks` 下取消 `SmRtAsr.xcframework` 的引用，如图：
 
-      <img src="./res/res_001.png">
+      ![](./res/res_001.png)
 
    5. SDK 最低支持 iOS 9，支持 bitcode。
 
