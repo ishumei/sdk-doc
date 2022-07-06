@@ -67,13 +67,13 @@ SmFraud.create(optionDic: {
    SmFraud.OPTION_PUBLICKEY: 'YOUR_PUBLICK_KEY', 
 
    //私有化或代理时必填：设置设备数据上传地址
-   SmFraud.OPTION_URL: 'YOUR_URL', 
+   //SmFraud.OPTION_URL: 'YOUR_URL', 
 
    //私有化或代理时必填：设置云配请求地址
-   SmFraud.OPTION_CONFURL: 'YOUR_CONF_URL', 
+   //SmFraud.OPTION_CONFURL: 'YOUR_CONF_URL', 
 
    //选填：是否使用https请求，默认不使用 
-   SmFraud.OPTION_USE_HTTPS: 1,  
+   //SmFraud.OPTION_USE_HTTPS: false,  
 }); 
 ```
 
