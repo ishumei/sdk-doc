@@ -57,7 +57,6 @@
    option.setMode(SmCaptchaWebView.MODE_SLIDE); 
    
    // 选填，支持自定义样式
-   option.setCaptchaHtml("http://castatic-dev.fengkongcloud.com/pr/v1.0.4/index.html");
    Map<String, Object> extOption = new HashMap<>();
    extOption.put("lang", "en"); // 验证码英文主题，默认中文
    
