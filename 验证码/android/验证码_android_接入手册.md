@@ -57,7 +57,6 @@
    option.setMode(SmCaptchaWebView.MODE_SLIDE); 
    
    // 选填，支持自定义样式
-   option.setCaptchaHtml("http://castatic-dev.fengkongcloud.com/pr/v1.0.4/index.html");
    Map<String, Object> extOption = new HashMap<>();
    extOption.put("lang", "en"); // 验证码英文主题，默认中文
    
@@ -67,7 +66,7 @@
            "  \"customFont\": { \n" +
            "    \"name\": \"Walsheim\",\n" + // 字体名，没有特别的限制
            // 这个ttf文件必须由客户配置，必须是绝对地址，以https或是http开头的url，且必须支持跨域(设置CORS)
-           "    \"url\": \"http://castatic-dev.fengkongcloud.com/pr/v1.0" +
+           "    \"url\": \"http://castatic.fengkongcloud.com/pr/v1.0" +
            ".4/assets/GT-Walsheim-Pro-Bold.ttf\"\n" +
            "  },\n" +
            "  \"fontFamily\": \"Arial\",\n" + // 与customFont只能存在一种，不然会覆盖自定义字体
