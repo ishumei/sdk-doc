@@ -73,7 +73,6 @@
    
    [caOption setTipMessage:@"xxxxx"];      // 选填，自定义提示文字，仅滑动式支持
    [caOption setChannel:@"xxxxx"];                   // 选填，渠道标识
-   [caOption setDeviceId:@"xxxxx"];   // 选填，数美反欺诈SDK获取到的设备标识
    
    // 连接新加坡机房特殊配置项，仅供验证码数据上报新加坡机房客户使用 
    // [caOption setCdnHost:@"castatic-xjp.fengkongcloud.com"];
