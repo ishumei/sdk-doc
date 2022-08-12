@@ -42,7 +42,7 @@
            @"customFont": @{ // 自定义字体
                @"name": @"Walsheim", // 字体名，没有特别的限制
                // 这个ttf文件必须由客户配置，必须是绝对地址，以https或是http开头的url，且必须支持跨域(设置CORS)。
-               @"url": @"http://castatic-dev.fengkongcloud.com/pr/v1.0.4/assets/GT-Walsheim-Pro-Bold.ttf",
+               @"url": @"http://castatic.fengkongcloud.com/pr/v1.0.4/assets/GT-Walsheim-Pro-Bold.ttf",
            },
            // 滑动式（MODE_SLIDE）模式下，自定义样式 withTitle 为 true 时，内容宽高比为 6:5，其它样式 3:2
            @"withTitle":@(YES),
