@@ -95,7 +95,6 @@
            "    }\n" +
            "  }\n" +
            "}"));
-   extOption.put("style", json);
    option.setExtOption(extOption);
    
    option.setTipMessage ("xxxx");       // 选填，自定义提示文字，仅滑动式支持
