@@ -1,600 +1,436 @@
-# 数美认证 SDK 接入文档
+# smauth-demo-android
 
-## 1 开发环境配置
+smauth 手机号一键登录 SDK Demo for Android
 
-SDK 支持版本：Android 4.0 及以上
+## SDK 位置
 
-**注意事项：**
+`Demo/app/libs/smauth*.aar`
 
-1. 数美认证由中国移动北京公司提供技术支持，避免项目同时接入中国移动认证 SDK 和本 SDK
-1. 一键登录服务必须打开蜂窝数据流量并且手机操作系统给予应用蜂窝数据权限才能使用
-2. 取号请求过程需要消耗用户少量数据流量（国外漫游时可能会产生额外的费用）
-3. 一键登录服务目前支持中国移动 2/3/4G（2G, 3G 因为无线网络环境问题，时延和成功率会比 4G 低） 和中国电信 4G、中国联通 4G
+## 工程配置
 
-### 1.1 导入 SDK 包
+### 导入 SDK 及依赖包
 
-1. 将 `smauth-${verison}.aar` 拷贝到 app  Module 的 libs 目录，如图所示
-
-   ![](./res/image-20211211111544037.png)
-
-   `smauth-x.x.x.aar` 名称中的 `x.x.x` 代表版本号，如 `smauth-1.0.0.aar`
-
-2. 在 `app/build.gradle` 文件中添加如下配置
-
-```groovy
-dependencies {
-	// 需要将 SDK 添加到 libs 中，并将 smauth-x.x.x.aar 替换为对应版本 SDK
-	implementation fileTree(dir: "libs", include: ["smauth-x.x.x.aar"])
-}
+``` java
+implementation 'com.google.code.gson:gson:2.8.8'
+implementation fileTree(dir: "libs", include: "smauth*.aar")
 ```
 
-3. 在 `AndroidManifest.xml` 文件中添加权限
+### 配置 AndroidManifest
 
 ```xml
-<!-- 添加必要的权限支持 -->
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-
-<!-- 建议的权限 -->
-<!-- 强烈建议开发者申请本权限，本权限主要用于在双卡情况下，更精准的获取数据流量卡的运营商类型 --> 
-<!-- 缺少该权限，存在取号失败概率上升的风险。 -->
-<!-- 同时，向用户申请此权限时，请按照国家相关法规向用户说明权限的用途，尊重用户个人隐私。 -->
-<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-```
-
-权限说明
-
-| 权限                 | 说明                                       |
-| -------------------- | ------------------------------------------ |
-| INTERNET             | 允许应用程序联网，用于访问网关和认证服务器 |
-| READ_PHONE_STATE     | 获取 imsi 用于判断双卡和换卡               |
-| ACCESS_WIFI_STATE    | 允许程序访问 WiFi 网络状态信息             |
-| ACCESS_NETWORK_STATE | 获取网络状态，判断是否数据、wifi 等        |
-| CHANGE_NETWORK_STATE | 允许程序改变网络连接状态                   |
-
-4. 配置授权登录 **activity**
-
-```xml
-<activity
-  android:name="com.cmic.gen.sdk.view.GenLoginAuthActivity"
-  android:configChanges="orientation|keyboardHidden|screenSize"
-  android:launchMode="singleTop"
-  android:screenOrientation="unspecified" />
-```
-
-5. SDK 最低支持 Android API LEVEL 14，确保项目 minSdkVersion 版本不小于 14
-
-```groovy
-// build.gradle
-android {
-  ...
-  defaultConfig {
-    minSdkVersion 14
-    ...
-  }
-  ...
-}
-```
-
-上述导入过程是在 Android Studio 进行，如在其他 IDE 中使用 SDK 需要自行适配。
-
-
-
-### 1.2 SDK 代码接入
-
-#### 1.2.1 创建 SmAuthHelper 实例
-
-SmAuthHelper 是 SDK 的功能入口，所有的接口调用都得通过 SmAuthHelper 进行调用。因此，调用 SDK，首先需要创建一个 SmAuthHelper 实例
-
-方法原型
-
-```java
-public static SmAuthHelper getInstance(Context context)
-```
-
-参数说明
-
-| 参数    | 类型    | 说明                                                   |
-| ------- | ------- | ------------------------------------------------------ |
-| context | Context | 调用者的上下文环境，其中 activity 中 this 即可以代表。 |
-
-示例代码
-
-```java
-public void onCreate(Bundle savedInstanceState) { 
-  super.onCreate(savedInstanceState); 
-  mContext = this; 
-  mSmAuthHelper = SmAuthHelper.getInstance(mContext); 
-}
-```
-
-#### 1.2.2 实现回调
-
-所有的 SDK 接口调用，都会传入一个回调，用于接收 SDK 返回的调用结果。结果为 `SDKRequestCode` 与 `JSONObject`。`SDKRequestCode` 为请求标识码，与请求参数中的 SDKRequestCode 呼应，SDKRequestCode = 用户传的 requestCode，如果开发者没有传 requestCode，那么 SDKRequestCode = -1
-
-`TokenListener` 的实现示例代码如下
-
-```java
-mListener = new TokenListener() { 
-  @Override 
-  public void onGetTokenComplete(int SDKRequestCode, JSONObject jObj) { 
-    if (jObj != null) {
-      mResultString = jObj.toString(); 
-      mHandler.sendEmptyMessage(RESULT); 
-      if (jObj.has("token")) { 
-        mtoken = jObj.optString("token"); 
-      } 
-    } 
-  }
-}
+<application>
+    <activity
+            android:name="com.cmic.gen.sdk.view.GenLoginAuthActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="behind" />
+</application>
 ```
 
 
 
-## 2 一键登录功能
+## 初始化
 
-### 2.1 使用流程说明
-
-![](./res/image-20211211115919958.png)
-
-### 2.2 取号请求
-
-本方法用于发起取号请求，SDK 完成网络判断、蜂窝数据网络切换等操作并缓存凭证 scrip。缓存允许用户在未开启蜂窝网络时成功取号。 取号接口使用 http 请求，开发者需按照安卓网络安全配置适配。 Android P 及以上可降低 targetSdkVersion 版本，或在 res 的 xml 目录下，新建一个 xml 文件(名称自定义，如：network_security_config.xml)
-
-```xml
-<?xml version="1.0" encoding="utf-8"?> 
-<network-security-config> 
-  <base-config cleartextTrafficPermitted="true" /> 
-</network-security-config>
-```
-
-并在 manifest 清单文件配置
-
-```xml
-<application 
-    ... 
-    android:networkSecurityConfig="@xml/network_security_config" 
-    ... 
-/>
-```
-
-取号方法原型
-
-```java
-public void getPhoneInfo(final String appId, 
-                         final String appKey, 
-                         final TokenListener listener, 
-                         final int requestCode)
-```
-
-参数说明
-
-| 参数        | 类型         | 说明                                                         |
-| ----------- | ------------ | ------------------------------------------------------------ |
-| appId       | String       | 应用的 AppID                                                 |
-| appkey      | String       | 应用密钥                                                     |
-| listener    | TokenListene | TokenListener 为回调监听器，是一个 java 接口，需要调用者自己实现；<br />TokenListener 是接口中的认证登录 token 回调接口，OnGetTokenComplete 是该接口中唯一的抽象方法，即 `void OnGetTokenComplete(JSONObject jsonobj)` |
-| requestCode | int          | 请求标识码。<br />与响应参数中的 SDKRequestCode 呼应，SDKRequestCode = 用户传的 requestCode，如果开发者没有传 requestCode，那么 SDKRequestCode = -1 |
-
-响应参数，OnGetTokenComplete 的参数 JSONObject，含义如下
-
-| 字段                         | 类型   | 含义                                                   |
-| ---------------------------- | ------ | ------------------------------------------------------ |
-| resultCode                   | String | 接口返回码，`"103000"` 为成功。具体返回码见 SDK 返回码 |
-| desc/resultString/resultDesc | String | 成功标识，true 为成功。                                |
-| traceId                      | String | 主要用于定位问题                                       |
-
-示例代码
-
-```java
-/*** 判断和获取 READ_PHONE_STATE 权限逻辑 ***/
-
-// 创建 SmAuthHelper 实例
-public void onCreate(Bundle savedInstanceState) { 
-    super.onCreate(savedInstanceState); 
-    mContext = this; 
-    mSmAuthHelper = SmAuthHelper.getInstance(mContext); 
-} 
-
-// 实现取号回调 
-mListener = new TokenListener() { 
-    @Override 
-    public void onGetTokenComplete(int SDKRequestCode, JSONObject jObj) {
-        // 应用接收到回调后的处理逻辑 
-    } 
-};
-
-// 调用取号方法
-mSmAuthHelper.getPhoneInfo(APP_ID, APP_KEY, mListener, requestCode);
-```
-
-### 2.3 授权请求
-
-应用调用本方法时，SDK 将拉起用户授权页面，用户确认授权后，SDK 将返回 token 给应用客户端。可通过返回码 200087 监听授权页是否成功拉起。
-
-#### 2.3.1 授权请求方法原型
-
-```java
-public void loginAuth(final String appId, 
-                      final String appKey, 
-                      final TokenListener listener,
-                      final int requestCode)
-```
-
-请求参数
-
-| 参数        | 类型          | 说明                                                         |
-| ----------- | ------------- | ------------------------------------------------------------ |
-| appId       | String        | 应用的 AppID                                                 |
-| appkey      | String        | 应用密钥                                                     |
-| listener    | TokenListener | TokenListener 为回调监听器，是一个 java 接口， 需要调用者自己实现；<br />TokenListener 是接口中的 认证登录 token 回调接口，OnGetTokenComplete 是该接口中唯一的抽象方法，即 `void OnGetTokenComplete(JSONObject jsonobj)` |
-| requestCode | int           | 请求标识码。与响应参数中的 SDKRequestCode 呼应，SDKRequestCode = 用户传的 requestCode，如果开发者没有传 requestCode，那么 SDKRequestCode = -1 |
-
-响应参数
-
-OnGetTokenComplete 的参数 JSONObject，含义如下
-
-| 字段                         | 类型   | 含义                                                         |
-| ---------------------------- | ------ | ------------------------------------------------------------ |
-| resultCode                   | String | 接口返回码，`"103000"`为成功。具体响应码见 SDK 返回码        |
-| desc/resultString/resultDesc | String | 失败时返回：返回错误码说明                                   |
-| authType                     | String | 认证类型： <br />    0: 其他；<br />    1:WiFi 下网关鉴权；<br />    2:网关鉴权； |
-| authTypeDes                  | String | 认证类型描述，对应 authType                                  |
-| token                        | String | 成功时返回：临时凭证，token 有效期 2min，一次有效；<br />同一用户（手机号）10 分钟内获取 token 且未使用的数量不超过 30 个 |
-| traceId                      | String | 主要用于定位问题                                             |
-
-示例代码
-
-```java
-// 创建 SmAuthHelper 实例 
-public void onCreate(Bundle savedInstanceState) { 
-  super.onCreate(savedInstanceState); 
-  mContext = this; 
-  mSmAuthHelper = SmAuthHelper.getInstance(mContext); 
-} 
-
-// 实现取号回调 
-mListener = new TokenListener() { 
-  @Override 
-  public void onGetTokenComplete(int SDKRequestCode, JSONObject jObj) {
-    // 应用接收到回调后的处理逻辑 
-  } 
-};
-
-//调用一键登录方法
-mSmAuthHelper.loginAuth(APP_ID, APP_KEY, mListener, requestCode);
-```
-
-#### 2.3.2 授权页面的回调方法
-
-| 方法名         | 说明                         |
-| -------------- | ---------------------------- |
-| pageInListener | 可以获得授权页面是否成功回调 |
-
-示例代码
-
-```java
-mSmAuthHelper.setPageInListener(new LoginPageInListener() { 
-  @Override 
-  public void onLoginPageInComplete(String resultCode, JSONObject jsonObj) { 
-    if(resultCode.equals("200087")){ 
-      Log.d("initSDK","page in---------------"); 
-    } 
-  } 
-});
-```
-
-### 2.4 授权页面设计
-
-为了确保用户在登录过程中将手机号码信息授权给开发者使用的知情权，一键登录需要开发者提供授权页登录页面供用户授权确认。开发者在调用授权登录方法前，必须弹出授权页，明确告知用户当前操作会将用户的本机号码信息传递给应用。
-
-#### 2.4.1 页面规范细则
-
- ![](./res/WX20220412-110849.png)
-
-**注意：**
-
-1. **开发者不得通过任何技术手段，破解授权页，或将授权页面的号码栏、隐私栏、品牌露出内容隐藏、覆盖。**
-2. **登录按钮文字描述必须包含 “登录” 或 “注册” 等文字，不得诱导用户授权。**
-3. **对于接入移动认证 SDK 并上线的应用，我方会对上线的应用授权页面做审查，如果有出现未按要求弹出或设计授权页面的，将关闭应用的认证取号服务。**
-
-#### 2.4.2 修改页面主题
-
-开发者可以通过 `setAuthThemeConfig` 方法修改授权页面主题
-
-方法原型
-
-```java
-public void setAuthThemeConfig(AuthThemeConfig authThemeConfig)
-```
-
-参数说明
-
-| 参数            | 类型            | 说明                                                         |
-| --------------- | --------------- | ------------------------------------------------------------ |
-| authThemeConfig | AuthThemeConfig | 主题配置对象，由 AuthThemeConfig.Builder().build()创建，开发者通过对 builder 中调用对应的方法配置授权页中对应的元素 |
-
-AuthThemeConfig.java 配置元素说明
-
-**状态栏**
-
-| 方法         | 说明                                                         |
-| ------------ | ------------------------------------------------------------ |
-| setStatusBar | 设置状态栏颜色（系统版本 5.0 以上可设置）、字体颜色（系统版本 6.0 以上可设置黑色、白色）。 |
-
-**服务条款导航栏**
-
-| 方法                 | 说明                                            |
-| -------------------- | ----------------------------------------------- |
-| setNavTextColor      | 设置服务条款标题字体颜色                        |
-| setNavColor          | 设置服务条款标题颜色                            |
-| setNavTextSize       | 设置服务条款标题字体大小                        |
-| setClauseLayoutResID | 设置服务条款标题布局资源文件 ID（包括返回按钮） |
-
-**授权页布局**
-
-| 方法               | 说明                    |
-| ------------------ | ----------------------- |
-| setAuthContentView | 设置授权页布局显示 View |
-| setAuthLayoutResID | 设置授权页布局文件 ID   |
-
-**安卓底部导航栏自适应**
-
-| 方法                 | 说明                                                         |
-| -------------------- | ------------------------------------------------------------ |
-| setFitsSystemWindows | 开启安卓底部导航栏自适应，开启后，导航栏唤起时，授权页面元素也会相对变化；<br />不开启自适应，自定义内容可以铺满全屏，设置状态栏透明后，可以达到沉浸式显示效果。<br />0: 开启自适应（默认开启）<br />1: 关闭自适应 |
-
-**授权页号码栏**
-
-| 方法                 | 说明                                  |
-| -------------------- | ------------------------------------- |
-| setNumberColor       | 设置手机号码字体颜色                  |
-| setNumberSize        | 设置号码栏字体大小、字体粗细          |
-| setNumFieldOffsetY   | 设置号码栏相对于状态栏下边缘 y 偏移   |
-| setNumFieldOffsetY_B | 设置号码栏相对于底部 y 偏移           |
-| setNumberOffsetX     | 设置号码栏相对于默认位置的 x 轴偏移量 |
-
-**授权页登录按钮**
-
-| 方法                   | 说明                                               |
-| ---------------------- | -------------------------------------------------- |
-| setLogBtnText          | 设置登录按钮文本内容、字体颜色、字体大小、字体粗细 |
-| setLogBtnImgPath       | 设置授权登录按钮图片                               |
-| setLogBtn              | 设置登录按钮的宽高                                 |
-| setLogBtnMargin        | 设置登录按钮相对于屏幕左右边缘边距                 |
-| setLogBtnOffsetY       | 设置登录按钮相对于状态栏下边缘 y 偏移              |
-| setLogBtnOffsetY_B     | 设置登录按钮相对于底部 y 偏移                      |
-| setLogBtnClickListener | 设置登录按钮点击监听事件                           |
-
-**授权页隐私栏**
-
-| 方法                     | 说明                                                         |
-| ------------------------ | ------------------------------------------------------------ |
-| setPrivacyAlignment      | 设置隐私条款的协议文本，自定义条款，自定义条款链接（支持四份条款） |
-| setPrivacyText           | 设置隐私条款的字体大小，文本颜色，是否居中。协议标题和其他文案可以分开设置文本颜色 |
-| setCheckBoxImgPath       | 设置复选框图片                                               |
-| setCheckTipText          | 设置未勾选提示的自定义提示文案。不设置则无提示               |
-| setPrivacyOffsetY        | 设置隐私条款相对于状态栏下边缘 y 偏移                        |
-| setPrivacyOffsetY_B      | 设置隐私条款相对于底部 y 偏移                                |
-| setPrivacyMargin         | 设置隐私条款距离手机左右边缘的边距                           |
-| setPrivacyState          | 设置是否默认勾选复选框                                       |
-| setPrivacyBookSymbol     | 设置书名号，0=设置，1=不设置，默认设置                       |
-| setCheckBoxLocation      | 设置复选框相对右侧协议文案居上或者居中，默认居上。0-居上，1-居中 |
-| setCheckedChangeListener | 设置授权页勾选框是否勾选的监听事件                           |
-
-**授权页转场动画**
-
-| 方法              | 说明               |
-| ----------------- | ------------------ |
-| setAuthPageActIn  | 设置授权页进场动画 |
-| setAuthPageActOut | 设置授权页出场动画 |
-
-**弹窗模式**
-
-| 方法                    | 说明                                                         |
-| ----------------------- | ------------------------------------------------------------ |
-| setAuthPageWindowMode   | 设置授权页窗口宽高比例                                       |
-| setAuthPageWindowOffset | 设置授权页窗口 X 轴 Y 轴偏移                                 |
-| setWindowBottom         | 设置授权页是否居于底部，0=居中；1=底部，设置为 1Y 轴的偏移失效 |
-| setThemeId              | 设置授权页弹窗主题，也可在 Manifest 设置                     |
-| setBackButton           | 弹窗授权页模式下，设置物理返回键是否有效，默认有效。true=有效，false=无效。 |
-
-**授权页语言切换**
-
-| model 属性      | 属性说明                     |
-| --------------- | ---------------------------- |
-| appLanguageType | 0.中文简体 1.中文繁体 2.英文 |
-
-**返回键监听**
-
-| 方法                   | 说明                                 |
-| ---------------------- | ------------------------------------ |
-| setBackPressedListener | 设置授权页返回键监听事件             |
-| setCheckBoxListener    | 设置授权页勾选框和登录按钮的监听事件 |
-
-#### 2.4.3 finish 授权页
-
-SDK 完成回调后，**不会立即关闭授权页面**，需要开发者主动调用离开授权页面方法去完成页面的关闭
-
-方法原型
-
-```java
-public void quitAuthActivity()
+``` java
+SmAuthHelper.create(context).register(applicationId, listener);
 ```
 
 
 
-## 3 本机号码校验
+## API
 
-### 3.1 使用流程说明
+### SmAuthHelper
 
-![image-20211211161418508](./res/image-20211211161418508.png)
-
-### 3.2 取号请求
-
-详情可参考一键登录的取号请求说明
-
-### 3.3 本机号码校验请求 token
-
-开发者可以在应用内部任意页面调用本方法，获取本机号码校验的接口调用凭证（token）
-
-本机号码校验方法原型
-
-```java
-public void mobileAuth(final String appId, 
-                       final String appKey, 
-                       final TokenListener listener, 
-                       final int requestCode)
+#### 获取SDK version
+``` java
+public static String sdkVersion()
 ```
 
-请求参数说明
-
-| 参数        | 类型          | 说明                                                         |
-| ----------- | ------------- | ------------------------------------------------------------ |
-| appId       | String        | 应用的 AppID                                                 |
-| appkey      | String        | 应用密钥                                                     |
-| listener    | TokenListener | TokenListener 为回调监听器，是一个 java 接口，需要调用者自己实现；TokenListener 是接口中的认证登录 token 回调接口，OnGetTokenComplete 是该接口中唯一的抽象方法，即 `void OnGetTokenComplete(JSONObject jsonobj)` |
-| requestCode | int           | 请求标识码。与响应参数中的 SDKRequestCode 呼应，SDKRequestCode = 用户传的 requestCode，如果开发者没有传 requestCode，那么 SDKRequestCode = -1 |
-
-响应参数
-
-OnGetTokenComplete 的参数 JSONObject，含义如下
-
-| 字段        | 类型   | 含义                                                         |
-| ----------- | ------ | ------------------------------------------------------------ |
-| resultCode  | String | 接口返回码，`"103000"` 为成功。具体响应码见 SDK 返回码       |
-| authType    | String | 登录类型。                                                   |
-| authTypeDes | String | 登录类型中文描述。                                           |
-| token       | String | 成功返回: 临时凭证<br />token 有效期 2min，一次有效，同一用户（手机号）10 分钟内获取 token 且未使用的数量不超过 30 个 |
-| traceId     | String | 主要用于定位问题                                             |
-
-示例代码
-
-```java
-// 创建 SmAuthHelper 实例 
-public void onCreate(Bundle savedInstanceState) { 
-  super.onCreate(savedInstanceState); 
-  mContext = this;
-  mSmAuthHelper = SmAuthHelper.getInstance(mContext); 
-} 
-
-// 实现校验回调 
-mListener = new TokenListener() {
-  @Override 
-  public void onGetTokenComplete(int SDKRequestCode, JSONObject jObj) {
-    // 应用接收到回调后的处理逻辑 
-  } 
-};
-
-// 调用本机号码校验方法 
-mSmAuthHelper.mobileAuth(APP_ID, APP_KEY, mListener, requestCode);
+#### 创建SmAuthHelper实例
+``` java
+public static SmAuthHelper create(Context context)
 ```
 
+* parameter:
+    * context: Android 上下文
+* return:
+    * SmAuthHelper实例
 
 
-## 4 其它 SDK 请求方法
-
-### 4.1 获取网络状态和运营商类型
-
-原型
-
-```java
-public JSONObject getNetworkType(Context context)
+#### 获取SmAuthHelper实例
+``` java
+public static SmAuthHelper getInstance()
 ```
 
-请求参数
+* parameter:
+    * -
+* return:
+    * SmAuthHelper实例
 
-| 参数    | 类型    | 说明       |
-| ------- | ------- | ---------- |
-| context | Context | 上下文对象 |
-
-响应参数
-
-参数 JSONObject，含义如下
-
-| 参数         | 类型   | 说明                                                         |
-| ------------ | ------ | ------------------------------------------------------------ |
-| operatorType | String | 运营商类型： <br /> 1.移动流量；<br /> 2.联通流量； <br /> 3.电信流量 |
-| networkType  | String | 网络类型：<br /> 0.未知； <br /> 1.流量； <br /> 2.wifi；<br /> 3.数据流量+wifi |
-
-### 4.2 **删除临时取号凭证** 
-
-开发者取号或者授权成功后，SDK 将取号的一个临时凭证缓存在本地，缓存允许用户在未开启蜂窝网络时成功取号。开发者可以使用本方法删除该缓存凭证。 
-
-原型
-
-```java
-public void delScrip()
+#### 销毁SmAuthHelper实例
+``` java
+public static void destroy()
 ```
 
-### 4.3 设置取号超时
+* parameter:
+    * -
+* return:
+    * -
 
-设置取号超时时间，默认为 8000 毫秒。
+#### 注册服务
+``` java
+public void register(SmAuthRegisterListener listener)
+```
+* parameter:
+    * listener: 注册callback
+* return:
+    * -
 
-开发者设置取号请求方法（getPhoneInfo）、授权请求方法（loginAuth），本机号码校验请求 token 方法（mobileAuth）的超时时间。开发者在使用 SDK 方法前，可以通过本方法设置将要使用的方法的超时时间。
+``` java
+public void register(String applicationId, SmAuthRegisterListener listener)
+```
+* parameter:
+    * applicationId: 控制台上登记APP信息后分配的applicationId
+    * listener: 注册callback
+* return:
+    * -
 
-原型
-
-```java
-public void setOverTime(long overTime)
+#### 预取号
+``` java
+public void preloadAuthorization(SmAuthPreloadListener listener, int requestCode)
 ```
 
-请求参数
+* parameter:
+    * listener: 预取号callback
+    * requestCode: 请求码，callback中会返回该请求码
+* return:
+    * -
 
-| 参数     | 类型 | 说明                       |
-| -------- | ---- | -------------------------- |
-| overTime | long | 设置超时时间（单位：毫秒） |
+#### 自定义授权页UI配置
+``` java
+public void setAuthThemeConfigure(ThemeConfig theme)
+```
 
+* parameter:
+    * theme: UI配置项
+* return:
+    * -
 
+#### 取号授权（弹出授权页）
+``` java
+public void loginAuth(SmAuthTokenListener listener, int requestCode)
+```
 
+* parameter:
+    * listener: 取号授权callback
+    * requestCode: 请求码，callback中会返回该请求码
+* return:
+    * -
 
-## 5 SDK 返回码说明
+#### 退出授权页
+``` java
+public void quitLoginAuth()
+```
 
-|返回码 |返回码描述 |
-|---|---|
-|103000 |成功 |
-|102507 |登录超时（授权页点登录按钮时） |
-|103101 |请求签名错误（若发生在客户端，可能是 appkey 传错，可检查是否跟 appsecret 弄混，或者有空格。若发生在服务端接口，需要检查验签方式是 MD5 还是 RSA， 如果是 MD5，则排查 signType 字段，若为 appsecret，需确认是否误用了 appkey 生签。如果是 RSA，需要检查使用的私钥跟报备的公钥是否对应和报文拼接是 否符合文档要求。） |
-|103102 |包签名错误（社区填写的 appid 和对应的包名包签名必须一致） |
-|103111 |网关 IP 错误（检查是否开了 vpn 或者境外 ip） |
-|103119 |appid 不存在（检查传的 appid 是否正确或是否有空格） |
-|103211 |其他错误，（常见于报文格式不对，先请检查是否符合这三个要求：a、json 形 式的报文交互必须是标准的 json 格式；b、发送时请设置 content type 为 application/json；c、参数类型都是 String。如有需要请联系数美客服） |
-|103412 |无效的请求（1.加密方式错误；2.非 json 格式；3.空请求等） |
-|103414 |参数校验异常 |
-|103511 |服务器 ip 白名单校验失败 |
-|103811 |token 为空 |
-|103902 |scrip 失效（客户端高频调用请求 token 接口） |
-|103911 |token 请求过于频繁，10 分钟内获取 token 且未使用的数量不超过 30 个 |
-|104201 |token 已失效或不存在（重复校验或失效）|
-|105001 |联通取号失败 |
-|105002 |移动取号失败（一般是物联网卡） |
-|105003 |电信取号失败 |
-|105012 |不支持电信取号 |
-|105013 |不支持联通取号 |
-|105018 |token 权限不足（使用了本机号码校验的 token 获取号码） |
-|105019 |应用未授权（未在开发者社区勾选能力） |
-|105021 |当天已达取号限额 |
-|105302 |appid 不在白名单 |
-|105312 |余量不足（体验版到期或套餐用完） |
-|105313 |非法请求 |
-|200002 |用户未安装 sim 卡 |
-|200005 |用户未授权（READ_PHONE_STATE） |
-|200020 |授权页关闭 |
-|200021 |数据解析异常（一般是卡欠费） |
-|200022 |无网络 |
-|200023 |请求超时 |
-|200024 |数据网络切换失败 |
-|200025 |其他错误（socket、系统未授权数据蜂窝权限等，如需要协助，请联系数美客服）|
-|200026 |输入参数错误 |
-|200027 |未开启数据网络或网络不稳定 |
-|200028 |网络异常 |
-|200038 |异网取号网络请求失败 |
-|200039 |异网取号网关取号失败 |
-|200040 |UI 资源加载异常 |
-|200050 |EOF 异常 |
-|200072 |CA 根证书校验失败 |
-|200080 |本机号码校验仅支持移动手机号 |
-|200082 |服务器繁忙 |
-|200087 |授权页成功调起|
+* parameter:
+    * -
+* return:
+    * -
+
+#### 手机号校验授权
+``` java
+public void verifyMobile(SmAuthVerifyMobileListener listener, int requestCode)
+```
+
+* parameter:
+    * listener: 手机号校验授权callback
+    * requestCode: 请求码，callback中会返回该请求码
+* return:
+    * -
+
+#### 获取当前网络状态及运营商信息
+``` java
+public NetworkInfo getNetworkInfo()
+```
+
+* parameter:
+    * -
+* return:
+    * 当前网络状态及运营商信息
+
+#### 设置服务接口超时时间
+``` java
+public void setTimeout(long overtime)
+```
+
+* parameter:
+    * overtime: 超时时间（毫秒）
+* return:
+    * -
+
+### 自定义授权页配置项 (ThemeConfig.Builder)
+``` java
+// 设置状态栏颜色
+public Builder setStatusBar(int statusBarColor, boolean isLightColor)
+// 设置自定义ContentView
+public Builder setAuthContentView(View contentView)
+// 设置手机号码字体大小
+public Builder setNumberSize(int numberSize, boolean isBold)
+// 设置手机号码字体颜色
+public Builder setNumberColor(int numberColor)
+// 设置手机号码的横向位置偏移
+public Builder setNumberOffsetX(int numberOffsetX)
+// 设置手机号码的纵向位置相对于顶部偏移
+public Builder setNumFieldOffsetY(int numFieldOffsetY)
+// 设置手机号码的纵向位置相对于底部偏移
+public Builder setNumFieldOffsetY_B(int numFieldOffsetY_B)
+// 设置授权按钮文本
+public Builder setLogBtnText(String logBtnText)
+// 设置授权按钮文本以及字体信息
+public Builder setLogBtnText(String logBtnText, int logBtnTextColor, int logBtnTextSize, boolean isBold)
+// 设置授权按钮字体颜色
+public Builder setLogBtnTextColor(int logBtnTextColor)
+// 设置授权按钮背景资源名称（btn.png就填btn）
+public Builder setLogBtnImgPath(String logBtnBackgroundPath)
+// 设置授权按钮尺寸
+public Builder setLogBtn(int width, int height)
+// 设置授权按钮横向margin
+public Builder setLogBtnMargin(int marginLeft, int marginRight)
+// 设置授权按钮的纵向位置相对于顶部偏移
+public Builder setLogBtnOffsetY(int logBtnOffsetY)
+// 设置授权按钮的纵向位置相对于底部偏移
+public Builder setLogBtnOffsetY_B(int logBtnOffsetY_B)
+// 设置协议勾选框未选中时的提示文本
+public Builder setCheckTipText(String checkTipText)
+// 设置协议勾选框选中状态图片资源名称
+public Builder setCheckedImgPath(String checkedImgPath)
+// 设置协议勾选框未选中状态图片资源名称
+public Builder setUncheckedImgPath(String uncheckedImgPath)
+// 设置协议勾选框详情
+public Builder setCheckBoxImgPath(String checkedImgPath, String uncheckedImgPath, int width, int height)
+// 设置协议默认勾选状态
+public Builder setPrivacyState(boolean privacyState)
+// 设置协议字体颜色
+public Builder setClauseColor(int clauseBaseColor, int clauseColor)
+// 设置协议横向margin
+public Builder setPrivacyMargin(int privacyMarginLeft, int privacyMarginRight)
+// 设置协议纵向相对于顶部的偏移
+public Builder setPrivacyOffsetY(int privacyOffsetY)
+// 设置协议纵向相对于底部的偏移
+public Builder setPrivacyOffsetY_B(int privacyOffsetY_B)
+// 设置协议名称是否显示书名号
+public Builder setPrivacyBookSymbol(boolean haveBookSymbol)
+// 设置复选框相对右侧协议文案居上或者居中，默认居上。0-居上，1-居中
+public Builder setCheckBoxLocation(int checkBoxLocation)
+// 设置协议政策勾选框的勾选状态切换回调
+public Builder setPrivacyCheckedChangeListener(SmAuthPrivacyCheckedChangeListener listener)
+// 设置授权页的进场动画
+public Builder setAuthPageActIn(String authPageActIn, String activityOut)
+// 设置授权页的退场动画
+public Builder setAuthPageActOut(String activityIn, String authPageActOut)
+// 设置授权页窗口宽高比例
+public Builder setAuthPageWindowMode(int windowWidth, int windowHeight)
+// 设置授权页窗口X轴Y轴偏移
+public Builder setAuthPageWindowOffset(int windowX, int windowY)
+// 设置授权页是否居于底部，0=居中；1=底部，设置为1Y轴的偏移失效
+public Builder setWindowBottom(int windowBottom)
+// 设置授权页弹窗主题，也可在Manifest设置
+public Builder setThemeId(int themeId)
+// 0.中文简体1.中文繁体2.英文
+public Builder setAppLanguageType(int appLanguageType)
+/** 开启安卓底部导航栏自适应，开启后，导航栏唤起时，授权页面元素也会相对变化；
+  * 不开启自适应，自定义内容可以铺满全屏，设置状态栏透明后，可以达到沉浸式显示效果。
+  * 0-开启自适应，1-关闭自适应，默认开启。
+**/
+public Builder setFitsSystemWindows(boolean isFitsSystemWindows)
+```
+
+### SmAuthRegisterListener
+
+``` java
+// 注册完成
+void onRegisted(boolean isSuccess, Exception exception);
+```
+
+### SmAuthPreloadListener
+
+``` java
+// 预取号完成
+void onPreloaded(int requestCode, PreloadResultBean token);
+// 预取号失败
+void onPreloadFailed(int requestCode, Exception exception);
+```
+
+### SmAuthTokenListener
+
+``` java
+// 获取授权Token完成
+void onGetToken(int requestCode, TokenBean token);
+// 获取授权Token失败
+void onGetTokenFailed(int requestCode, Exception exception);
+```
+
+### SmAuthVerifyMobileListener
+
+``` java
+// 校验完成
+void onVerified(int requestCode, VerifyMobileBean result);
+// 校验失败
+void onVerifiedFailed(int requestCode, Exception exception);
+```
+
+## 运营商SDK错误码
+
+> 在调用号码认证服务一键登录和本机号码校验功能的接口时，会返回运营商对应接口的错误码。常见接口错误码、错误描述，可参考下述
+
+### 中国移动
+
+| **状态码** | **状态码描述**                                               |
+| ---------- | ------------------------------------------------------------ |
+| 103000     | 成功                                                         |
+| 102101     | 无网络                                                       |
+| 102102     | 网络异常(网络请求出错，一般出现在网络安全策略限制了不能使用http、设备开启了代理或连接的WiFi有网络链接安全策略限制的场景，建议结合SDK日志具体分析) |
+| 102103     | 未开启数据网络                                               |
+| 102121     | 用户取消登录                                                 |
+| 102203     | 输入参数错误                                                 |
+| 102223     | 数据解析异常                                                 |
+| 102507     | 登录超时（授权页点登录按钮时）                               |
+| 102508     | 数据网络切换失败                                             |
+| 103101     | 请求签名错误(请求签名错误（若发生在客户端，可能是appkey传错，可检查是否跟appsecret弄混，或者有空格。若发生在服务端接口，需要检查验签方式是MD5还是RSA，如果是MD5，则排查signType字段，若为appsecret，需确认是否误用了appkey生签。如果是RSA，需要检查使用的私钥跟报备的公钥是否对应和报文拼接是否符合文档要求。） |
+| 103102     | 包签名/Bundle ID错误（报备的和实际使用的对不上）             |
+| 103103     | 用户不存在                                                   |
+| 103111     | 网关IP错误（检查是否开了vpn或者境外ip）                      |
+| 103119     | AppID不存在。（检查传的appid是否正确或是否有空格）           |
+| 103211     | 其他错误（常见于报文格式不对，先请检查是否符合这三个要求：a、json形式的报文交互必须是标准的json格式；b、发送时请设置content type为application/json；c、参数类型都是String |
+| 103412     | 无效的请求有加密方式错误、非JSON格式和空请求等               |
+| 103414     | 参数校验异常                                                 |
+| 103511     | 服务器IP白名单校验失败                                       |
+| 103811     | Token为空                                                    |
+| 103902     | 短时间内重复登录，造成script失效                             |
+| 103911     | Token请求过于频繁，10分钟内获取Token且未使用的数量不超过30个 |
+| 104201     | Token重复校验失败、失效或不存在                              |
+| 105002     | 移动取号失败（一般是物联网卡）                               |
+| 105013     | 不支持联通取号                                               |
+| 105018     | 使用了本机号码校验的Token获取号码，导致Token权限不足         |
+| 105019     | 应用未授权                                                   |
+| 105021     | 已达当天取号限额                                             |
+| 105302     | AppID不在白名单                                              |
+| 105313     | 非法请求                                                     |
+| 200002     | 手机未安装sim卡                                              |
+| 200005     | 用户未授权（READ_PHONE_STATE）                               |
+| 200006     | 用户未授权（SEND_SMS）                                       |
+| 200007     | authType仅使用短信验证码认证                                 |
+| 200008     | 1. authType参数为空；2. authType参数不合法；                 |
+| 200009     | 应用合法性校验失败（包名包签名未填写正确）                   |
+| 200010     | 无法识别SIM卡或没有SIM卡（Android）                          |
+| 200012     | 取号失败，跳短信验证码登录                                   |
+| 200013     | 短信上行发送短信失败（短信上行）                             |
+| 200014     | 手机号码格式错误（短验）                                     |
+| 200015     | 短信验证码格式错误                                           |
+| 200016     | 更新KS失败                                                   |
+| 200017     | 非移动卡不支持短信上行                                       |
+| 200018     | 不支持网关登录                                               |
+| 200019     | 不支持短信验证码登录                                         |
+| 200020     | 用户取消登录                                                 |
+| 200021     | 数据解析异常                                                 |
+| 200022     | 无网络                                                       |
+| 200023     | 请求超时                                                     |
+| 200024     | 数据网络切换失败                                             |
+| 200025     | 位置错误（一般是线程捕获异常、socket、系统未授权移动数据网络权限等，请提工单联系工程师） |
+| 200026     | 输入参数错误。                                               |
+| 200027     | 未开启移动数据网络或网络不稳定                               |
+| 200028     | 网络请求出错                                                 |
+| 200029     | 请求出错,上次请求未完成                                      |
+| 200030     | 没有初始化参数                                               |
+| 200031     | 生成token失败                                                |
+| 200032     | KS缓存不存在                                                 |
+| 200033     | 复用中间件获取Token失败                                      |
+| 200034     | 预取号token失效                                              |
+| 200035     | 协商ks失败                                                   |
+| 200036     | 预取号失败                                                   |
+| 200037     | 获取不到openid                                               |
+| 200038     | 异网取号网络请求失败                                         |
+| 200039     | 异网取号网关取号失败                                         |
+| 200040     | UI资源加载异常                                               |
+| 200042     | 授权页弹出异常                                               |
+| 200048     | 用户未安装SIM卡                                              |
+| 200050     | EOF异常                                                      |
+| 200061     | 授权页面异常                                                 |
+| 200064     | 服务端返回数据异常                                           |
+| 200072     | CA根证书校验失败                                             |
+| 200082     | 服务器繁忙                                                   |
+| 200086     | ppLocation为空                                               |
+| 200087     | 仅用于监听授权页成功拉起                                     |
+| 200096     | 当前网络不支持取号                                           |
+
+### 中国电信
+
+| **状态码** | **状态码描述**                                               |
+| ---------- | ------------------------------------------------------------ |
+| 0          | 请求成功                                                     |
+| -64        | Permission-denied（无权限访问）                              |
+| -65        | API-request-rates-Exceed-Limitations（调用接口超限）         |
+| -10001     | 取号失败，mdn为空                                            |
+| -10002     | 参数错误                                                     |
+| -10003     | 解密失败                                                     |
+| -10004     | IP受限                                                       |
+| -10005     | 异网取号回调参数异常                                         |
+| -10006     | mdn取号失败，且属于电信网络                                  |
+| -10007     | 重定向到异网取号                                             |
+| -10008     | 超过预设取号阈值                                             |
+| -10009     | 时间戳过期                                                   |
+| -10013     | Perator_unsupported，提工单联系工程师                        |
+| -20005     | Sign-invalid（签名错误）                                     |
+| -20006     | 应用不存在                                                   |
+| -20007     | 公钥数据不存在                                               |
+| -20100     | 内部解析错误                                                 |
+| -20102     | 加密参数解析失败                                             |
+| -30001     | 时间戳非法                                                   |
+| -30003     | topClass-invalid,topclass无效                                |
+| 51002      | 参数为空                                                     |
+| 51114      | 无法获取手机号数据                                           |
+| -8001      | 网络异常，请求失败                                           |
+| -8002      | 请求参数错误                                                 |
+| -8003      | 请求超时                                                     |
+| -8004      | 移动数据网络未开启                                           |
+| -8010      | 无网络连接（网络错误）                                       |
+| -720001    | Wi-Fi切换4G请求异常                                          |
+| -720002    | Wi-Fi切换4G超时                                              |
+| 80000      | 请求超时                                                     |
+| 80001      | 网络连接失败、网络链接已中断、Invalid argument、目前不允许数据连接 |
+| 80002      | 响应码错误404                                                |
+| 80003      | 网络无连接                                                   |
+| 80005      | socket超时异常                                               |
+| 80007      | IO异常                                                       |
+| 80008      | No route to host                                             |
+| 80009      | Nodename nor servname provided, or not known                 |
+| 80010      | Socket closed by remote peer                                 |
+| 80800      | Wi-Fi切换超时                                                |
+| 80801      | Wi-Fi切换异常                                                |
+| -9999      | 网络故障(networkauth-fail)                                   |
+| -720001    | 切换异常,切换流量卡时网络不稳定                              |
+| -720002    | 切换异常超时                                                 |
+
+### 中国联通
+
+| **状态码**                  | **状态码描述**                       |
+| --------------------------- | ------------------------------------ |
+| 0                           | 表示请求成功                         |
+| -10008                      | JSON转换失败                         |
+| 1，请求超时                 | 请求超时                             |
+| 1，私网IP查找号码失败       | 私网IP查找号码失败                   |
+| 1，私网IP校验错误           | 私网IP校验错误                       |
+| 1，源IP鉴权失败             | 源IP鉴权失败                         |
+| 1，获取鉴权信息失败         | 获取鉴权信息失败                     |
+| 1，获得的手机授权码失败     | 一般是由于请求SDK超时导致的失败      |
+| 1，网关取号失败             | 网关取号失败                         |
+| 1，网络请求失败             | 网络请求失败                         |
+| 1，验签失败                 | 签名校验失败                         |
+| 1，传入code和AppID不匹配    | 传入code和AppID不匹配                |
+| 1，似乎已断开与互联网的链接 | 网络不稳定导致连接断开               |
+| 1，connect address error    | 连接地址错误，一般是由于超时导致失败 |
+| 1，select socket error      | 选择socket错误                       |
+| 1，handshake failed         | 握手失败                             |
+| 1，decode ret_url fail      | URL解码失败                          |
+| 1，connect error            | 连接错误                             |
+| 2，请求超时                 | 接口请求耗时超过timeout设定的值      |

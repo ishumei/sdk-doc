@@ -1,462 +1,420 @@
-#  1. 接入指南
 
-sdk 支持版本：iOS 8. 0及以上
+# 数美号码认证 iOS SDK 接入文档
 
-**注意事项：**
+## 一、接入说明
 
+开发环境：
+* 最低部署版本：iOS 9.0及以上。
+* Xcode开发工具：12.0及以上。
 
-1. 一键登录服务必须打开蜂窝数据流量并且手机操作系统给予应用蜂窝数据权限才能使用
-1. 数美认证由中国移动北京公司提供技术支持，避免项目同时接入中国移动认证 SDK 和本 SDK
-2. 取号请求过程需要消耗用户少量数据流量（国外漫游时可能会产生额外的费用）
-3. 一键登录服务目前支持中国移动 2/3/4/5G（ 2 , 3G因为无线网络环境问题，时延和成功率会比 4 G低）
-和中国电信 4G、中国联通 4G、5G（如有更新会在技术沟通QQ群上通知）
-4. 该 SDK 版本带有 UI 逻辑（授权页和服务条款页）
-5. 关于双卡的适配问题：
-当两张卡的运营商不一致时，SDK 会获取设备上网卡的运营商并进行取号，但上网卡不一定
-会获取成功（飞行模式状态时），若获取失败，SDK 将默认取号卡为移动运营商取号，如果
-匹配，则取号成功，否则 SDK 返回 103111 ；
-当 SDK 存在缓存并且两张卡的运营商不相同时，SDK 会重新获取上网卡运营商与上一次取号
-的运营商进行对比，若两次运营商不一致，则以最新设置的上网卡的运营商为准，重新取
-号，上次获取的缓存将自动失效；双卡运营商相同的情况则不需要重新取号。
-iOS 13 上已完成双卡适配，SDK 通过苹果提供的方法获取运营商，若获取失败，SDK 将默认
-取号卡为移动运营商取号，如果匹配，则取号成功，否则 SDK 返回 103111 。
+集成方式：
 
-## 1.1 开发流程
+* 将`SmAuth.xcframework`拖拽到Xcode工程内（需要勾选Copy items if needed选项）。
+* 点击项目target -> General -> Frameworks,Libraries,and Embedded Content -> SmAuth.xcframework，在Embed选项下，选择`Embed & Sign`。
 
-**第一步：下载SDK及相关文档**
+-------
 
-请在开发者群或官网下载最新的 SDK 包
+**一键登录使用步骤：**
 
-**第二步：搭建开发环境**
-
-1. xcode 版本需使用 12.0 以上，否则会报错
-2. 导入认证 SDK 的 .xcframework，在 Xcode 的 TARGETS 的 `Framework,Libraries,and Embedded Content`  中，点击 '+' 号，点击 add Other, 选择 .xcframework 添加依赖
-3. 在Xcode中找到 TARGETS-->Build Setting-->Linking-->Other Linker Flags 在这选项中需要添加`-ObjC`
-注意:如果以上操作仍然出现 `unrecognized selector sent to instance` 找不到方法的报错,则添加更改为
-`-all_load`
-4. 资源文件:在 Xcode 中务必导入 TYRZResource.bundle 到项目中，否则授权界面显示异常（不显示默
-认图片）。 TARGETS-->Build Phases-->Copy Bundle Resources-> 点击 "+" --> Add
-Other --> SmAuth.xcframework --> ios-arm64_armv7 -->SmAuth.framework -->TYRZResource.bundle --> Open
-5. 导入sdk语句：`#import <SmAuth/SmAuth.h>`，导入后才能调用 SDK 的方法
-6. 在 info.plist 文件中添加一个子项目 App Transport Security Settings，然后在其中添加一个 key：Allow
-Arbitrary Loads，其值为 YES 。修改后其他运营商才能使用一键登录。
-7. 添加依赖库，在项目设置 TARGETS -> 选项卡Build Phase -> Linked
-Binary with Libraries 添加如下依赖库：Network.framework，并将 status 设置为 Optional。
-
-
-**第三步：开始使用移动认证SDK**
-
-**[1] 初始化 SDK**
-
-在 appDelegate.m 文件的 didFinishLaunchingWithOptions 函数中添加初始化代码。初始化代码只需要执行一次就可以。
-```objective-c
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
-(NSDictionary *)launchOptions {
-	[[SmAuthHelper shareInstance] registerAppId:@"xxxxxx" AppKey:@"xxxxxx"];
-	return YES;
-}
+* 导入头文件
+```oc
+#import <SmAuth/SmAuth.h>
 ```
 
-**方法原型：**
-
-```objective-c
-- (void)registerAppId:(NSString *)appId AppKey:(NSString *)appKey;
+* 初始化
+```oc
+// AppId在UCloud号码认证平台申请
+[[SmAuthHelper shareInstance] registerWithAppId:@"xxxxx"];
+// 开启日志
+[[SmAuthHelper shareInstance] consolePrintLoggerEnable:YES];
+// 设置超时
+[[SmAuthHelper shareInstance] setTimeoutInterval:6000];
 ```
 
-**参数说明：**
-
-| 参数   | 类型     | 说明        |
-| ------ | -------- | ----------- |
-| appId  | NSString | 应用的appid |
-| appKey | NSString | 应用密钥    |
-
-# 2. 一键登录功能
-
-## 2.1 流程说明
-
-![](./res/image001.png)
-
-
-## 2.2 取号请求
-
-本方法用于发起取号请求，SDK 完成网络判断、蜂窝数据网络切换等操作并缓存凭证 script。
-
-**取号方法原型**
-
-```objective-c
-- (void)getPhoneNumberCompletion:(void(^)(NSDictionary *_Nonnull result))completion;
+* 预加载授权页（取号）
+```oc
+- (void)preLoadLoginAuthorizePageWithCompletion:(void(^)(NSError * _Nullable))completion;
 ```
 
-**参数说明：**
-
-
-|参数|类型|说明|
-|--|--|--|
-|completion|Block|取号回调|
-
-**响应参数：**
-
-| 参数       | 类型     | 说明             |
-| ---------- | -------- | ---------------- |
-| resultCode | NSString | 返回相应的结果码 |
-| desc       | NSString | 调用描述         |
-
-**请求示例代码**
-
-```objective-c
-[[SmAuthHelper shareInstance] getPhoneNumberCompletion:^(NSDictionary * _Nonnull sender) {
-        NSString *resultCode = sender[@"resultCode"];
-        NSMutableDictionary *result = [NSMutableDictionary dictionaryWithDictionary:sender];
-        NSLog(@"预取号 ： %@",result);
-        if ([resultCode isEqualToString:@"103000"]) {
-            NSLog(@"预取号成功");
-        } else {
-            NSLog(@"预取号失败");
-        }
-}];
+* 加载授权页
+```oc
+- (void)loadLoginAuthorizePageWithViewConfig:(UAuthViewConfig *)viewConfig completion:(void (^)(NSError *error, NSString *token))completion;
 ```
 
-## 2.3 授权请求
-
-应用调用本方法时，SDK 将拉起用户授权页面，用户确认授权后，SDK 将返回 token 给应用客户端。可通过返回码 200087 监听授权页是否成功拉起。
-
-**授权请求方法原型：**
-
-```objective-c
-- (void)getAuthorizationWithModel:(SmCustomModel *)model complete:(void (^)(id sender))completion;
+* 关闭授权页
+```oc
+- (void)unloadLoginAuthorizePageAnimated:(BOOL)animated completion:(void (^_Nullable)(void))completion;
 ```
 
-**请求参数：**
+-------
 
-| **参数**   | **类型**      | **说明**                        |
-| ---------- | ------------- | ------------------------------- |
-| model      | SmCustomModel | 需要配置的Model属性(控制器必传) |
-| completion | Block         | 取号回调                        |
+**本机号码验证使用步骤：**
 
- **响应参数：**
-
-| **参数**   | **类型** | **说明**                                                     |
-| ---------- | -------- | ------------------------------------------------------------ |
-| resultCode | NSString | 返回相应的结果码                                             |
-| token      | NSString | 成功时返回:临时凭证，token有效期2min，一次有效，同一用户(手 机号)10分钟内获取token且未使用的数量不超过30个 |
-
-**请求示例代码**
-
-```objective-c
-SmCustomModel *model = [[SmCustomModel alloc]init];
-model.currentVC = self;//必传
-model.authPageBackgroundImage = [UIImage imageNamed:@"tooopen_sy_122409821526"];
-// model.numberSize = 10;
-// model.navReturnImg = [UIImage imageNamed:@"tooopen_sy_122409821526"];
-// model.logBtnImgs = @[[UIImage imageNamed:@"12341553737084_.pic_hd"],[UIImage
-// imageNamed:@"12341553737084_.pic_hd"],[UIImage imageNamed:@"12341553737084_.pic_hd"]];
-// model.logBtnImgs = []
-// model.authViewBlock = ^(UIView *customView) {
-// UIImageView *ima = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"tooopen_sy_122409821526"]];
-// ima.frame = customView.bounds;
-// [customView addSubview:ima];
-// };
-// model.customSMSFlag = YES;
-[[SmAuthHelper shareInstance] getAuthorizationWithModel:model complete:^(NSDictionary *
-_Nonnull sender) {
-// NSDecimalNumber *end = [self.class stopLoading];
-// NSDecimalNumberHandler *subHandler = [self.class roundPlainWithScale:3];
-// NSDecimalNumber *delta = [end decimalNumberBySubtracting:beginwithBehavior:subHandler];
-// NSMutableDictionary *result = [sender mutableCopy];
-// result[@"duration"] = delta;
-// [self displayObject:result withTitle:@"一键登录"
-  [alertActionHandler:^(UIAlertAction * _Nonnull action) {
-  //  [self dismissViewControllerAnimated:YES completion:nil];
-  		[self displayObject:sender];
- 	}];
-}];
+* 预加载授权页（取号）
+```oc
+- (void)preLoadLoginAuthorizePageWithCompletion:(void(^)(NSError * _Nullable))completion;
 ```
 
-## 2.4 授权页面设计
-
-为了确保用户在登录过程中将手机号码信息授权给开发者使用的知情权，一键登录需要开发者提供授权页登录页面供用户授权确认。开发者在调用授权登录方法前，必须弹出授权页，明确告知用户当前操作会将用户的本机号码信息传递给应用。
-
-### 2.4.1 页面规范细则
-
-整体说明：
-我们一致致力让授权页面在保证获得用户知情且同意授权的前提下，提供给开发者更多的便利性。基于此我们推出了 570 版本，去掉了 slogan 、logo 、标题栏等元素，保留号码栏、登录按钮、隐私栏三个最重要的元素。开发者所需要的其他元素可以通过自定义控件实现。
-
-![](./res/image002.png)
-
-**注意：**
-
-**1 、开发者不得通过任何技术手段，破解授权页，或将授权页面的隐私栏、品牌露出内容隐藏、覆盖。**
-
-**2 、登录按钮文字描述必须包含“登录”或“注册”等文字，不得诱导用户授权。**
-
-**3 、对于接入数美认证 SDK 并上线的应用，我方会对上线的应用授权页面做审查，如果有出现未按要求弹出或设计授权页面的，将关闭应用的认证取号服务。**
-
-### 2.4.2 Model属性
-
-通过 model 属性，可以实现：
-
-1. 可以允许开发者在授权页面上添加自定义的控件；
-
-2. 设置授权页面的元素控件的布局
-
-
-
-**当前 VC，注意：使用一键登录服务时，这个值必传**
-
-```objective-c
-@property (nonatomic,strong) UIViewController *currentVC;
+* 手机号码检测（获取验证Token）
+```oc
+- (void)verifyPhoneNumberCompletion:(void(^)(NSError * _Nullable, NSString * _Nullable))completion;
 ```
 
-**授权界面自定义控件 View 的 Block**
+## 二、SDK接口说明
 
-| model属性 | 值类型 | 属性说明 |
-| ---- | ---- | ---- |
-|authViewBlock|UIView *customView, CGRect logoFrame, CGRect numberFrame,CGRect，sloganFrame, CGRect loginBtnFrame, CGRect,checkBoxFrame, CGRect privacyFrame|设置授权页应用自定义控件|
+#### 2.1 初始化SDK
 
-示例：
-```objective-c
-UIImageView *ima = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"tooopen_sy_122409821526"]];
-ima.frame = customView.bounds;
-[customView addSubview:ima];
+**接口描述** 
+
+>  初始化SDK。
+
+**接口示例**
+
+```oc
+[[SmAuthHelper shareInstance] registerWithAppId:@"xxxxx"];
 ```
 
-**授权界面动画效果**
+**参数说明**
 
-| model属性 | 值类型 | 属性说明 |
-| --------- | ------ | -------- |
-|presentType|UAPresentationDirection|授权页面推出动画效果|
-|modalPresentationStyle|UIModalPresentationStyle|模态展示样式设置属性。为了解决部分用户全屏调出授权页的控制器(即demo中 的OpenViewController)的生命周期调用问题，开放该属性由用户自行设置|
-|presentAnimated|bool|默认为 1，有授权页动画；设置为 0 则没有授权页动画|
+> appId: UCloud号码认证平台申请应用ID。
 
-**授权界面背景图片**
+-------
 
-| model属性               | 值类型 | 属性说明     |
-| ----------------------- | ---------- | ---------------- |
-| authPageBackgroundImage | UIImage    | 授权页面背景图片 |
+#### 2.2 预加载授权页（取号）
 
-**自定义 Loading View**
+**接口描述** 
 
-| model属性            | 值类型         | 属性说明                                                |
-| -------------------- | ------------------- | ------------------------------------------------------------ |
-| authLoadingViewBlock | UIView *loadingView | 回调默认关闭,如需自己控制关闭,则用keywindow并在 一键登录回调中关闭 |
+>  预加载授权页，使用前应先判断运营商信息、网络信息等。
 
-**号码栏**
+**接口示例**
 
-|model属性|值类型|属性说明|
-|------|------|------|
-|numberText|`NSDictionary<NSAttributedStringKey,id>`|手机号码富文本设置（字体大小、颜色）|
-|numberOffsetY|CGFloat|号码栏Y相对于界面上边缘y 偏移(优先级比setY_B高)|
-|numberOffsetY_B|CGFloat|号码栏Y相对于界面下边缘y偏移|
-|numberOffsetX|NSNumber|号码栏X相对于默认值的左右偏移|
-
-**登录按钮**
-
-|model属性|值类型|属性说明|
-|----|----|----|
-|logBtnText|NSAttributedString|设置登录按钮的富文本属性（字体大小、颜色、文案内容）|
-|logBtnImgs|NSArray|设置授权登录按钮三种状态的图片数组，数组顺序为: [0]激活状态的图片;[1] 失效状态的图片;[2] 高亮状态的图片|
-|logBtnOriginLR|NSArray<br />(NSNumber *)|设置登录按钮距离屏幕的左右边距(左右边距可以不一样)|
-|logBtnHeight|CGFloat|设置登录按钮高h|
-|logBtnOffsetY|CGFloat|设置登录按钮相对于界面上边缘y偏移|
-|logBtnOffsetY_B|CGFloat|设置登录按钮相对于界面下边缘y偏移|
-
-**隐私条款**
-
-|model属性|值类型|属性说明|
-|----|----|----|
-|appPrivacy|NSArray (NSAttributedString)|APP自定义隐私条款:数组(务必按顺序)要设置 NSLinkAttributeName属性可以跳转协议 比 如:@[NSAttributedString对象,...]|
-|appPrivacyDemo|NSAttributedString|设置隐私的内容模板，也可以设置文本的居中或 居左。<br />1. 全句可自定义但必须保留"&&默认 &&"字段表明SDK默认协议,否则设置不生效 <br />2. 协议1和协议2的名称要与数组 NSAttributedString1 和 NSAttributedString2 ... 里的名称 一样  <br />3. 必设置项(参考SDK的demo) appPrivacyDemo设置内容: 登录并同意中国移动条款协议|
-|privacySymbol|BOOL|设置协议是否有书名号|
-|uncheckedImg|UIImage|设置复选框未选中时图片|
-|checkedImg|UIImage|设置复选框选中时图片|
-|checkTipText|NSString|设置未勾选提示的自定义提示文案|
-|checkboxWH|CGFloat|复选框大小（只能正方形）必须大于12|
-|privacyColor|UIColor|设置隐私条款名称颜色（协议）|
-|privacyState|BOOL|隐私条款check框默认状态 默认:NO ，可通过该属性获取check 框当前状态|
-|privacyOffsetY|NSNumber|设置隐私条款相对于界面上边缘y偏移|
-|privacyOffsetY_B|NSNumber|设置隐私条款相对于界面下边缘y偏移|
-|appPrivacyOriginLR|NSArray (NSNumber *)|设置隐私协议距离屏幕的左右边距|
-|PrivacyUncheckAnimation|BOOL|设置隐私协议抖动效果。true=抖动，false=无抖动，默认无抖动|
-
-**服务条款页面标题栏**
-
-| model**属性**    | **值类型**                              | **属性说明**                                                 |
-| ---------------- | --------------------------------------- | ------------------------------------------------------------ |
-| webNavColor      | UIColor                                 | 设置标题栏颜色                                               |
-| webNavTitleAttrs | `NSDictionary<NSAttributedStringKey, id>` | 设置协议页标题栏字体大小、颜色 (协议页标题，sdk通过读取HTML 的title获取，默认使用"服务条款"作 为标题) |
-| webNavReturnImg  | UIImage                                 | 设置标题栏返回按钮图标                                       |
-
-**横竖屏**
-
-| model属性 | 值类型 | 属性说明 |
-| --------- | ------ | -------- |
-|faceOrientation|UIInterfaceOrientation|开发者可以仅设置竖屏授权页;开发者可以仅设置横 屏授权页;开发者可以在授权页的前一个页面来选择 并控制调起横屏还是竖屏授权页，不设置的话，默认竖屏授权页。|
-
-注意:该属性可以强制横屏弹窗，但是sdk内部页面不适配跟随系统重力感应自动旋转页面。
-
-**弹窗授权页**
-| model属性 | 值类型 | 属性说明 |
-| --------- | ------ | -------- |
-|authWindow|BOOL|窗口模式开关|
-|controllerSize|CGSize|此属性支持半弹框方式与authWindow不同(此 方式为UIPresentationController)设置后自动隐 藏切换按钮|
-|cornerRadius|CGFloat|自定义窗口弧度半径 默认是10|
-|modalTransitionStyle|UIModalTransitionStyle|窗口模式推出动画(系统自带)|
-|scaleH|CGFloat|自定义窗口高-缩放系数(屏幕高乘以系数) 默认 是0.5|
-|scaleW|CGFloat|自定义窗口宽-缩放系数(屏幕宽乘以系数) 默认 是0.8|
-|webNavReturnImg|UIImage|web协议界面导航返回图标(尺寸根据图片大小)|
-
-**页面多语言设置**
-| model属性 | 值类型 | 属性说明 |
-| --------- | ------ | -------- |
-|appLanguageType|UALanguagType|UALanguageSimplifiedChinese 简体中文; UALanguageTraditionalChinese 繁体中文;<br />UALanguageEnglish英文|
-
-### 2.4.3 授权页面的关闭
-
-开发者可以自定义关闭授权页面。
-
-
-```objective-c
-- (void)ua_dismissViewControllerAnimated: (BOOL)flag completion: (void (^ __nullable) (void))completion;
+```oc
+- (void)preLoadLoginAuthorizePageWithCompletion:(void(^)(NSError * _Nullable))completion;
 ```
 
-**代码示例**
+**回调说明**
 
-```objective-c
-............
-//系统原方法
-[self dismissViewControllerAnimated:YES completion:nil];
-//SDK提供的方法
-[UASDKLogin.shareLogin ua_dismissViewControllerAnimated:YES completion:nil];
-............
+> 错误码:`200027`-->蜂窝网络未开启；`-10003`-->蜂窝网络权限未开启；其它错误码参照运营商错误码列表。
+
+-------
+
+#### 2.3 加载授权页
+
+**接口描述** 
+
+>  拉取授权页。
+
+**接口示例**
+
+```oc
+- (void)loadLoginAuthorizePageWithViewConfig:(UAuthViewConfig *)viewConfig completion:(void (^)(NSError *error, NSString *token))completion;
 ```
 
+**参数说明**
 
-# 3. 本机号码校验
+> viewConfig: 授权页配置model。
 
-## 3.1 使用流程说明
+**回调说明**
 
-![image-20211213103448496](./res/image003.png)
+> 错误码: 参照运营商错误码列表。
+> token: 取号token，使用该token去开发者应用后台换取完整手机号码。
 
-## 3.2 取号请求
+-------
 
-详情可参考一键登录的取号请求说明（2.3章）
+#### 2.4 关闭授权页
 
-## 3.3 本机号码校验请求 token
-开发者可以在应用内部任意页面调用本方法，获取本机号码校验的接口调用凭证（ token ）
+**接口描述** 
 
-**本机号码校验方法原型**
+>  关闭授权页。
 
-```objective-c
-- (void)mobileAuthCompletion:(void(^)(NSDictionary *_Nonnull result))completion;
+**接口示例**
+
+```oc
+- (void)unloadLoginAuthorizePageAnimated:(BOOL)animated completion:(void (^_Nullable)(void))completion;
 ```
 
-**请求参数说明：**
+**参数说明**
 
-| **参数**   | **类型** | **说明** |
-| ---------- | -------- | -------- |
-| completion | Block    | 方法回调 |
+> animated: 是否开启动画。
 
-**响应参数：**
+-------
 
-| **字段**   | **类型** | **含义**                                                     |
-| ---------- | -------- | ------------------------------------------------------------ |
-| resultCode | NSString | 接口返回码，“103000”为成功。                                 |
-| token      | NSString | 成功返回:临时凭证，token有效期2min，一次有效，同一用户(手机号) 10分钟内获取token且未使用的数量不超过30个 |
+#### 2.5 本机号码校验Token获取
 
-# 4. 其它SDK请求方法
+**接口描述** 
 
-## 4.1 获取网络状态和运营商类型
+>  本机号码校验Token获取。
 
-本方法用于获取用户当前的网络环境和运营商
+**接口示例**
 
-网络类型及运营商（双卡下，获取上网卡的运营商）
-
-**原型**
-
-```objective-c
--(NSDictionary<NSString *, NSNumber *>*) getNetworkInfo;
+```oc
+- (void)verifyPhoneNumberCompletion:(void(^)(NSError * _Nullable, NSString * _Nullable))completion;
 ```
 
-**响应说明**
+**回调说明**
 
-| **参数**    | **类型**     | **说明**           |
-| ----------- | ------------ | ------------------ |
-| networkInfo | NSDictionary | <运营商, 网络类型> |
+> 错误码: 参照运营商错误码列表。
+> token: 本机号码验证token，使用该token去开发者应用后台验证是否是本机手机号码。
 
-字典对应的键值:
+-------
 
-| **参数**    | **类型** | **说明**                                                     |
-| ----------- | -------- | ------------------------------------------------------------ |
-| networkType | NSNumber | 0.无网络; 1.数据流量; 2.wifi; 3.数据+wifi                    |
-| carrier     | NSNumber | 0.未知(未插sim卡，其它运营商等); <br />1.中国移动;<br/> 2.中国联通;<br/> 3.中国电信 |
+#### 2.6 日志打印
 
-## 4.2 删除临时取号凭证
+**接口描述** 
 
-本方法用于删除取号方法 getPhoneNumberCompletion 成功后返回的取号凭证 script
+>  日志打印。
 
-**原型**
+**接口示例**
 
-```objective-c
--(BOOL) delScript;
+```oc
+- (void)consolePrintLoggerEnable:(BOOL)enable;
 ```
 
-**响应说明**
+**参数说明**
 
-| **参数** | **类型** | **说明**                                  |
-| -------- | -------- | ----------------------------------------- |
-| state    | BOOL     | 删除结果状态，(YES:删除成功，NO:删除失败) |
+> enable: 是否开启控制台日志打印。
 
-## 4.3 **自定义请求超时设置**
+-------
 
-本方法用于设置取号、一键登录、本机号码校验请求的超时时间
+#### 2.7 超时设置
 
-**原型**
+**接口描述** 
 
-```objective-c
-- (void)setTimeoutInterval:(NSTimeInterval)timeout;
+>  超时设置。
+
+**接口示例**
+
+```oc
+- (void)setTimeoutInterval:(NSTimeInterval)interval;
 ```
 
-**响应说明**
+**参数说明**
 
-| **参数** | **类型**       | **说明**                                                     |
-| -------- | -------------- | ------------------------------------------------------------ |
-| timeout  | NSTimeInterval | 设置取号、授权请求和本机号码校验请求时的超时时间，开发者不 配置时，默认所有请求的超时时间都为8000，单位毫秒 |
+> interval: 单位毫秒，建议设置为8000毫秒。
 
-# 5. 返回码说明
+-------
 
-## 5.1 SDK返回码
+#### 2.8 运营商类型
 
-|返回码|返回码描述|
-|------|------|
-|103000|成功|
-|103101|请求签名错误（若发生在客户端，可能是appkey传错，可检查是否跟appsecret弄混，或者有空格。若发生在服务端接口，需要检查验签方式是MD5还是RSA，如果是MD5，则排查signType字段，若为appsecret，需确认是否误用了appkey生签。如果是RSA，需要检查使用的私钥跟报备的公钥是否对应和报文拼接是否符合文档要求。）|
-|103102|包签名/Bundle ID错误(报备的和实际使用的对不上)|
-|103111|网关IP错误（检查是否开了vpn或者境外ip）|
-|103119|appid不存在（检查传的appid是否正确或是否有空格）|
-|103211|其他错误，（常见于报文格式不对，先请检查是否符合这三个要求：a、json形式的报文交互必须是标准的json格式；b、发送时请设置content|
-|103902|scrip失效（客户端高频调用请求token接口）|
-|103911|token请求过于频繁，10分钟内获取token且未使用的数量不超过30个|
-|103273|预取号联通重定向|
-|105002|移动取号失败（一般是物联网卡）|
-|105003|电信取号失败|
-|105021|已达当天取号限额|
-|105302|appid不在白名单|
-|105313|非法请求|
-|200020|用户取消登录|
-|200021|数据解析异常（一般是卡欠费）|
-|200022|无网络|
-|200023|请求超时|
-|200025|其他错误（socket、系统未授权数据蜂窝权限等，如需要协助，请加入qq群发问）|
-|200027|未开启数据网络|
-|200028|网络请求出错|
-|200038|异网取号网络请求失败|
-|200048|用户未安装sim卡|
-|200050|EOF异常|
-|200061|授权页面异常|
-|200064|服务端返回数据异常|
-|200072|CA根证书校验失败|
-|200080|本机号码校验仅支持移动手机号|
-|200082|服务器繁忙|
-|200086|ppLocation为空|
-|200087|仅用于监听授权页成功拉起|
-|200096|当前网络不支持取号|
+**接口描述** 
+
+>  运营商类型。
+
+**接口示例**
+
+```oc
+- (SmCarrierType)carrierType;
+```
+
+**参数说明**
+
+> SmCarrierType: 
+
+`SmCarrierTypeUnknown`-->未知；
+
+`SmCarrierTypeMobile`-->中国移动; 
+
+`SmCarrierTypeUnicome`-->中国联通;
+
+`SmCarrierTypeTelecom`-->中国电信。
+
+-------
+
+#### 2.9 连接网络类型
+
+**接口描述** 
+
+>  当前连接网络类型。
+
+**接口示例**
+
+```oc
+- (SmNetworkType)networkType;
+```
+
+**参数说明**
+
+> SmNetworkType:
+
+`SmNetworkTypeUnknown`-->未知
+
+`SmNetworkTypeNotReachable`-->无网络
+
+`SmNetworkTypeCellular`-->数据流量
+
+`SmNetworkTypeWifi`-->WiFi
+
+`SmNetworkTypeCellularAndWifi`-->数据流量+WiFi
+
+-------
+
+#### 2.10 SDK版本
+
+**接口描述** 
+
+>  当前SDK版本。
+
+**接口示例**
+
+```oc
+- (NSString *)getSDKVersion;
+```
+
+## 三、其他注意事项
+
+其它接口的使用方法，请参考Demo中的示例。        
+
+## 四、运营商SDK错误码
+> 在调用号码认证服务一键登录和本机号码校验功能的接口时，会返回运营商对应接口的错误码。常见接口错误码、错误描述，可参考下述
+
+### 中国移动
+
+| **状态码** | **状态码描述**                                               |
+| ---------- | ------------------------------------------------------------ |
+| 103000     | 成功                                                         |
+| 102101     | 无网络                                                       |
+| 102102     | 网络异常(网络请求出错，一般出现在网络安全策略限制了不能使用http、设备开启了代理或连接的WiFi有网络链接安全策略限制的场景，建议结合SDK日志具体分析) |
+| 102103     | 未开启数据网络                                               |
+| 102121     | 用户取消登录                                                 |
+| 102203     | 输入参数错误                                                 |
+| 102223     | 数据解析异常                                                 |
+| 102507     | 登录超时（授权页点登录按钮时）                               |
+| 102508     | 数据网络切换失败                                             |
+| 103101     | 请求签名错误(请求签名错误（若发生在客户端，可能是appkey传错，可检查是否跟appsecret弄混，或者有空格。若发生在服务端接口，需要检查验签方式是MD5还是RSA，如果是MD5，则排查signType字段，若为appsecret，需确认是否误用了appkey生签。如果是RSA，需要检查使用的私钥跟报备的公钥是否对应和报文拼接是否符合文档要求。） |
+| 103102     | 包签名/Bundle ID错误（报备的和实际使用的对不上）             |
+| 103103     | 用户不存在                                                   |
+| 103111     | 网关IP错误（检查是否开了vpn或者境外ip）                      |
+| 103119     | AppID不存在。（检查传的appid是否正确或是否有空格）           |
+| 103211     | 其他错误（常见于报文格式不对，先请检查是否符合这三个要求：a、json形式的报文交互必须是标准的json格式；b、发送时请设置content type为application/json；c、参数类型都是String |
+| 103412     | 无效的请求有加密方式错误、非JSON格式和空请求等               |
+| 103414     | 参数校验异常                                                 |
+| 103511     | 服务器IP白名单校验失败                                       |
+| 103811     | Token为空                                                    |
+| 103902     | 短时间内重复登录，造成script失效                             |
+| 103911     | Token请求过于频繁，10分钟内获取Token且未使用的数量不超过30个 |
+| 104201     | Token重复校验失败、失效或不存在                              |
+| 105002     | 移动取号失败（一般是物联网卡）                               |
+| 105013     | 不支持联通取号                                               |
+| 105018     | 使用了本机号码校验的Token获取号码，导致Token权限不足         |
+| 105019     | 应用未授权                                                   |
+| 105021     | 已达当天取号限额                                             |
+| 105302     | AppID不在白名单                                              |
+| 105313     | 非法请求                                                     |
+| 200002     | 手机未安装sim卡                                              |
+| 200005     | 用户未授权（READ_PHONE_STATE）                               |
+| 200006     | 用户未授权（SEND_SMS）                                       |
+| 200007     | authType仅使用短信验证码认证                                 |
+| 200008     | 1. authType参数为空；2. authType参数不合法；                 |
+| 200009     | 应用合法性校验失败（包名包签名未填写正确）                   |
+| 200010     | 无法识别SIM卡或没有SIM卡（Android）                          |
+| 200012     | 取号失败，跳短信验证码登录                                   |
+| 200013     | 短信上行发送短信失败（短信上行）                             |
+| 200014     | 手机号码格式错误（短验）                                     |
+| 200015     | 短信验证码格式错误                                           |
+| 200016     | 更新KS失败                                                   |
+| 200017     | 非移动卡不支持短信上行                                       |
+| 200018     | 不支持网关登录                                               |
+| 200019     | 不支持短信验证码登录                                         |
+| 200020     | 用户取消登录                                                 |
+| 200021     | 数据解析异常                                                 |
+| 200022     | 无网络                                                       |
+| 200023     | 请求超时                                                     |
+| 200024     | 数据网络切换失败                                             |
+| 200025     | 位置错误（一般是线程捕获异常、socket、系统未授权移动数据网络权限等，请提工单联系工程师） |
+| 200026     | 输入参数错误。                                               |
+| 200027     | 未开启移动数据网络或网络不稳定                               |
+| 200028     | 网络请求出错                                                 |
+| 200029     | 请求出错,上次请求未完成                                      |
+| 200030     | 没有初始化参数                                               |
+| 200031     | 生成token失败                                                |
+| 200032     | KS缓存不存在                                                 |
+| 200033     | 复用中间件获取Token失败                                      |
+| 200034     | 预取号token失效                                              |
+| 200035     | 协商ks失败                                                   |
+| 200036     | 预取号失败                                                   |
+| 200037     | 获取不到openid                                               |
+| 200038     | 异网取号网络请求失败                                         |
+| 200039     | 异网取号网关取号失败                                         |
+| 200040     | UI资源加载异常                                               |
+| 200042     | 授权页弹出异常                                               |
+| 200048     | 用户未安装SIM卡                                              |
+| 200050     | EOF异常                                                      |
+| 200061     | 授权页面异常                                                 |
+| 200064     | 服务端返回数据异常                                           |
+| 200072     | CA根证书校验失败                                             |
+| 200082     | 服务器繁忙                                                   |
+| 200086     | ppLocation为空                                               |
+| 200087     | 仅用于监听授权页成功拉起                                     |
+| 200096     | 当前网络不支持取号                                           |
+
+### 中国电信
+
+| **状态码** | **状态码描述**                                               |
+| ---------- | ------------------------------------------------------------ |
+| 0          | 请求成功                                                     |
+| -64        | Permission-denied（无权限访问）                              |
+| -65        | API-request-rates-Exceed-Limitations（调用接口超限）         |
+| -10001     | 取号失败，mdn为空                                            |
+| -10002     | 参数错误                                                     |
+| -10003     | 解密失败                                                     |
+| -10004     | IP受限                                                       |
+| -10005     | 异网取号回调参数异常                                         |
+| -10006     | mdn取号失败，且属于电信网络                                  |
+| -10007     | 重定向到异网取号                                             |
+| -10008     | 超过预设取号阈值                                             |
+| -10009     | 时间戳过期                                                   |
+| -10013     | Perator_unsupported，提工单联系工程师                        |
+| -20005     | Sign-invalid（签名错误）                                     |
+| -20006     | 应用不存在                                                   |
+| -20007     | 公钥数据不存在                                               |
+| -20100     | 内部解析错误                                                 |
+| -20102     | 加密参数解析失败                                             |
+| -30001     | 时间戳非法                                                   |
+| -30003     | topClass-invalid,topclass无效                                |
+| 51002      | 参数为空                                                     |
+| 51114      | 无法获取手机号数据                                           |
+| -8001      | 网络异常，请求失败                                           |
+| -8002      | 请求参数错误                                                 |
+| -8003      | 请求超时                                                     |
+| -8004      | 移动数据网络未开启                                           |
+| -8010      | 无网络连接（网络错误）                                       |
+| -720001    | Wi-Fi切换4G请求异常                                          |
+| -720002    | Wi-Fi切换4G超时                                              |
+| 80000      | 请求超时                                                     |
+| 80001      | 网络连接失败、网络链接已中断、Invalid argument、目前不允许数据连接 |
+| 80002      | 响应码错误404                                                |
+| 80003      | 网络无连接                                                   |
+| 80005      | socket超时异常                                               |
+| 80007      | IO异常                                                       |
+| 80008      | No route to host                                             |
+| 80009      | Nodename nor servname provided, or not known                 |
+| 80010      | Socket closed by remote peer                                 |
+| 80800      | Wi-Fi切换超时                                                |
+| 80801      | Wi-Fi切换异常                                                |
+| -9999      | 网络故障(networkauth-fail)                                   |
+| -720001    | 切换异常,切换流量卡时网络不稳定                              |
+| -720002    | 切换异常超时                                                 |
+
+### 中国联通
+
+| **状态码**                  | **状态码描述**                       |
+| --------------------------- | ------------------------------------ |
+| 0                           | 表示请求成功                         |
+| -10008                      | JSON转换失败                         |
+| 1，请求超时                 | 请求超时                             |
+| 1，私网IP查找号码失败       | 私网IP查找号码失败                   |
+| 1，私网IP校验错误           | 私网IP校验错误                       |
+| 1，源IP鉴权失败             | 源IP鉴权失败                         |
+| 1，获取鉴权信息失败         | 获取鉴权信息失败                     |
+| 1，获得的手机授权码失败     | 一般是由于请求SDK超时导致的失败      |
+| 1，网关取号失败             | 网关取号失败                         |
+| 1，网络请求失败             | 网络请求失败                         |
+| 1，验签失败                 | 签名校验失败                         |
+| 1，传入code和AppID不匹配    | 传入code和AppID不匹配                |
+| 1，似乎已断开与互联网的链接 | 网络不稳定导致连接断开               |
+| 1，connect address error    | 连接地址错误，一般是由于超时导致失败 |
+| 1，select socket error      | 选择socket错误                       |
+| 1，handshake failed         | 握手失败                             |
+| 1，decode ret_url fail      | URL解码失败                          |
+| 1，connect error            | 连接错误                             |
+| 2，请求超时                 | 接口请求耗时超过timeout设定的值      |
