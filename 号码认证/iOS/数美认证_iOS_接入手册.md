@@ -23,7 +23,7 @@
 
 * 初始化
 ```oc
-// AppId在UCloud号码认证平台申请
+// AppId
 [[SmAuthHelper shareInstance] registerWithAppId:@"xxxxx"];
 // 开启日志
 [[SmAuthHelper shareInstance] consolePrintLoggerEnable:YES];
@@ -76,7 +76,7 @@
 
 **参数说明**
 
-> appId: UCloud号码认证平台申请应用ID。
+> appId: 数美号码认证提供的 ID。
 
 -------
 
