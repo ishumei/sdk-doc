@@ -49,7 +49,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
 | product | string | 否 | embed（嵌入式）| 展现形式，支持：embed（嵌入式）、float（浮动式）、popup（弹出层） |
 | mode | string  | 否 | slide | 模式：支持slide（滑动验证码）、auto_slide（无图片滑动验证码）、select（文字点选验证码）、 icon_select（图标点选验证码）、  seq_select（成语语序验证码）、spatial_select（空间逻辑） |
 | appendTo  | string  | 是 | 无  | 验证码dom元素的id。embed（嵌入式）、float（浮动式）必须配置，popup（弹出层）不需要 |
-| lang | string | 否 | zh-cn（简体中文） | 模式：支持zh-cn（简体中文）、en（英文）、ph（菲律宾语）、ina（印尼语）、tha（泰语）、vn（越南语）、mys（马来语）、jp（日语）及kr(韩语) |
+| lang | string | 否 | zh-cn（简体中文） | 模式：支持zh-cn（简体中文）、en（英文）、ph（菲律宾语）、ina（印尼语）、tha（泰语）、vn（越南语）、mys（马来语）、jp（日语）、kr(韩语)、西班牙语（es）、孟加拉语（bn）、葡萄牙语（pt）、德语（de）、法语（fr）、印地语（hi）、意大利语（it）、乌尔都语（ur）、俄语（ru）、瑞典语（sv）、土耳其语（tr）、中文繁体 （zh-tw）、阿拉伯语（ar） |
 | useBrowserLang | boolean | 否 | false | 是否高优使用浏览器设置的语言作为验证码的语言 |
 | customData | object | 否 | {} | 自定义数据 |
 | tipsMessage.sliderPlaceholder | string | 否 | 向右滑动滑块填充拼图 | 自定义滑块默认文案,仅滑块验证支持自定义设置 |
