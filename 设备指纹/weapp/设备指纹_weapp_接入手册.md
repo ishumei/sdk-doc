@@ -100,8 +100,8 @@ Page({
 | -- | -- | -- | -- | -- |
 | organization | string | 是 | 无 | 数美分配的公司标识，数美后台可以查看看 |
 | publicKey | string | 是 | 无 | 私钥标识，邮件中publicKey项 |
-| protocol | string  | 否 | https | 如果使用http，则设置成 http |
-| apiHost  | string  | 否 | fp-it.fengkongcloud.com  | 数据上报的域名，详见`APIHOST`枚举值|
+| apiProtocol | string  | 否 | https | 如果使用http，则设置成 http |
+| apiHost  | string  | 否 | fp-it.fengkongcloud.com  | 数据上报的域名，详见`APIHOST`枚举值，然后微信账号下要将域名设置到白名单中，例如 https://fp-it.fengkongcloud.com/  ， 如果apiProtocol设置为http，则是 http://fp-it.fengkongcloud.com/ |
 
 #### `APIHOST`枚举值
 
