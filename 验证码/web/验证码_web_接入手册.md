@@ -15,10 +15,10 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
     <script src="https://castatic.fengkongcloud.cn/pr/v1.0.4/smcp.min.js"></script>
 
     // 连接新加坡机房特殊配置项，仅供验证码数据上报新加坡机房客户使用
-    // <script src="https://castatic-xjp.fengkongcloud.com/pr/v1.0.4/smcp.min.js"></script>
+    // <script src="https://castatic-xjp.fengkongcloud.cn/pr/v1.0.4/smcp.min.js"></script>
 
     // 连接美国机房特殊配置项，仅供验证码数据上报美国机房客户使用
-    // <script src="https://castatic-fjny.fengkongcloud.com/pr/v1.0.4/smcp.min.js"></script>
+    // <script src="https://castatic-fjny.fengkongcloud.cn/pr/v1.0.4/smcp.min.js"></script>
 ```
 
 **2. 初始化方法**
@@ -27,10 +27,10 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
         organization: 'xxxx', // 数美后台可以查看公司标识
 
         // 连接新加坡机房特殊配置项，仅供验证码数据上报新加坡机房客户使用
-        // domains: ["captcha-xjp.fengkongcloud.com"],
+        // domains: ["captcha-xjp.fengkongcloud.cn"],
 
         // 连接美国机房特殊配置项，仅供验证码数据上报美国机房客户使用
-        // domains: ["captcha-fjny.fengkongcloud.com"],
+        // domains: ["captcha-fjny.fengkongcloud.cn"],
         product: 'popup', // 展现形式，具体选项见下表
         mode: 'slide', // 验证码模式，具体选项见下表
         appendTo: 'captchaId', // 验证码dom元素的id，
