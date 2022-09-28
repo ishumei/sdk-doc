@@ -1,6 +1,6 @@
 数美设备指纹 SDK（即 'smsdk'）最低支持 API Level 14。
 
-#### 1 工程配置
+## 1 工程配置
 
 本章节为 Android Studio 工程配置步骤，其他 IDE 开发者，如 IntelliJ IDEA、Eclipse 等，需要自行根据本节描述进行转换。跨平台配置，如 Flutter、uniapp、unity3d 等，可以自行增加插件进行接入，也可以联系我们提供对应插件 Demo。
 
@@ -112,7 +112,7 @@
    -keep class com.ishumei.** {*;}
    ```
 
-#### 2 标准接入
+## 2 标准接入
 
 最简初始化，初始化成功后，会立即进行数据采集，所以需要开发者确保在 ”同意“ 隐私政策前 **不要** 调用 `create` 方法。
 
@@ -222,7 +222,7 @@ boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 
 
 由于检测机构或者应用市场对隐私政策解读不一致，导致部分字段在某些检测中被标记为风险字段，因为无法确切确定这些字段属于数据违规字段，且数美有相关策略使用到这些字段，所以将这些字段采集与否权限已交给开发者，开发者可以通过 "常见问题 Android 屏蔽采集部分字段" 章节屏蔽字段。
 
-#### 3 私有化接入
+## 3 私有化接入
 
 主要步骤与标准接入类似，需要增加以下配置
 
@@ -237,7 +237,7 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真是场�
 
 注意，如果传入 host 为 http 请求，如 `http://private-host`，需要确保 APP 可以发送 http 请求，参考 "工程配置" 章节 http 设置部分。私有化接入完成后，需要根据 "测试" 章节进行自测检查。
 
-#### 4 代理接入
+## 4 代理接入
 
 smsdk 端上逻辑设置与标准接入类似，需要增加以下配置
 
@@ -250,7 +250,7 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真是场�
 
 开发者需要自行搭建代理服务器，代理服务器相关处理参考 ”服务器接入 代理接入“ 章节。
 
-#### 5 测试
+## 5 测试
 
 1. 调用 `SmAntiFraud.create(context, option)` 方法获取返回值为 `true`
 2. 调用 `SmAntiFraud.getDeviceId()` 方法返回值为 boxId，如 `Bm21V93t5QwTNdwyQxxxxxRYuSnOuwwylqZvz8Lixxxxx17lRMqcQ1jz9RwN6qW31/Z0YYmxN8KQnrya9xxxxxx==`
@@ -258,7 +258,7 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真是场�
 4. 通过数美管理后台导航栏选择 ”设备风险趋势"，找到 “设备详情” 部分，查看是否有数据上报（可能存在延时，一般不超过 30 分钟）
 5. 无法通过测试时，联系数美工作人员进行排查
 
-#### 1.6 SDK 升级
+## 6 SDK 升级
 
 本文适用于 Android smsdk v2 版本升级到 Android smsdk v3 版本，smsdk v2 将于 2022 年 12 月 30 日停止维护，希望已接入客户尽快切换到 smsdk v3 版本。
 

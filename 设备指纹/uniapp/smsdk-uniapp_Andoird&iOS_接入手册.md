@@ -1,10 +1,10 @@
-## 数美设备指纹 uniapp 接入手册
+# 数美设备指纹 uniapp 接入手册
 
 数美设备指纹 SDK 支持 App原生插件本地插件，相关基础知识参考 uniapp 官方 [插件说明](https://nativesupport.dcloud.net.cn/NativePlugin/README)。
 
-### 1 SDK 接入
+## 1 SDK 接入
 
-#### 1.1 添加本地插件
+### 1.1 添加本地插件
 
 1. 将 `SmsdkUniPlugin` 文件夹放入 `YOUR_PROJECT/nativeplugins` 目录
 2. HBuilderX 选中 `manifest.json`，选择 App原生插件配置
@@ -12,16 +12,16 @@
 
 ![image-20220919154526570](./res/image-20220919154526570.png)
 
-#### 1.2 引入插件
+### 1.2 引入插件
 
 ```js
 // 示例代码位置：SmsdkUniappDemo/pages/index/index.vue
 const SmAntiFraud = uni.requireNativePlugin('SmsdkUniPlugin');
 ```
 
-#### 1.3 sdk API
+### 1.3 sdk API
 
-#####  初始化 smsdk
+####  初始化 smsdk
 
 ```js
 SmAntiFraud.create({
@@ -49,13 +49,13 @@ ret 结构
 }
 ```
 
-##### 获取标识
+#### 获取标识
 
 ```js
 SmAntiFraud.getDeviceId();
 ```
 
-##### 其它方法
+#### 其它方法
 
 获取 sdk 版本号
 
@@ -63,19 +63,19 @@ SmAntiFraud.getDeviceId();
 SmAntiFraud.getSdkVersion();
 ```
 
-### 2 打包
+## 2 打包
 
 使用 HBuilderX -> 发行 -> 原生APP-云打包 生成 apk 或者 ipa 包，具体打包方式，参考 DCloud 官方说明。
 
-### 3 注意事项
+## 3 注意事项
 
-#### 3.1 数据合规
+### 3.1 数据合规
 
 smsdk 调用初始化方法时会采集设备数据，为避免数据违规问题，需要在 app 隐私政策中添加数美隐私协议，同意隐私政策后再进行初始化。
 
 数美隐私协议参考《数美设备风险SDK接入手册》。
 
-#### 3.2 验证是否接入成功
+### 3.2 验证是否接入成功
 
 - 初始化完成后，调用`SmAntiFraud.getDeviceId()` 方法获取到 serverId 或 boxId 即代表接入成功，其他为失败。serverId 和 boxId 示例参考《数美设备风险SDK接入手册》；
 
