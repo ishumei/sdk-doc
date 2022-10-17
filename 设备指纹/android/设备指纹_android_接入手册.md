@@ -34,7 +34,6 @@
    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
    
    <!-- 强烈建议权限 -->
-   <uses-permission android:name="android.permission.READ_PHONE_STATE" />
    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -48,7 +47,6 @@
    | ---------------------------- | ------------------------------------------------------------ |
    | INTERNET（必选）             | 将采集数据通过网络发送到服务器                               |
    | ACCESS_NETWORK_STATE（必选） | 判断网络是否连接；<br/>获取 network （网络连接状态）信息，如 2g, 3g, 4g, wifi 等，运营商信息 |
-   | READ_PHONE_STATE             | 读取 IMEI、IMSI、ICCID 信息                                  |
    | ACCESS_COARSE_LOCATION       | 获取 cell （基站）信息                                       |
    | ACCESS_FINE_LOCATION         | 获取 cell （基站）信息                                       |
    | ACCESS_WIFI_STATE            | 获取 bssid（wifi mac）, ssid 信息                            |
