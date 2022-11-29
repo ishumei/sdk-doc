@@ -1,6 +1,6 @@
 #  android 验证码SDK接入步骤
 
-**Android 验证码 SDK目前支持兼容的最低android系统版本为 4.0.3**
+**Android 验证码 SDK目前支持兼容的最低 android API Level 21**
 
 1. **导入jar 包**
 
