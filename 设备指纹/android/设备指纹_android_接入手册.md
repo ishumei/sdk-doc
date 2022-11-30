@@ -229,8 +229,8 @@ boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 
 option.setArea("YOUR-ORGANIZATION");
 // 设置私有地址，将 private-host 替换为私有化的主机名（域名）
 String host = "https://private-host"; 
-option.setUrl(host + "/deviceprofile/v4"); // 示例路径，需要与真是场景
-option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真是场景
+option.setUrl(host + "/deviceprofile/v4"); // 示例路径，需要与真实场景一致
+option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场景一致
 ```
 
 注意，如果传入 host 为 http 请求，如 `http://private-host`，需要确保 APP 可以发送 http 请求，参考 "工程配置" 章节 http 设置部分。私有化接入完成后，需要根据 "测试" 章节进行自测检查。
@@ -242,8 +242,8 @@ smsdk 端上逻辑设置与标准接入类似，需要增加以下配置
 ```java
 // 设置私有地址，将 host 替换为代理服务器的主机名（域名）
 String host = "https://proxy-host";
-option.setUrl(host + "/deviceprofile/v4"); // 示例路径，需要与真是场景
-option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真是场景
+option.setUrl(host + "/deviceprofile/v4"); // 示例路径，需要与真实场景一致
+option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场景一致
 ```
 
 开发者需要自行搭建代理服务器，代理服务器相关处理参考 ”服务器接入 代理接入“ 章节。
