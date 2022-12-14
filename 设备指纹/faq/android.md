@@ -55,8 +55,7 @@ public void onCreate() {
 SmAntiFraud.SmOption option = new SmAntiFraud.SmOption(); 
 ... // 其它设置
 Set<String> notCollect = new HashSet<>(); 
-// 大小写敏感，所有字母应为小写
-notCollect.add("oaid"); // 不采集 OAID
+notCollect.add("oaid"); // 不采集 oaid
 option.setNotCollect(notCollect);
 SmAntiFraud.create(ctx, option);
 ```
