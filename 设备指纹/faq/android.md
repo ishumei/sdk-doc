@@ -71,6 +71,7 @@ SmAntiFraud.create(ctx, option);
 | oaid     | Android开发中匿名设备标识符 | 各手机厂商关键 API 不同                                      | 暂无                                            |
 | operator | 运营商编码                  | TelephonyManager#getSimOperator                              | 影响网络状态的校验                              |
 | sensor   | 传感器信息                  | SensorManager#getSensorList                                  | 影响与篡改识别相关的逻辑校验                    |
+| sensorsData | 传感器数值信息 | SensorManager#registerListener<br />SensorManager#unregisterListener | 暂无影响，后续可能会影响聚集类的策略 |
 | sdCacheLimit | SD 卡缓存 |FileInputStream、FileOutputStream|低版本系统上会影响全局标识关联能力|
 | props_sn | 系统属性序列号              | SystemProperties.get("sys.serialno")<br />SystemProperties.get("persist.radio.serialno")<br />SystemProperties.get("ro.ril.oem.sno")<br />SystemProperties.get("ro.ril.oem.psno")<br />SystemProperties.get("gsm.serial") | 在 Android 9 及以下版本，可能影响设备标识稳定性 |
 | ssid     | WIFI 名称                   | WifiManager#getConnectionInfo<br />WifiInfo#getSSID          | 影响风险设备聚集风险的识别                      |
