@@ -52,7 +52,7 @@
        // apiHost:'fp-sa-it-acc.portal101.cn'
       
        // 2.5 私有化特殊配置
-       // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+       // staticHost: 'xxxxxx' // 私有化客户自己引入线上cdn地址，此项必填；如果客户本地引入js文件，此项不填
        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
     };
 
