@@ -17,7 +17,7 @@ https://mp.weixin.qq.com/wxopen/plugindevdoc?appid=wxfb52904a0e24dc20&token=&lan
     "pages": [],
     "plugins": {
         "smCaptcha": {
-            "version": "1.4.1",
+            "version": "1.3.4",
             "provider": "wxfb52904a0e24dc20"
         }
     }
