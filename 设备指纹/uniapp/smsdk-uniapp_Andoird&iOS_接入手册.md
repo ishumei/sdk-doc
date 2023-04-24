@@ -31,6 +31,7 @@ SmAntiFraud.create({
     'publicKeyIOS': YOUR_IOS_PUBLICK_KEY,         // iOS publicKey
     'url': 'YOUR_URL',                            // 设备指纹请求地址
     'confUrl': 'YOUR_CONF_URL',                   // 云配请求地址
+  	'cloudConf': [false|true],					  // 是否使用云配功能，默认使用
     'notCollect': 'imei imsi',                    // Android 不采集项（每项使用空格隔开）
     'area': 'YOUR_AREA',                          // 区域
     'usingHttps': [false|true]                    // 是否使用 https 传输数据
