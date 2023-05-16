@@ -94,6 +94,21 @@ Page({
 });
 ```
 
+### 注意事项
+1、小程序开发管理需要将服务端域名添加到白名单中，如果私有化配置了apiHost，需要将这个自定义域名加白。
+2、设备指纹sdk支持在跨端框架taro2/3 中集成使用，不过注意在taro2框架中需要将sdk从编译中排除，在taro2框架的config中如下配置即可。
+```javascript
+mini: {
+    compile: {
+        exclude: [
+            function (modulePath) {
+                return modulePath.indexOf('fp-wx.min') >= 0
+            },
+        ],
+    },
+},
+```
+
 ### 参数
 
 | **字段** | **参数类型**  | **是否必填** | **默认值** | **字段说明** |
