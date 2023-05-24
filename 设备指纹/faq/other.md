@@ -6,8 +6,8 @@
 | -------- | ----------- | --------- | ------------------------------------------- |
 | boxId    | N/A         | Bxxxx==   | 以 'B' 开头的 89 位字符串                   |
 | boxData  | N/A         | Dxxxxxx== | 以 'D' 开头的 8k 左右长度的字符串           |
-| localId  | 20xxxx00xxx | N/A       | 62 位字符长度的字符串，第 47/48 位数字为 00 |
-| serverId | 20xxxx01xxx | N/A       | 62 位字符长度的字符串，第 47/48 位数字为 01 |
+| localId  | 20xxxx00xxx | N/A       | 62 位字符长度的字符串，第 48/49 位数字为 00 |
+| serverId | 20xxxx01xxx | N/A       | 62 位字符长度的字符串，第 48/49 位数字为 01 |
 
 app 首次启动，初始化 SDK 未完成数据上报时调用 `getDeviceId` 方法，v2 版本会返回 localId，v3 版本会返回 boxData，localId 不可以当做设备标识，卸载重装 lcoalId 会发生变化。
 
