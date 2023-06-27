@@ -10,9 +10,10 @@
 
    
 
-2. 添加 SDK 依赖，在 target 下导入如下依赖库：SystemConfiguration.framework、Security.framework、AdSupport.framework、libresolv.tbd、libz.tbd、libsqlite3.0.tbd、CoreMotion.framework、libsmantifraud.a静态库。如下图所示
+2. 添加 SDK 依赖，在 `TARGETS` -> `General` -> `Frameworks,Libraries,and Embedded Content` 中导入如下依赖库：
 
-   ![smsdk-ios-depen](./res/smsdk-ios-depen.png)
+   - `IOKit.framework`
+   - `libSmAntiFraud.a`
 
 3. http 设置，smsdk 默认使用 http 请求，需要修改 Info.plist，新增 `[Allow Arbitrary Loads]`，如下所示
 
