@@ -173,8 +173,10 @@ SmAntiFraud.registerServerIdCallback(new SmAntiFraud.IServerSmidCallback() {
   @Override
   public void onError(int errCode) {
     // -1：无网络，常见原因：设备无网络
-		// -2：网络异常，网络连接异常（conn.getResponseCode() 抛出异常）或者 http 状态非 200，常见原因：代理或私有化服务器配置错误
-		// -3：业务异常，下发业务状态码非 1100，服务器未返回 deviceId，常见原因：参数配置错误、qps 超限、服务器异常
+    // -2：网络异常，网络连接异常（conn.getResponseCode() 抛出异常）或者 http 状态非 200，常见原因：代理或私有化服务器配置错误
+    // -3：业务异常，下发业务状态码非 1100，服务器未返回 deviceId，常见原因：参数配置错误、qps 超限、服务器异常
+    
+    // 触发此方法后，可以通过 SmAntiFraud.getDeviceId() 获取 boxId 或者 boxData，建议在子线程中调用 SmAntiFraud.getDeviceId() 方法。
   }
 });
 ```
