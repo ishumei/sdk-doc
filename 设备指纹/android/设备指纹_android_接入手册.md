@@ -89,26 +89,13 @@
    </network-security-config>
    ```
 
-5. 添加 smsdk 隔离进程服务声明
-
-   ```xml
-   <application
-   	......>
-   	<service
-   		android:name="com.ishumei.smantifraud.IServiceImp"
-   		android:isolatedProcess="true" />
-   </application>
-   ```
-
-   服务用于检测 Magisk 工具，为避免 Application 中代码引起隔离进程异常导致检测失效，需要对隔离进程做绕过处理，参考 ”常见问题  Android 如何判断隔离进程“，如果此配置与 APP 其他配置冲突，可移除此服务声明。注意，smsdk 3.3.0 之前版本不需要此配置。
-
-6. 代码放混淆
+5. 代码放混淆
 
    向 proguard-rules.pro 文件中添加 smsdk 防混淆规则，如下
 
-   ```sh
-   -keep class com.ishumei.** {*;}
-   ```
+    ```sh
+    -keep class com.ishumei.** {*;}
+    ```
 
 ## 2 标准接入
 
@@ -127,6 +114,17 @@ option.setPublicKey("YOUR_PUBLICK_KEY");
 // 初始化
 boolean isOk = SmAntiFraud.create(context, option);
 ```
+
+| SmOption 方法   | 参数类型      | 是否必填 | 默认值              | 说明                                                         |
+| --------------- | ------------- | -------- | ------------------- | ------------------------------------------------------------ |
+| setOrganization | String        | 是       | 无                  | 数美分配的公司标识，数美后台可以查看                         |
+| setAppId        | String        | 是       | default             | 应用标识，区分不同应用，数美后台可以查看                     |
+| setPublicKey    | String        | 是       | 无                  | 公钥标识，开通账号发送邮件中publicKey项                      |
+| setUrl          | String        | 否       | 无                  | 代理模式、私有化模式中设置设备数据上报地址                   |
+| setConfUrl      | String        | 否       | 无                  | 代理模式、私有化模式中设置云配信息获取地址                   |
+| setCloudConf    | boolean       | 否       | true                | 是否启用云配功能，如果设置为 flase，则不会发起云网络请求     |
+| setArea         | String        | 否       | SmAntiFraud.AREA_BJ | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
+| setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段，[使用说明](https://help.ishumei.com/docs/tw/sdk/faq/android#3-android-%E5%B1%8F%E8%94%BD%E9%87%87%E9%9B%86%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5) |
 
 调用 `create` 方法时，smsdk 会检查传入参数是否合法，如果返回值为 `false`，则需要过滤 logcat 日志中的 `Smlog` 进行自检，注意 smsdk 3.3.0 之前版本没有返回值。
 
@@ -172,14 +170,18 @@ SmAntiFraud.registerServerIdCallback(new SmAntiFraud.IServerSmidCallback() {
 
   @Override
   public void onError(int errCode) {
-    // -1：无网络，常见原因：设备无网络
-    // -2：网络异常，网络连接异常（conn.getResponseCode() 抛出异常）或者 http 状态非 200，常见原因：代理或私有化服务器配置错误
-    // -3：业务异常，下发业务状态码非 1100，服务器未返回 deviceId，常见原因：参数配置错误、qps 超限、服务器异常
-    
+    // 错误码含义见下表
     // 触发此方法后，可以通过 SmAntiFraud.getDeviceId() 获取 boxId 或者 boxData，建议在子线程中调用 SmAntiFraud.getDeviceId() 方法。
   }
 });
 ```
+
+| errCode | 含义                                                         |
+| ------- | ------------------------------------------------------------ |
+| -1      | 无网络，常见原因：设备无网络                                 |
+| -2      | 网络异常，网络连接异常（conn.getResponseCode() 抛出异常）或者 http 状态非 200，常见原因：代理或私有化服务器配置错误 |
+| -3      | 业务异常，下发业务状态码非 1100，服务器未返回 deviceId，常见原因：参数配置错误、qps 超限、服务器异常 |
+| -4      | 其他异常                                                     |
 
 boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 boxData 直接查询设备风险。查看 ”解密工具及代理服务器说明 设备指纹标识解密“ 章节，了解如何获取明文设备标识。
 
