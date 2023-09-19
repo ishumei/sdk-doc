@@ -10,7 +10,7 @@
 
    
 
-2. 添加 SDK 依赖，在 `TARGETS` -> `General` -> `Frameworks,Libraries,and Embedded Content` 中导入如下依赖库：
+2. 添加 SDK 依赖，在 `TARGETS` -> `General` -> `Frameworks,Libraries,and Embedded Content` 中导入如下依赖库
 
    - `IOKit.framework`
    - `libSmAntiFraud.a`
@@ -19,79 +19,110 @@
 
    ![smsdk-ios-plist](./res/smsdk-ios-plist.png)
 
-4. 如果 APP 之前未采集过 IDFA ，上架 App Store 时，需要勾选 Advertising Identifier，并勾选如下选项
+4. 如果 APP 之前未采集过`idfa` ，上架App Store时，需要根据App Connect的政策，明确app中使用`idfa`并说明原因，
 
-   1. Attribute this app installation to a previously served advertisement（跟踪广告带来的安装）
-   2. Attribute an action taken within this app to a previously served advertisement（跟踪广告带来的用户的后续行为）
-   3. Limit Ad Tracking setting in iOS(属于确认项)
+   若不想使用`idfa`，可参考下面初始化章节，设置`notCollect`不采集`idfa`，
 
-   如图所示
+   若app归属于儿童类，则联系数美运营提供不包含采集`idfa`相关代码的SDK。
 
-   ![smsdk-ios-idfa](./res/smsdk-ios-idfa.png)
 
 ## 2 标准接入
 
-最简初始化，初始化成功后，会立即进行数据采集，所以需要开发者确保在 ”同意“ 隐私政策前 **不要** 调用 `create` 方法。
+### 2.1 初始化
+
+调用SDK的 `-[SmAntiFraud create:]` 方法完成初始化。
+
+初始化非阻塞当前线程，会采集数据并网络传输，缓存 `deviceId`，调用时机如下
+
+1. APP 首次启动，同意隐私政策后调用。
+2. APP 非首次启动，且同意了隐私政策，启动时调用。
+
+若`create`方法返回`NO`，则需要检查初始化参数是否正确，可以过滤日志中的 `Smlog` 进行自检。
+
+初始化需要 `SmOption` 实例，其中的具体参数如下
+
+| **字段**          | **参数类型**           | **是否必填** | **默认值**                                      | **字段说明**                                                 |
+| ----------------- | ---------------------- | ------------ | ----------------------------------------------- | ------------------------------------------------------------ |
+| organization      | NSString*              | 是           | null                                            | 数美分配的公司标识，数美后台可以查看                         |
+| appId             | NSString*              | 是           | null                                            | 应用标识，区分不同应用，数美后台可以查看                     |
+| publicKey         | NSString*              | 是           | null                                            | 公钥标识，开通账号发送邮件中publicKey项                      |
+| url               | NSString*              | 否           | http://fp-it.fengkongcloud.com/deviceprofile/v4 | 设备数据上传的url                                            |
+| confUrl           | NSString*              | 否           | http://fp-it.fengkongcloud.com/v3/cloudconf     | 请求云配的url                                                |
+| extraInfo         | NSString*              | 否           | null                                            | 额外信息                                                     |
+| cloudConf         | BOOL                   | 否           | YES                                             | 是否开启云配功能，YES代表开启                                |
+| transport         | BOOL                   | 否           | YES                                             | 是否开启设备指纹功能，YES代表开启                            |
+| usingShortBoxData | BOOL                   | 否           | NO                                              | 是否使用较短的boxData，NO代表不使用                          |
+| delegate          | id<ServerSmidProtocol> | 否           | null                                            | 使用回调方法异步获取标识时，实现`ServerSmidProtocol`的对象   |
+| notCollect        | NSArray<NSString*>     | 否           | null                                            | 设置SDK不采集项，目前仅支持"idfa"                            |
+| area              | SmAntiFraudArea        | 否           | AREA_BJ                                         | 数据上传和云配的服务器机房地址。<br />AREA_BJ：北京机房<br />AREA_XJP：新加坡机房<br />AREA_FJNY：弗吉尼亚机房 |
+
+### 2.2 获取标识
+
+客户端获取到标识分为 `boxId` 和 `boxData`，**两者都会变化**。若需要唯一不变的标识，查看 ”解密工具及代理服务器说明 设备指纹标识解密“ 章节，了解如何获取明文设备标识。
+
+- 同步方式
+
+  调用SDK的 `-[SmAntiFraud getDeviceId]` 方法获取设备标识，调用时机如下
+
+  1. 初始化`create` 方法返回 `YES` 后 1～2 秒。时间供初始化方法收集数据和网络传输。
+  2. 在业务事件时使用，比如登录、注册等关键事件中上报 `getDeviceId` 返回的字符串。
+
+- 异步方式
+
+  异步方式可以在初始化之后，最早时机获取到服务端下发的最新的boxId。
+
+  需要调用`-[SmOption setDelegate:]`设置实现了 `ServerSmidProtocol` 接口的实例对象，具体方式如下
+
+  1. 继承 `ServerSmidProtocol` 接口，如 `@interface ViewController () <ServerSmidProtocol>`
+
+  2. 实现接口的 `smOnSuccess` 和 `smOnError` 方法，如
+
+     ```objective-c
+     - (void)smOnSuccess:(NSString*) boxId {
+       // 服务器下发成功或缓存中有可用 boxId
+     }
+     
+     - (void)smOnError:(NSInteger) errCode {
+       // 服务端下发标识失败，错误码：errCode
+       // 尝试使用 `-[SmAntiFraud getDeviceId]` 方法主动获取标识
+       // 数美未对errCode进行任何处理，需业务方自行记录，处理分析等
+     }
+     ```
+
+  3. 在 `SmOption` 对象中设置 `delegate`，如 `[option setDelegate:self]`
+
+  `errCode`错误码列举如下
+  
+  | errCode | **描述**                                                     |
+  | ------- | ------------------------------------------------------------ |
+  | -1      | 无网络，常见原因：设备无网络                                 |
+  | -2      | 网络异常，网络连接异常或者 http 状态非 200，常见原因：代理或私有化服务器配置错误 |
+  | -3      | 业务异常，下发业务状态码非 1100，服务器未返回 deviceId，常见原因：参数配置错误、qps 超限、服务器异常 |
+  | -4      | 未知错误                                                     |
+
+### 2.3 代码示例
 
 ```objective-c
 // 初始化参数对象
 SmOption *option = [[SmOption alloc] init];
-// 必填，组织标识
-[option setOrganization: @"YOUR_ORGANIZATION"];
-// 必填，应用标识，登录数美后台应用管理查看，没有合适值，可以写 "default"
-[option setAppId:@"YOUR_APP_ID"];
-// 必填，加密 KEY，邮件中 android_public_key 附件内容
-[option setPublicKey:@"YOUR_PUBLICK_KEY"];
+[option setOrganization: @"YOUR_ORGANIZATION"];// 必填
+[option setAppId:@"YOUR_APP_ID"];							 // 必填
+[option setPublicKey:@"YOUR_PUBLICK_KEY"];		 // 必填
 
 // 初始化
 BOOL isOk = [[SmAntiFraud shareInstance] create:option];
+if (!isOk) {
+	// 检查option初始化参数是否设置正确
+}
 ```
 
-调用 `create` 方法时，smsdk 会检查传入参数是否合法，如果返回值为 `NO`，则需要过滤日志中的 `Smlog` 进行自检。
+### 2.4 接入检验
 
-初始化调用时机
+参考 "测试" 章节自查是否接入SDK成功。
 
-1. APP 首次启动，同意隐私政策后调用
-2. APP 非首次启动，且同意了隐私政策，启动时调用
+## 3 海外业务接入
 
-`create` 方法采集数据大约需要 200 毫秒（低端机型会出现超出 1 秒情况），采集过程发生在子线程，不会阻塞当前线程。正常初始化后，可调用 ` [[SmAntiFraud shareInstance] getDeviceId]` 获取标识。
-
-获取标识时机：
-
-1. 在 `create` 方法返回 `YES` 后调用（返回 `NO` 时调用 `getDeviceId` 方法同样有 boxData 返回，但此 boxData 无法转换成设备标识）
-2. 在需要上报业务事件时使用，比如登录、注册等关键事件中上报 `getDeviceId` 返回的字符串
-
-部分开发者将 `getDeviceId` 放到所有网络请求的 Header 中，这样做会出现一些问题，需要开发者配合处理，原因及方案将参照 "Android SDK 标准接入 场景二 场景三" 章节。缩减 boxData 长度方法如下（请将这个方法当做备选方案，原因参考 Android 相关说明）
-
-```objective-c
-[option setUsingShortBoxData:YES];
-```
-
-相对于 Android smsdk，iOS smsdk 采集速度更快，几乎不会发生 ANR 问题，但是如果需要最早时机获取到 boxId，可以通过 Delegate 方式获取，方法如下
-
-1. 继承 `ServerSmidProtocol` 接口，如 `@interface ViewController () <ServerSmidProtocol>`
-
-2. 实现接口的 `smOnSuccess` 和 `smOnError` 方法，如
-
-   ```objective-c
-   - (void)smOnSuccess:(NSString*) boxId {
-     // 服务器下发成功或缓存中有可用 boxId
-   }
-   
-   - (void)smOnError:(NSInteger) errCode {
-     // -1：无网络，常见原因：设备无网络
-     // -2：网络异常，网络连接异常或者 http 状态非 200，常见原因：代理或私有化服务器配置错误
-     // -3：业务异常，下发业务状态码非 1100，服务器未返回 deviceId，常见原因：参数配置错误、qps 超限、服务器异常
-   }
-   ```
-
-3. 在 `SmOption` 对象中设置 Delegate，如 `[option setDelegate:self]`
-
-boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 boxData 直接查询设备风险。查看 ”解密工具及代理服务器说明 设备指纹标识解密“ 章节，了解如何获取明文设备标识。
-
-至此 smsdk 国内标准接入部分已经全部完成，如果没有定制化需求，此时已经接入完毕，建议参考 "测试" 章节自查是否接入成功。
-
-海外标准接入（由于数据合规要求，所有海外接入都需要走代理模式，此处文档为无法提供代理服务的特殊客户使用），需要使用海外专用包，并切换设备指纹机房，设置如下
+海外业务需按代理模式接入，若无法提供代理服务，可以使用数美的海外的服务器节点，主要步骤与标准接入相同，需要增加以下配置
 
 1. 业务机房在欧美（弗吉尼亚机房）
 
@@ -125,7 +156,7 @@ boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 
    // [option setConfUrl:[host stringByAppendingString:@"/v3/cloudconf"]];
    ```
 
-## 3 私有化接入
+## 4 私有化接入
 
 主要步骤与标准接入类似，需要增加以下配置
 
@@ -138,9 +169,9 @@ NSString *host = @"http://private-host";
 
 注意，如果传入 host 为 http 请求，如 `http://private-host`，需要确保 APP 可以发送 http 请求，参考 "工程配置" 章节 http 设置部分。私有化接入完成后，需要根据 "测试" 章节进行自测检查。
 
-## 4 代理接入
+## 5 代理接入
 
-smsdk 端上逻辑设置与标准接入类似，需要增加以下配置
+主要步骤与标准接入类似，需要增加以下配置
 
 ```java
 // 设置私有地址，将 host 替换为代理服务器的主机名（域名）
@@ -149,27 +180,12 @@ String host = "https://proxy-host";
 [option setConfUrl:[host stringByAppendingString:@"/v3/cloudconf"]]; // 示例路径，需要与真实场景一致
 ```
 
-开发者需要自行搭建代理服务器，代理服务器相关处理参考 ”代理服务器说明 代理接入“ 章节。
+开发者需要自行搭建代理服务器，代理服务器相关处理参考 “代理服务器说明 代理接入“ 章节。
 
-## 5 测试
+## 6 测试
 
-1. 调用 `[[SmAntiFraud shareInstance] create:option]` 方法获取返回值为 `YES`
-2. 调用 `[[SmAntiFraud shareInstance] getDeviceId]` 方法返回值为 boxId，如 `Bm21V93t5QwTNdwyQxxxxxRYuSnOuwwylqZvz8Lixxxxx17lRMqcQ1jz9RwN6qW31/Z0YYmxN8KQnrya9xxxxxx==`
-3. 查看控制台是否有 Smlog 异常输出，若有异常输出，请根据提示修改
-4. 通过数美管理后台导航栏选择 ”设备风险趋势"，找到 “设备详情” 部分，查看是否有数据上报（可能存在延时，一般不超过 30 分钟）
-5. 无法通过测试时，联系数美工作人员进行排查
-
-## 6 SDK 升级
-
-本文适用于 iOS smsdk v2 版本升级到 iOS smsdk v3 版本，smsdk v2 将于 2022 年 12 月 30 日停止维护，希望已接入客户尽快切换到 smsdk v3 版本。
-
-升级步骤及注意事项
-
-1. 删除旧版本 smsdk，将 `SmAntiFraud.h` 和 `libSmAntiFraud.a` 全部从项目中移除
-2. 根据 ”iOS SDK 工程配置“ 章节步骤接入新版本 smsdk
-3. 新版本中删除了部分 API，替换包后，导致编译失败，直接将 smsdk 报错方法删除即可
-4. 运行新 smsdk，根据 ”iOS SDK 测试“ 章节进行自测，如果不成功，请根据错误提示进行修改或联系数美工作人员进行排查
-5. 代理接入客户，需要根据 ”解密工具及代理服务器说明 代理接入“ 章节进行代理服务器升级
-6. 私有化接入客户，需要联系数美工作人员进行整体升级
-
-smsdk v3 版本终端不再提供明文设备标识，业务端不可以将 boxId 或 boxData 直接当做标识，获取标识方法参考 ”解密工具及代理服务器说明 设备指纹标识解密“。
+1. 调用 `[[SmAntiFraud shareInstance] create:option]` 方法获取返回值为 `YES`。
+2. 调用 `[[SmAntiFraud shareInstance] getDeviceId]` 方法返回值为89位的 boxId，如 `Bm21V93t5QwTNdwyQxxxxxRYuSnOuwwylqZvz8Lixxxxx17lRMqcQ1jz9RwN6qW31/Z0YYmxN8KQnrya9xxxxxx==`。
+3. 查看控制台是否有 Smlog 异常输出，若有异常输出，请根据提示修改。
+4. 通过数美管理后台导航栏选择 ”设备风险趋势"，找到 “设备详情” 部分，查看是否有数据上报（可能存在延时，一般不超过 30 分钟）。
+5. 无法通过测试时，联系数美工作人员进行排查。
