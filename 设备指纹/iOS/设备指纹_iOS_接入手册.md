@@ -52,7 +52,7 @@
 | cloudConf         | BOOL                   | 否           | YES                                             | 是否开启云配功能，YES代表开启                                |
 | transport         | BOOL                   | 否           | YES                                             | 是否开启设备指纹功能，YES代表开启                            |
 | usingShortBoxData | BOOL                   | 否           | NO                                              | 是否使用较短的boxData，NO代表不使用                          |
-| delegate          | id<ServerSmidProtocol> | 否           | null                                            | 使用回调方法异步获取标识时，实现`ServerSmidProtocol`的对象   |
+| delegate          | `id<ServerSmidProtocol>` | 否           | null                                            | 使用回调方法异步获取标识时，实现`ServerSmidProtocol`的对象   |
 | notCollect        | NSArray<NSString*>     | 否           | null                                            | 设置SDK不采集项，目前仅支持"idfa"                            |
 | area              | SmAntiFraudArea        | 否           | AREA_BJ                                         | 数据上传和云配的服务器机房地址。<br />AREA_BJ：北京机房<br />AREA_XJP：新加坡机房<br />AREA_FJNY：弗吉尼亚机房 |
 
