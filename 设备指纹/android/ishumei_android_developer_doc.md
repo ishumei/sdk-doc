@@ -53,26 +53,14 @@ This chapter is the Android Studio project configuration steps. Other IDE develo
    | WRITE_EXTERNAL_STORAGE (optional) | Save smsdk cached infomation                                 |
    | READ_EXTERNAL_STORAGE (optional)  | Restore smsdk cached information                             |
 
-4. Add smsdk isolation process service declaration
-
-   ```xml
-   <application
-   	......>
-   	<service
-   		android:name="com.ishumei.smantifraud.IServiceImp"
-   		android:isolatedProcess="true" />
-   </application>
-   ```
-   
-   In order to prevent the code in the Application from causing an abnormality in the isolation process and causing the detection to fail, the isolation process needs to be bypassed. Refer to "FAQ How Android Determines the Isolation Process". If this configuration conflicts with other APP configurations, you can remove this service declaration. Note, smsdk version before 3.3.0 does not need this configuration.
-   
-6. proguard config
+4. proguard config
 
    Add smsdk anti-obfuscation rules to the proguard-rules.pro file, as follows
-
+   
    ```sh
    -keep class com.ishumei.** {*;}
    ```
+   
 
 ## 2 Standard Embedded Mode
 
