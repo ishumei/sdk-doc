@@ -2,28 +2,56 @@
 
 ## 1 工程配置
 
-1. 导入 smsdk 静态库，导入 include 文件夹和 libsmantifraud.a 静态库，如图所示
+### 1.1 导入 smsdk 包
 
-   ![image-20220907172509726](./res/image-20220907172509726.png)
+- 旧版 smsdk 使用 .a 形式的包，导入方式如下：
+     
+     在项目中选择 Add Files to，在弹出的界面中选择 Copy items if needed，再选择 SmAntiFraud.h 和 libSmAntiFraud.a，选择添加。
+     
+     ![image-20220907172509726](./res/image-20220907172509726.png)
+     
+     ![image-20220907172358663](./res/image-20220907172358663.png)
+     
+     导入 smsdk 包后，代码中通过 `#import` 导入`SmAntiFraud.h`头文件相对路径即可，如下：
+     
+     ```objective-c
+     #import "../include/SmAntiFraud/SmAntiFraud.h"
+     ```
 
-   ![image-20220907172358663](./res/image-20220907172358663.png)
+- 新版 smsdk 使用 .xcframework 形式的包，导入方式如下：
 
-   
+  1. 复制 SmAntiFraud.xcframework 到项目中
 
-2. 添加 SDK 依赖，在 `TARGETS` -> `General` -> `Frameworks,Libraries,and Embedded Content` 中导入如下依赖库
+  2. 使用 Xcode 打开项目，点击项目，点击对应的 target，选择 General 页面。
+
+  3. 在  Frameworks,Libraries,and Embedded Content 中，点击 + 号  -> Add Other  -> Add Files -> 选择 SmAntiFraud.xcframework，Embed方式选择 `Do Not Embeded`。
+
+  4. 导入 smsdk 包后，代码中通过  `#import`  导入引用：
+
+     ```objective-c
+     #import <SmAntiFraud/SmAntiFraud.h>
+     ```
+
+### 1.2 添加 smsdk 依赖
+
+在 TARGETS -> General -> Frameworks,Libraries,and Embedded Content 中导入如下依赖库
 
    - `IOKit.framework`
-   - `libSmAntiFraud.a`
 
-3. http 设置，smsdk 默认使用 http 请求，需要修改 Info.plist，新增 `[Allow Arbitrary Loads]`，如下所示
+### 1.3 http 设置
+smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
 
-   ![smsdk-ios-plist](./res/smsdk-ios-plist.png)
+   1. 点击项目的 Info.plist，点击 + 号，选中 App Transport Security Settings
+   2. 在 App Transport Security Settings 配置项中，点击 + 号，选择 Allow Arbitrary Loads，并配置为 YES
 
-4. 如果 APP 之前未采集过`idfa` ，上架App Store时，需要根据App Connect的政策，明确app中使用`idfa`并说明原因，
+### 1.4 idfa 配置
+如果 APP 之前未采集过 `IDFA` ，上架App Store时，需要根据App Connect的政策，明确app中使用`idfa`并说明原因，
 
-   若不想使用`idfa`，可参考下面初始化章节，设置`notCollect`不采集`idfa`，
+   若不想使用 `IDFA`，可参考下面初始化章节，设置 `notCollect` 不采集 `IDFA`，
 
-   若app归属于儿童类，则联系数美运营提供不包含采集`idfa`相关代码的SDK。
+   若app归属于儿童类，则联系数美运营提供不包含采集 `IDFA` 相关代码的SDK。
+
+
 
 
 ## 2 标准接入
