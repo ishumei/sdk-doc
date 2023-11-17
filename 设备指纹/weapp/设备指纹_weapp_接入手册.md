@@ -6,12 +6,13 @@
 将产出js文件拷贝到小程序的libs目录
 
 ### 初始化
-在app.js 引入如下所示代码：
+正常使用：在app.js 引入如下所示代码：
 
 ```javascript
 const SMSdk = require('./libs/weapp-fp'); // 注意：require之后要立即初始化配置
 
 // 更多参数请看下一章节详细说明
+// 若需要采集openId，和unionId则在wx.login()后获取到openId 和unionId。再进行SMSdk.initConf() 初始化操作。
 SMSdk.initConf({
     // 1. 通用配置项
     organization: 'xxxxxxx', // 必填，公司标识，邮件中organization项
@@ -60,6 +61,20 @@ App({
     onLaunch() {
     }
 });
+```
+### 采集openId和unionId
+为了保证设备标识稳定性及风险识别能力，需要您将openId和unionId通过配置传递给我们。具体接入方式如下：
+
+1、在wx.login()后，将获取到的res.code传给后端获取对应的openId，unionId
+
+2、将获取到openId 和unionId。调用SMSdk.setOpenId SMSdk.setUnionId 进行配置
+
+3、进行SMSdk.initConf() 初始化操作。
+
+```javascript
+    SMSdk.setOpenId('您获取到的openId');
+    SMSdk.setUnionId('您获取到的UnionId');
+    SMSdk.initConf({}); // 同正常初始化接入
 ```
 
 ### 使用设备标识
@@ -136,3 +151,10 @@ mini: {
 | **方法名** | **参数** | **返回值**  | **说明** |
 | -- | -- | -- | -- |
 | getDeviceId | 无 | Promise | 异步方法，返回一个 promise，以便在未来某个时候把deviceId交给使用者。该方法可以在初始化之后需要的地方都可以调用 |
+
+### 采集openId，unionId的方法
+
+| **方法名** | **参数** | **返回值**  | **说明** |
+| -- | -- | -- | -- |
+| setOpenId | string | 无 | 将登录后获取的openId加入采集 |
+| setUnionId | string | 无 | 将登录后获取的unionId加入采集 |
