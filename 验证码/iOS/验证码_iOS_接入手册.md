@@ -2,13 +2,23 @@
 
 ## 工程配置
 
-iOS 验证码 SDK 最低兼容 iOS8.0
+iOS 验证码 SDK 最低兼容 iOS 9.0
 
-### 导入静态库
+### 导入.xcframework
 
-在工程下导入include文件夹和libSmCaptcha.a静态库。
+在工程下导入 SmCaptcha.xcframework，具体方式如下：
+
+首先将 SmCaptcha.xcframework 移动到项目中，接着在 Xcode 的 TARGETS -> General -> Framework,Libraries, and Enbeded Content 中，点击 + 号 -> Add Other -> Add Files，选择 SmCaptcha.xcframework，并将 Embed 方式设置为 "Embed & Sign"。
 
 ## 接入
+
+### 导入头文件
+
+在代码中使用 `#import ` 导入头文件：
+
+```objective-c
+#import <SmCaptcha/SmCaptchaWebView.h>
+```
 
 ### 参数设置
 
