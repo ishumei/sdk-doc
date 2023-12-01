@@ -132,7 +132,6 @@ boolean isOk = SmAntiFraud.create(context, option);
 
 1. APP 首次启动，同意隐私政策后调用
 2. APP 非首次启动，且同意了隐私政策，启动时调用
-3. 只在 **主进程** 中调用，避免多进程导致频繁采集问题，参考 "常见问题 Android 如何判断主进程" 章节
 
 `create` 方法采集数据大约需要 1 秒（低端机型会出现超出 2 秒情况），采集过程发生在子线程，不会阻塞当前线程。正常初始化后，可调用 `SmAntiFraud.getDeviceId` 获取标识。
 
@@ -262,7 +261,7 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场�
 
 ## 6 SDK 升级
 
-本文适用于 Android smsdk v2 版本升级到 Android smsdk v3 版本，smsdk v2 将于 2022 年 12 月 30 日停止维护，希望已接入客户尽快切换到 smsdk v3 版本。
+本文适用于 Android smsdk v2 版本升级到 Android smsdk v3 版本。
 
 升级步骤及注意事项
 

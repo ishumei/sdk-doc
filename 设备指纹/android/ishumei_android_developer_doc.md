@@ -1,6 +1,6 @@
 ishumei SDK（namely  'smsdk'）minSdkVersion is 14.
 
-## 1 Project Cofnig
+## 1 Project Config
 
 This chapter is the Android Studio project configuration steps. Other IDE developers, such as IntelliJ IDEA, Eclipse, etc., need to convert according to the description in this section. For cross-platform configuration, such as Flutter, uniapp, unity3d, etc., you can add plug-ins for access by yourself, or contact us to provide corresponding plug-in demos.
 
@@ -207,7 +207,7 @@ Developers need to set up a proxy server by themselves. For related processing o
 
 ## 6 SDK upgrade
 
-This article applies to the upgrade of Android smsdk v2 to Android smsdk v3. smsdk v2 will stop maintenance on December 30, 2022. We hope that customers who have already connected can switch to smsdk v3 as soon as possible.
+This article applies to the upgrade of Android smsdk v2 to Android smsdk v3. 
 
 Upgrade steps and precautions
 
