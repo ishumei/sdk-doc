@@ -5,7 +5,7 @@
 ### 1.1 导入 smsdk 包
 
 - 旧版 smsdk 使用 .a 形式的包，导入方式如下：
-     
+  
      在项目中选择 Add Files to，在弹出的界面中选择 Copy items if needed，再选择 SmAntiFraud.h 和 libSmAntiFraud.a，选择添加。
      
      ![image-20220907172509726](./res/image-20220907172509726.png)
@@ -83,6 +83,15 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 | delegate          | `id<ServerSmidProtocol>` | 否           | null                                            | 使用回调方法异步获取标识时，实现`ServerSmidProtocol`的对象   |
 | notCollect        | NSArray<NSString*>     | 否           | null                                            | 设置SDK不采集项，目前仅支持"idfa"                            |
 | area              | SmAntiFraudArea        | 否           | AREA_BJ                                         | 数据上传和云配的服务器机房地址。<br />AREA_BJ：北京机房<br />AREA_XJP：新加坡机房<br />AREA_FJNY：弗吉尼亚机房 |
+
+| SmAntiFraud 方法 | 参数类型    | 返回值类型        | 说明                                                         |
+| ---------------- | ----------- | ----------------- | ------------------------------------------------------------ |
+| create           | SmOption    | void 或者 boolean | SDK 初始化方法，旧版本返回值为 void，新版本范围值为 boolean 型，含义如下：<br />false: 初始化失败，可以查看 logcat 检查错误日志<br />true: 初始化成功，此时代表离线检查没有问题，不一定代表接入成功，具体可以查看 **测试** 章节检测是否接入成功 |
+| getDeviceId      | void        | String            | 获取标识，需要在 create 方法后调用，使用时机见后文           |
+| getSDKVersion    | void        | String            | 获取 SDK 版本                                                |
+| startDetector    | AbsDetector | void              | 微行为相关方法，需要配合其它 SDK 使用，如无需求，则不需要关注此方法 |
+| stopDetector     | AbsDetector | void              | 微行为相关方法，需要配合其它 SDK 使用，如无需求，则不需要关注此方法 |
+| getVData         | void        | String            | 微行为相关方法，需要配合其它 SDK 使用，如无需求，则不需要关注此方法 |
 
 ### 2.2 获取标识
 

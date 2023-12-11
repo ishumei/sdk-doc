@@ -115,16 +115,26 @@ option.setPublicKey("YOUR_PUBLICK_KEY");
 boolean isOk = SmAntiFraud.create(context, option);
 ```
 
-| SmOption 方法   | 参数类型      | 是否必填 | 默认值              | 说明                                                         |
-| --------------- | ------------- | -------- | ------------------- | ------------------------------------------------------------ |
-| setOrganization | String        | 是       | 无                  | 数美分配的公司标识，数美后台可以查看                         |
-| setAppId        | String        | 是       | default             | 应用标识，区分不同应用，数美后台可以查看                     |
-| setPublicKey    | String        | 是       | 无                  | 公钥标识，开通账号发送邮件中publicKey项                      |
-| setUrl          | String        | 否       | 无                  | 代理模式、私有化模式中设置设备数据上报地址                   |
-| setConfUrl      | String        | 否       | 无                  | 代理模式、私有化模式中设置云配信息获取地址                   |
-| setCloudConf    | boolean       | 否       | true                | 是否启用云配功能，如果设置为 flase，则不会发起云网络请求     |
-| setArea         | String        | 否       | SmAntiFraud.AREA_BJ | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
-| setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段，[使用说明](https://help.ishumei.com/docs/tw/sdk/faq/android#3-android-%E5%B1%8F%E8%94%BD%E9%87%87%E9%9B%86%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5) |
+| SmOption 方法   | 参数类型      | 是否必填 | 默认值                                          | 说明                                                         |
+| --------------- | ------------- | -------- | ----------------------------------------------- | ------------------------------------------------------------ |
+| setOrganization | String        | 是       | 无                                              | 数美分配的公司标识，数美后台可以查看                         |
+| setAppId        | String        | 是       | 无                                              | 应用标识，区分不同应用，数美后台可以查看                     |
+| setPublicKey    | String        | 是       | 无                                              | 公钥标识，开通账号发送邮件中publicKey项                      |
+| setUrl          | String        | 否       | http://fp-it.fengkongcloud.com/deviceprofile/v4 | 代理模式、私有化模式中设置设备数据上报地址                   |
+| setConfUrl      | String        | 否       | http://fp-it.fengkongcloud.com/v3/cloudconf     | 代理模式、私有化模式中设置云配信息获取地址                   |
+| setCloudConf    | boolean       | 否       | true                                            | 是否启用云配功能，如果设置为 flase，则不会发起云网络请求     |
+| setArea         | String        | 否       | SmAntiFraud.AREA_BJ                             | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
+| setNotCollect   | `Set<String>` | 否       | 否                                              | 屏蔽部分采集字段，[使用说明](https://help.ishumei.com/docs/tw/sdk/faq/android#3-android-%E5%B1%8F%E8%94%BD%E9%87%87%E9%9B%86%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5) |
+
+| SmAntiFraud 方法         | 参数类型              | 返回值类型     | 说明                                                         |
+| ------------------------ | --------------------- | -------------- | ------------------------------------------------------------ |
+| create                   | Context<br />SmOption | void 或boolean | 初始化方法，旧版本返回值为 void，新版本范围值为 boolean 型，含义如下：<br />false: 初始化失败，可以查看 logcat 检查错误日志<br />true: 初始化成功，此时代表离线检查没有问题，不一定代表接入成功，具体可以查看 **测试** 章节检测是否接入成功 |
+| registerServerIdCallback | IServerSmidCallback   | void           | 回调方法，此方法需要在 create 方法后调用，具体使用方法见后文 |
+| getDeviceId              | void                  | String         | 获取标识，需要在 create 方法后调用，使用时机见后文           |
+| getSDKVersion            | void                  | String         | 获取 SDK 版本                                                |
+| startDetector            | AbsDetector           | void           | 微行为相关方法，需要配合其它 SDK 使用，如无需求，则不需要关注此方法 |
+| stopDetector             | AbsDetector           | void           | 微行为相关方法，需要配合其它 SDK 使用，如无需求，则不需要关注此方法 |
+| getVData                 | void                  | String         | 微行为相关方法，需要配合其它 SDK 使用，如无需求，则不需要关注此方法 |
 
 调用 `create` 方法时，smsdk 会检查传入参数是否合法，如果返回值为 `false`，则需要过滤 logcat 日志中的 `Smlog` 进行自检，注意 smsdk 3.3.0 之前版本没有返回值。
 
