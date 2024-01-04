@@ -55,7 +55,16 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
 根据[苹果隐私政策规定](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files?language=objc)，嵌入数美SDK的app需要在Xcode项目的 PrivacyInfo.xcprivacy 中补全条款，若项目中没有，需要根据[官方说明](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files?language=objc)使用Xcode 15及以上的版本新建一个 PrivacyInfo.xcprivacy 文件。
 
-开发者需要将数美SDK下的 PrivacyInfo.xcprivacy 中的条款补全到app的 PrivacyInfo.xcprivacy 中。
+开发者需要将数美SDK下的 PrivacyInfo.xcprivacy 中的条款补全到app的 PrivacyInfo.xcprivacy 中，具体补全方式可以参考如下：
+
+- 使用Source Code方式添加
+
+  1. Xcode中使用Source Code方式打开app项目下的PrivacyInfo.xcprivacy。
+  2. 将数美SDK中的PrivacyInfo.xcprivacy文件中的`NSPrivacyCollectedDataTypes`和`NSPrivacyAccessedAPITypes`对应的值复制，并添加到app的PrivacyInfo.xcprivacy中的`NSPrivacyCollectedDataTypes`和`NSPrivacyAccessedAPITypes`下。
+
+- 使用Property List的方式添加
+
+  除了Source Code直接复制代码的形式外，也可以在Xcode中使用Property List的方式打开PrivacyInfo.xcprivacy文件，在其中点击+，Xcode会提示可选的条款和可设置项，保障新增的条目项和数美的PrivacyInfo.xcprivacy声明的条目项一致即可完成添加。
 
 数美SDK的 PrivacyInfo.xcprivacy 文件位于：
 SmAntiFraud.xcframework/ios-arm64/SmAntiFraud.framework/PrivacyInfo.xcprivacy
