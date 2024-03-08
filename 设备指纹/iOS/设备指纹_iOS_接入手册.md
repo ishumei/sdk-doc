@@ -46,7 +46,7 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
   1. 在 Xcode 中选择 PrivacyInfo.xcprivacy
 
-  2. 将以下条款添加到 PrivacyInfo.xcprivacy 中的`Privacy Nutrition Label Types`和`Privacy Accessed API Types`下
+  2. 将以下条款添加到 PrivacyInfo.xcprivacy 中的`Privacy Nutrition Label Types`和`Privacy Accessed API Types`下，具体配置如下图：
 
      ![privacy](./res/privacy.png)
 
@@ -58,32 +58,32 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
      ```xml
      <key>NSPrivacyCollectedDataTypes</key>
-      <array>
-        <dict>
-          <key>NSPrivacyCollectedDataType</key>
-          <string>NSPrivacyCollectedDataTypeDeviceID</string>
-          <key>NSPrivacyCollectedDataTypeLinked</key>
-          <false/>
-          <key>NSPrivacyCollectedDataTypeTracking</key>
-          <true/>
-          <key>NSPrivacyCollectedDataTypePurposes</key>
-          <array>
-            <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
-          </array>
-        </dict>
-        <dict>
-          <key>NSPrivacyCollectedDataType</key>
-          <string>NSPrivacyCollectedDataTypeFitness</string>
-          <key>NSPrivacyCollectedDataTypeLinked</key>
-          <false/>
-          <key>NSPrivacyCollectedDataTypeTracking</key>
-          <false/>
-          <key>NSPrivacyCollectedDataTypePurposes</key>
-          <array>
-            <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
-          </array>
-        </dict>
-      </array>
+     	<array>
+     		<dict>
+     			<key>NSPrivacyCollectedDataType</key>
+     			<string>NSPrivacyCollectedDataTypeDeviceID</string>
+     			<key>NSPrivacyCollectedDataTypeLinked</key>
+     			<false/>
+     			<key>NSPrivacyCollectedDataTypeTracking</key>
+     			<true/>
+     			<key>NSPrivacyCollectedDataTypePurposes</key>
+     			<array>
+     				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+     			</array>
+     		</dict>
+     		<dict>
+     			<key>NSPrivacyCollectedDataType</key>
+     			<string>NSPrivacyCollectedDataTypeFitness</string>
+     			<key>NSPrivacyCollectedDataTypeLinked</key>
+     			<false/>
+     			<key>NSPrivacyCollectedDataTypeTracking</key>
+     			<false/>
+     			<key>NSPrivacyCollectedDataTypePurposes</key>
+     			<array>
+     				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+     			</array>
+     		</dict>
+     	</array>
      ```
   
   3. 添加 NSPrivacyAccessedAPITypes 相关条款：将以下文本粘贴到最外层的`<dict>`和`</dict>`中的key值为`NSPrivacyAccessedAPITypes`下，若无此key值，则需要先创建。
