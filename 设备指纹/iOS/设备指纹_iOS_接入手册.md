@@ -3,22 +3,7 @@
 ## 1 工程配置
 
 ### 1.1 导入 smsdk 包
-
-- 旧版 smsdk 使用 .a 形式的包，导入方式如下：
-  
-     在项目中选择 Add Files to，在弹出的界面中选择 Copy items if needed，再选择 SmAntiFraud.h 和 libSmAntiFraud.a，选择添加。
-     
-     ![image-20220907172509726](./res/image-20220907172509726.png)
-     
-     ![image-20220907172358663](./res/image-20220907172358663.png)
-     
-     导入 smsdk 包后，代码中通过 `#import` 导入`SmAntiFraud.h`头文件相对路径即可，如下：
-     
-     ```objective-c
-     #import "../include/SmAntiFraud/SmAntiFraud.h"
-     ```
-
-- 新版 smsdk 使用 .xcframework 形式的包，导入方式如下：
+新版 smsdk 使用 .xcframework 形式的包，导入方式如下：
 
   1. 复制 SmAntiFraud.xcframework 到项目中
 
@@ -55,21 +40,73 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
 根据[苹果隐私政策规定](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files?language=objc)，嵌入数美SDK的app需要在Xcode项目的 PrivacyInfo.xcprivacy 中补全条款，若项目中没有，需要根据[官方说明](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files?language=objc)使用Xcode 15及以上的版本新建一个 PrivacyInfo.xcprivacy 文件。
 
-开发者需要将数美SDK下的 PrivacyInfo.xcprivacy 中的条款补全到app的 PrivacyInfo.xcprivacy 中，具体补全方式可以参考如下：
+参考以下方式添加数美SDK依赖的隐私条款：
 
-- 使用Source Code方式添加
+1. 以 Source Code 打开 PrivacyInfo.xcprivacy：右键 PrivacyInfo.xcprivacy，选择 Open As，选择 Source Code，
 
-  1. Xcode中使用Source Code方式打开app项目下的PrivacyInfo.xcprivacy。
-  2. 将数美SDK中的PrivacyInfo.xcprivacy文件中的`NSPrivacyCollectedDataTypes`和`NSPrivacyAccessedAPITypes`对应的值复制，并添加到app的PrivacyInfo.xcprivacy中的`NSPrivacyCollectedDataTypes`和`NSPrivacyAccessedAPITypes`下。
+2. 添加 NSPrivacyCollectedDataTypes：将以下文本粘贴到最外层的`<dict>`和`</dict>`中
 
-- 使用Property List的方式添加
+   ```xml
+   <key>NSPrivacyCollectedDataTypes</key>
+   	<array>
+   		<dict>
+   			<key>NSPrivacyCollectedDataType</key>
+   			<string>NSPrivacyCollectedDataTypeDeviceID</string>
+   			<key>NSPrivacyCollectedDataTypeLinked</key>
+   			<false/>
+   			<key>NSPrivacyCollectedDataTypeTracking</key>
+   			<true/>
+   			<key>NSPrivacyCollectedDataTypePurposes</key>
+   			<array>
+   				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+   			</array>
+   		</dict>
+   		<dict>
+   			<key>NSPrivacyCollectedDataType</key>
+   			<string>NSPrivacyCollectedDataTypeFitness</string>
+   			<key>NSPrivacyCollectedDataTypeLinked</key>
+   			<false/>
+   			<key>NSPrivacyCollectedDataTypeTracking</key>
+   			<false/>
+   			<key>NSPrivacyCollectedDataTypePurposes</key>
+   			<array>
+   				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+   			</array>
+   		</dict>
+   	</array>
+   ```
 
-  除了Source Code直接复制代码的形式外，也可以在Xcode中使用Property List的方式打开PrivacyInfo.xcprivacy文件，在其中点击+，Xcode会提示可选的条款和可设置项，保障新增的条目项和数美的PrivacyInfo.xcprivacy声明的条目项一致即可完成添加。
+3. 添加NSPrivacyAccessedAPITypes：将以下文本粘贴到最外层的`<dict>`和`</dict>`中
 
-数美SDK的 PrivacyInfo.xcprivacy 文件位于：
-SmAntiFraud.xcframework/ios-arm64/SmAntiFraud.framework/PrivacyInfo.xcprivacy
-
-
+   ```xml
+   <key>NSPrivacyAccessedAPITypes</key>
+   	<array>
+   		<dict>
+   			<key>NSPrivacyAccessedAPIType</key>
+   			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+   			<key>NSPrivacyAccessedAPITypeReasons</key>
+   			<array>
+   				<string>35F9.1</string>
+   			</array>
+   		</dict>
+   		<dict>
+   			<key>NSPrivacyAccessedAPITypeReasons</key>
+   			<array>
+   				<string>C617.1</string>
+   			</array>
+   			<key>NSPrivacyAccessedAPIType</key>
+   			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+   		</dict>
+   		<dict>
+   			<key>NSPrivacyAccessedAPITypeReasons</key>
+   			<array>
+   				<string>CA92.1</string>
+   			</array>
+   			<key>NSPrivacyAccessedAPIType</key>
+   			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+   		</dict>
+   	</array>
+   ```
 
 
 ## 2 标准接入
