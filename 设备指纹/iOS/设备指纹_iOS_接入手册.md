@@ -96,8 +96,8 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
      			<array>
      				<string>35F9.1</string>
      			</array>
-                 <key>NSPrivacyAccessedAPIType</key>
-                 <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+           <key>NSPrivacyAccessedAPIType</key>
+           <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
      		</dict>
      		<dict>
      			<key>NSPrivacyAccessedAPITypeReasons</key>
