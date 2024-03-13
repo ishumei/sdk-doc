@@ -23,7 +23,7 @@ iOS 验证码 SDK 最低兼容 iOS 9.0
 ### 参数设置
 
 ```objective-c
-// 初始化验证码WebView
+// 启动验证码WebView
 SmCaptchaOption *caOption = [[SmCaptchaOption alloc] init];
 [caOption setOrganization: @”xxxxx”];   // 必填，组织标识
 [caOption setAppId:@"default"];         // 必填，应用标识
@@ -37,7 +37,7 @@ SmCaptchaOption *caOption = [[SmCaptchaOption alloc] init];
 [caOption setMode: SM_MODE_SLIDE];    
 
 [caOption setExtOption:@{
-  //（选填项）验证码英文主题，默认中文，其他语言参考：https://help.ishumei.com/docs/tw/captcha/web/developDoc 初始化参数 lang 值解释
+  //（选填项）验证码英文主题，默认中文，其他语言参考：https://help.ishumei.com/docs/tw/captcha/web/developDoc 启动参数 lang 值解释
   @"lang" : @"en",
   // (选填项) 自定义样式，仅 滑动式（MODE_SLIDE）模式 支持自定义样式
   @"style": @{
@@ -91,7 +91,7 @@ SmCaptchaOption *caOption = [[SmCaptchaOption alloc] init];
 // [caOption setHost:@"YOUR_HOST"];
 ```
 
-### 初始化
+### 启动
 
 ```objective-c
 // 构造数美验证码对象，验证码宽高比为 3:2，滑动式（MODE_SLIDE）模式下，自定义样式 withTitle 为 true 时，内容宽高比为 6:5
@@ -99,7 +99,7 @@ SmCaptchaWKWebView *_webview = [[SmCaptchaWKWebView alloc] init];
 CGRect captchaRect = CGRectMake(0, 0, width, width * 2 / 3);
 [_webview setFrame:captchaRect];
 
-// 初始化错误，参考错误码含义进行修改；self 实现 SmCaptchaProtocol 协议
+// 启动错误，参考错误码含义进行修改；self 实现 SmCaptchaProtocol 协议
 NSInteger code = [_webview createWithOption: caOption delegate: self];
 if (SmCaptchaSuccess != code) {
   NSLog(@"SmCaptchaWKWebView init failed %ld", code);
@@ -113,7 +113,7 @@ if (SmCaptchaSuccess != code) {
 ```objective-c
 - (void)onInitWithContent:(NSDictionary *)content
 {
-  // web 参数初始化完成时，回调此方法
+  // web 参数启动完成时，回调此方法
   // [content objectForKey:@"captchaUuid"] 获取uuid，用于业务统计
   NSLog(@"onInitWithContent : %@",content);
 } 

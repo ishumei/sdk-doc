@@ -5,14 +5,14 @@
 ### 导入SDK文件
 将产出js文件拷贝到小程序的libs目录
 
-### 初始化
+### 启动
 正常使用：在app.js 引入如下所示代码：
 
 ```javascript
-const SMSdk = require('./libs/weapp-fp'); // 注意：require之后要立即初始化配置
+const SMSdk = require('./libs/weapp-fp'); // 注意：require之后要立即配置参数并启动
 
 // 更多参数请看下一章节详细说明
-// 若需要采集openId，和unionId则在wx.login()后获取到openId 和unionId。再进行SMSdk.initConf() 初始化操作。
+// 若需要采集openId，和unionId则在wx.login()后获取到openId 和unionId。再进行SMSdk.initConf() 启动操作。
 SMSdk.initConf({
     // 1. 通用配置项
     organization: 'xxxxxxx', // 必填，公司标识，邮件中organization项
@@ -55,8 +55,8 @@ App({
      */
     SMSdk: SMSdk,
     /**
-     * 生命周期函数--监听小程序初始化
-     * 当小程序初始化完成时，会触发 onLaunch（全局只触发一次）
+     * 生命周期函数--监听小程序启动
+     * 当小程序启动完成时，会触发 onLaunch（全局只触发一次）
      */
     onLaunch() {
     }
@@ -69,12 +69,12 @@ App({
 
 2、将获取到openId 和unionId。调用SMSdk.setOpenId SMSdk.setUnionId 进行配置
 
-3、进行SMSdk.initConf() 初始化操作。
+3、进行SMSdk.initConf() 启动操作。
 
 ```javascript
     SMSdk.setOpenId('您获取到的openId');
     SMSdk.setUnionId('您获取到的UnionId');
-    SMSdk.initConf({}); // 同正常初始化接入
+    SMSdk.initConf({}); // 同正常启动接入
 ```
 
 ### 使用设备标识
@@ -98,7 +98,7 @@ Page({
     },
 
     /**
-     * 方式二 SMSdk.getDeviceId方法在初始化之后即可调用
+     * 方式二 SMSdk.getDeviceId方法在启动之后即可调用
      * 例如 可以在onReady生命周期函数中调用，也可以在小程序其他生命周期中调用
      */
     onReady() {
@@ -150,7 +150,7 @@ mini: {
 
 | **方法名** | **参数** | **返回值**  | **说明** |
 | -- | -- | -- | -- |
-| getDeviceId | 无 | Promise | 异步方法，返回一个 promise，以便在未来某个时候把deviceId交给使用者。该方法可以在初始化之后需要的地方都可以调用 |
+| getDeviceId | 无 | Promise | 异步方法，返回一个 promise，以便在未来某个时候把deviceId交给使用者。该方法可以在启动SDK之后需要的地方都可以调用 |
 
 ### 采集openId，unionId的方法
 

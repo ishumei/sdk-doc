@@ -99,10 +99,10 @@
 
 ## 2 标准接入
 
-最简初始化，初始化成功后，会立即进行数据采集，所以需要开发者确保在 ”同意“ 隐私政策前 **不要** 调用 `create` 方法。
+最简启动SDK，启动成功后，会立即进行数据采集，所以需要开发者确保在 ”同意“ 隐私政策前 **不要** 调用 `create` 方法。
 
 ```java
-// 初始化参数对象
+// 启动SDK参数对象
 SmAntiFraud.SmOption option = new SmAntiFraud.SmOption();
 // 必填，组织标识
 option.setOrganization("YOUR_ORGANIZATION");
@@ -111,7 +111,7 @@ option.setAppId("YOUR_APP_ID");
 // 必填，加密 KEY，邮件中 android_public_key 附件内容
 option.setPublicKey("YOUR_PUBLICK_KEY"); 
 
-// 初始化
+// 启动SDK
 boolean isOk = SmAntiFraud.create(context, option);
 ```
 
@@ -128,13 +128,13 @@ boolean isOk = SmAntiFraud.create(context, option);
 
 调用 `create` 方法时，smsdk 会检查传入参数是否合法，如果返回值为 `false`，则需要过滤 logcat 日志中的 `Smlog` 进行自检，注意 smsdk 3.3.0 之前版本没有返回值。
 
-初始化调用时机
+调用`create`运行SDK时机
 
 1. APP 首次启动，同意隐私政策后调用
 2. APP 非首次启动，且同意了隐私政策，启动时调用
 3. 只在 **主进程** 中调用，避免多进程导致频繁采集问题，参考 "常见问题 Android 如何判断主进程" 章节
 
-`create` 方法采集数据大约需要 1 秒（低端机型会出现超出 2 秒情况），采集过程发生在子线程，不会阻塞当前线程。正常初始化后，可调用 `SmAntiFraud.getDeviceId` 获取标识。
+`create` 方法采集数据大约需要 1 秒（低端机型会出现超出 2 秒情况），采集过程发生在子线程，不会阻塞当前线程。正常启动SDK后，可调用 `SmAntiFraud.getDeviceId` 获取标识。
 
 获取标识时机：
 
@@ -145,11 +145,11 @@ boolean isOk = SmAntiFraud.create(context, option);
 
 ![smsdk-flow](./res/smsdk-flow.png)
 
-场景一：初始化后，smsdk 缓存中有 boxId，如图 ”7. 应用事件“，此时调用 `getDeviceId` 会立即返回 boxId，可以将 boxId 直接放到业务请求 Header 中。此场景一般出现在初始化时，smsdk 已经完成过一次服务交互，从服务器获取到 boxId 并缓存成功。
+场景一：启动SDK后，smsdk 缓存中有 boxId，如图 ”7. 应用事件“，此时调用 `getDeviceId` 会立即返回 boxId，可以将 boxId 直接放到业务请求 Header 中。此场景一般出现在启动SDK时，smsdk 已经完成过一次服务交互，从服务器获取到 boxId 并缓存成功。
 
-场景二：初始化后，smsdk 缓存中没有 boxId 但是有 boxData，如图 ”9. 应用事件“，此时调用 `getDeviceId` 会立即返回 boxData，由于 boxData 长度较长，直接存放在业务请求 Header 中可能会出现 4K 限制，导致 boxData 被截断，处理方案见下文。此场景一般出现在初始化时，smsdk 采集完成后，生成 boxData，但是未完成一次服务交互，未能将 boxData 更新为 boxId。
+场景二：启动SDK后，smsdk 缓存中没有 boxId 但是有 boxData，如图 ”9. 应用事件“，此时调用 `getDeviceId` 会立即返回 boxData，由于 boxData 长度较长，直接存放在业务请求 Header 中可能会出现 4K 限制，导致 boxData 被截断，处理方案见下文。此场景一般出现在启动SDK时，smsdk 采集完成后，生成 boxData，但是未完成一次服务交互，未能将 boxData 更新为 boxId。
 
-场景三：初始化后，smsdk  缓存中没有 boxId 且没有 boxData，如图中 "12. 应用事件"。此时调用 `getDeviceId` 方法会等待采集完成，并将采集数据加密生成 boxData 返回，等待过程与采集速度和`create`时机有关，假设采集耗时为 2 秒，若调用 `create` 后立即调用 `getDeviceId`，那么 `getDeviceId` 方法会阻塞当前线程 2 秒；若调用 `create`  1 秒后调用 `getDeviceId` 方法，`getDeviceId` 会阻塞当前线程 1 秒，需要开发者确保不会由于阻塞造成 ANR。此处同样有 boxData 被截断的问题。此场景一般出现在初始化后，smsdk 缓存中没有 boxId 且 smsdk 正在采集中时调用 `getDeviceId` 方法。
+场景三：启动SDK后，smsdk  缓存中没有 boxId 且没有 boxData，如图中 "12. 应用事件"。此时调用 `getDeviceId` 方法会等待采集完成，并将采集数据加密生成 boxData 返回，等待过程与采集速度和`create`时机有关，假设采集耗时为 2 秒，若调用 `create` 后立即调用 `getDeviceId`，那么 `getDeviceId` 方法会阻塞当前线程 2 秒；若调用 `create`  1 秒后调用 `getDeviceId` 方法，`getDeviceId` 会阻塞当前线程 1 秒，需要开发者确保不会由于阻塞造成 ANR。此处同样有 boxData 被截断的问题。此场景一般出现在启动SDK后，smsdk 缓存中没有 boxId 且 smsdk 正在采集中时调用 `getDeviceId` 方法。
 
 场景二和场景三所述 boxData 截断问题解决方案：与业务端同学协调，调整业务请求 Header 长度限制，建议调整到 24KB 大小；如果业务侧无法修改可以通过配置 smsdk 进行 boxData 长度调整，此方法会降低 boxData 安全性，请作为备选方案执行
 
@@ -157,7 +157,7 @@ boolean isOk = SmAntiFraud.create(context, option);
 option.usingShortBoxData(true); 
 ```
 
-场景三中所述阻塞问题解决方案：不要在初始化时立即调用 `getDeviceId` 方法，建议延迟 1 到 2 秒调用，如果需要在最早时机调用，可以使用回调方式监听 boxId
+场景三中所述阻塞问题解决方案：不要在启动SDK时立即调用 `getDeviceId` 方法，建议延迟 1 到 2 秒调用，如果需要在最早时机调用，可以使用回调方式监听 boxId
 
 ```java
 // 此方法必须在 create 方法之前调用，否则可能会出现不触发回调问题

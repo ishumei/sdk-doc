@@ -21,7 +21,7 @@ const SmAntiFraud = uni.requireNativePlugin('SmsdkUniPlugin');
 
 ### 1.3 sdk API
 
-####  初始化 smsdk
+####  启动 smsdk
 
 ```js
 SmAntiFraud.create({
@@ -72,12 +72,12 @@ SmAntiFraud.getSdkVersion();
 
 ### 3.1 数据合规
 
-smsdk 调用初始化方法时会采集设备数据，为避免数据违规问题，需要在 app 隐私政策中添加数美隐私协议，同意隐私政策后再进行初始化。
+启动SDK时会采集设备数据，为避免数据违规问题，需要在 app 隐私政策中添加数美隐私协议，同意隐私政策后再进行启动。
 
 数美隐私协议参考《数美设备风险SDK接入手册》。
 
 ### 3.2 验证是否接入成功
 
-- 初始化完成后，调用`SmAntiFraud.getDeviceId()` 方法获取到 serverId 或 boxId 即代表接入成功，其他为失败。serverId 和 boxId 示例参考《数美设备风险SDK接入手册》；
+- 启动SDK完成后，调用`SmAntiFraud.getDeviceId()` 方法获取到 serverId 或 boxId 即代表接入成功，其他为失败。serverId 和 boxId 示例参考《数美设备风险SDK接入手册》；
 
-- `SmAntiFraud.create` 方法回调中返回 `"smid": "xxx"` 代表接入成功，回调方法参考 1.3 小节 "初始化 smsdk" 部分；
+- `SmAntiFraud.create` 方法回调中返回 `"smid": "xxx"` 代表接入成功，回调方法参考 1.3 小节 "启动 smsdk" 部分；

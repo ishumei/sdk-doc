@@ -56,7 +56,7 @@ dependencies {
    
    //（选填项）样式配置
    Map<String, Object> extOption = new HashMap<>();
-   //（选填项）验证码英文主题，默认中文，其他语言参考：https://help.ishumei.com/docs/tw/captcha/web/developDoc 初始化参数 lang 值解释
+   //（选填项）验证码英文主题，默认中文，其他语言参考：https://help.ishumei.com/docs/tw/captcha/web/developDoc 启动参数 lang 值解释
    extOption.put("lang", "en");
    // (选填项) 自定义样式，仅 滑动式（MODE_SLIDE）模式 支持自定义样式
    extOption.put("style", 
@@ -112,13 +112,13 @@ dependencies {
    // option.setHost(host);
    ```
 
-### 初始化
+### 启动
 
 ```java
 SmCaptchaWebView mCaptchaView = new SmCaptchaWebView(context);
 int code = mCaptchaView.initWithOption(option, mSimpleResultListener);
 if (SmCaptchaWebView.SMCAPTCHA_SUCCESS != code) {
-  // 初始化错误，参考错误码含义进行修改
+  // 启动错误，参考错误码含义进行修改
 } else {
   // 将 mCaptchaView 添加到指定容器中
   // 验证码宽高比为 3:2
@@ -134,7 +134,7 @@ SimpleResultListener mSimpleResultListener = new SimpleResultListener() {
   @Override
   public void onInitWithContent(JSONObject content) {
     super.onInitWithContent(content);
-    // web 参数初始化完成时，回调此方法
+    // web 参数启动完成时，回调此方法
     // 通过 content.optString("captchaUuid") 获取 uuid，用于业务统计
   }
 

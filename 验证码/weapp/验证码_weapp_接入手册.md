@@ -10,7 +10,7 @@ https://mp.weixin.qq.com/wxopen/plugindevdoc?appid=wxfb52904a0e24dc20&token=&lan
 
 申请完成后请通知数美，待数美审批。审批完成后，按照如下流程接入SDK。
 
-### 2. 初始化小程序验证码
+### 2. 启动小程序验证码
 ```js
 // app.json
 {
@@ -66,7 +66,7 @@ Page({
         console.log('监听验证码关闭');
     },
 
-    resetCaptcha() { // 某些场景需要初始化验证码
+    resetCaptcha() { // 某些场景需要启动验证码
         plugin.reset();
     },
 

@@ -6,7 +6,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
 
 ### 嵌入SDK的详细步骤
 
-**1. 引入初始化js** 
+**1. 引入js** 
 
 引入最新版js入口文件，版本是：1.0.4
 
@@ -21,7 +21,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
     // <script src="https://castatic-fjny.fengkongcloud.cn/pr/v1.0.4/smcp.min.js"></script>
 ```
 
-**2. 初始化方法**
+**2. 启动方法**
 ```js
     initSMCaptcha({
         organization: 'xxxx', // 数美后台可以查看公司标识
@@ -39,7 +39,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
     });
 ```
 
-初始化参数如下表所示：
+启动参数如下表所示：
 
 | **字段** | **参数类型**  | **是否必填** | **默认值** | **字段说明** |
 | -- | -- | -- | -- | -- |
@@ -100,7 +100,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
      });
 ```
 3.4 onReady，验证码所有资源（js、css及图片）加载就绪后的回调，
-返回type字段用以区分3种不同情况下的加载成功，init：初始化后 refresh：手动刷新图片后 afterFail：验证失败后
+返回type字段用以区分3种不同情况下的加载成功，init：启动后 refresh：手动刷新图片后 afterFail：验证失败后
 ```js
     initSMCaptcha({ 
         organization: 'xxxx', //数美后台查看
@@ -110,7 +110,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
 
         // 全部资源加载成功后
         SMCaptcha.onReady(function (rootEl, params) {
-            // params中包含type字段，'init'-初始化后 | 'refresh'-手动刷新图片后 | 'afterFail'-验证失败后
+            // params中包含type字段，'init'-启动后 | 'refresh'-手动刷新图片后 | 'afterFail'-验证失败后
             console.log('onReady', params);
         });
     });
@@ -240,8 +240,8 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
         // ...
     });
 ```
-3.13） 初始化参数中支持传入字段captchaUuid
-初始化参数中支持传入字段captchaUuid（32位随机字符串），用来将数美侧的埋点日志与业务端的埋点日志关联上，后续无论是定位问题或是对齐埋点数据都是有用的。详见下述示例代码。
+3.13） 启动参数中支持传入字段captchaUuid
+启动参数中支持传入字段captchaUuid（32位随机字符串），用来将数美侧的埋点日志与业务端的埋点日志关联上，后续无论是定位问题或是对齐埋点数据都是有用的。详见下述示例代码。
 ```js
 initSMCaptcha({ 
     organization: 'xxxx', //数美后台查看
@@ -257,7 +257,7 @@ initSMCaptcha({
 
     // 全部资源加载成功后
     SMCaptcha.onReady(function (dom, params) {
-        // params中有type字段，'init'-初始化后 | 'refresh'-手动刷新图片后 | 'afterFail'-验证失败后
+        // params中有type字段，'init'-启动后 | 'refresh'-手动刷新图片后 | 'afterFail'-验证失败后
         console.log('onReady', params);
 
         // 业务端可以自行埋点
@@ -310,7 +310,7 @@ initSMCaptcha({
 | 2001   | 资源异常   |
 | 2002   | 服务器异常 |
 | 2003   | 参数异常   |
-| 2004   | 初始化异常 |
+| 2004   | 启动SDK异常 |
 | 2005   | 网络超时   |
 
 **5. 完整代码示例**
@@ -371,7 +371,7 @@ initSMCaptcha({
 
             // 全部资源加载成功后
             SMCaptcha.onReady(function (dom, params) {
-                // params中有type字段，'init'-初始化后 | 'refresh'-手动刷新图片后 | 'afterFail'-验证失败后
+                // params中有type字段，'init'-启动后 | 'refresh'-手动刷新图片后 | 'afterFail'-验证失败后
                 console.log('onReady', params);
             });
 
@@ -417,7 +417,7 @@ initSMCaptcha({
             });
         }
 
-        // 初始化验证码
+        // 启动验证码
         initSMCaptcha({
             organization: 'xxx',
             appendTo: captchaId
