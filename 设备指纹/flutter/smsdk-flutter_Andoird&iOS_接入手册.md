@@ -20,11 +20,11 @@
 
 在 Flutter 项目根目录下执行：`Flutter pub get`
 
-## 4 初始化SDK
+## 4 启动SDK
 
-安装后首次启动时，在用户同意隐私协议后，立即初始化 SDK。避免出现用户未同意隐私协议已经采集数据问题。
+安装后首次启动时，在用户同意隐私协议后，立即启动 SDK。避免出现用户未同意隐私协议已经采集数据问题。
 
-后续启动时，应在启动后立即初始化 SDK。
+后续app启动时，应在app启动后立即启动 SDK。
 
 方法调用可参考 `sm_smsdk_flutter_demo/lib/main.dart` 文件示例代码。
 
@@ -58,7 +58,7 @@ import 'package:sm_fraud/sm_fraud.dart';
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 ```
 
-### 4.3 调用 plugin 的 create 方法初始化 SDK
+### 4.3 调用 plugin 的 create 方法启动 SDK
 
 create 方法接收一个 Map，Map 中的 key 值已经在 SmFraud 类中定义，其中必填项有 3 项， 如下
 

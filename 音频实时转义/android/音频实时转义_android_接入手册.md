@@ -41,7 +41,7 @@
 
 2. **SDK 代码接入**
 
-   1. 初始化
+   1. 启动SDK
 
       ```java
       SmRtAsrClient.AsrOption option = new SmRtAsrClient.AsrOption();
@@ -56,7 +56,7 @@
       // 选填参数，设置 http 数据传输机房，机房位置需要联系数美客服，websocket 通讯失败时会暂时切换到 http 通讯
       option.setHttpUrl(SESSION_START_URL);
       
-      // 初始化，context 为非空必传参数
+      // 启动，context 为非空必传参数
       SmRtAsrClient client = SmRtAsrClient.create(context, option);
       ```
 
@@ -214,7 +214,7 @@
    | 2101   | 无网络     | 设备无网络                                                   | 忽略                                                         |
    | 2102   | 语音丢包   | 网络异常导致语音频段无法上传到服务器                         | 忽略                                                         |
    | 2103   | 语音放弃   | 发送语音包过于频繁（如 4 秒发送了超过 100 个片段）超出缓存限制，导致新加入的语音片段会被丢弃 | 忽略                                                         |
-   | 2301   | 状态错误   | SDK API 调用错误，比如未初始化时调用了 startSession          | 确保优先初始化                                               |
+   | 2301   | 状态错误   | SDK API 调用错误，比如未启动时调用了 startSession          | 确保优先启动SDK                                               |
    | 2401   | 服务端错误 | 服务未按照协议发送数据                                       | 忽略                                                         |
    | 2402   | 服务端错误 | 服务未按照协议发送数据                                       | 忽略                                                         |
    | 2403   | 服务端错误 | 服务未按照协议发送数据                                       | 忽略                                                         |

@@ -29,7 +29,7 @@ implementation fileTree(dir: "libs", include: "smauth*.aar")
 
 
 
-## 初始化
+## 启动SDK
 
 ``` java
 SmAuthHelper.create(context).register(applicationId, listener);
@@ -341,7 +341,7 @@ void onVerifiedFailed(int requestCode, Exception exception);
 | 200027 | 未开启移动数据网络或网络不稳定                                                                                                                                                                                                                                                                                  |
 | 200028 | 网络请求出错                                                                                                                                                                                                                                                                                                    |
 | 200029 | 请求出错,上次请求未完成                                                                                                                                                                                                                                                                                         |
-| 200030 | 没有初始化参数                                                                                                                                                                                                                                                                                                  |
+| 200030 | 没有启动参数                                                                                                                                                                                                                                                                                                  |
 | 200031 | 生成token失败                                                                                                                                                                                                                                                                                                   |
 | 200032 | KS缓存不存在                                                                                                                                                                                                                                                                                                    |
 | 200033 | 复用中间件获取Token失败                                                                                                                                                                                                                                                                                         |

@@ -32,7 +32,7 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 ### 1.4 idfa 配置
 如果 APP 之前未采集过 `IDFA` ，上架App Store时，需要根据App Connect的政策，明确app中使用`idfa`并说明原因，
 
-   若不想使用 `IDFA`，可参考下面初始化章节，设置 `notCollect` 不采集 `IDFA`，
+   若不想使用 `IDFA`，可参考下面启动SDK章节，设置 `notCollect` 不采集 `IDFA`，
 
    若app归属于儿童类，则联系数美运营提供不包含采集 `IDFA` 相关代码的SDK。
 
@@ -120,18 +120,18 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
 ## 2 标准接入
 
-### 2.1 初始化
+### 2.1 启动SDK
 
-调用SDK的 `-[SmAntiFraud create:]` 方法完成初始化。
+调用SDK的 `-[SmAntiFraud create:]` 方法启动SDK。
 
-初始化非阻塞当前线程，会采集数据并网络传输，缓存 `deviceId`，调用时机如下
+启动SDK非阻塞当前线程，会采集数据并网络传输，缓存 `deviceId`，调用时机如下
 
 1. APP 首次启动，同意隐私政策后调用。
 2. APP 非首次启动，且同意了隐私政策，启动时调用。
 
-若`create`方法返回`NO`，则需要检查初始化参数是否正确，可以过滤日志中的 `Smlog` 进行自检。
+若`create`方法返回`NO`，则需要检查启动SDK参数是否正确，可以过滤日志中的 `Smlog` 进行自检。
 
-初始化需要 `SmOption` 实例，其中的具体参数如下
+启动SDK需要 `SmOption` 实例，其中的具体参数如下
 
 | **字段**          | **参数类型**           | **是否必填** | **默认值**                                      | **字段说明**                                                 |
 | ----------------- | ---------------------- | ------------ | ----------------------------------------------- | ------------------------------------------------------------ |
@@ -156,12 +156,12 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
   调用SDK的 `-[SmAntiFraud getDeviceId]` 方法获取设备标识，调用时机如下
 
-  1. 初始化`create` 方法返回 `YES` 后 1～2 秒。时间供初始化方法收集数据和网络传输。
+  1. 调用`create` 方法启动SDK返回 `YES` 后 1～2 秒。时间供SDK收集数据和网络传输。
   2. 在业务事件时使用，比如登录、注册等关键事件中上报 `getDeviceId` 返回的字符串。
 
 - 异步方式
 
-  异步方式可以在初始化之后，最早时机获取到服务端下发的最新的boxId。
+  异步方式可以在启动SDK之后，最早时机获取到服务端下发的最新的boxId。
 
   需要调用`-[SmOption setDelegate:]`设置实现了 `ServerSmidProtocol` 接口的实例对象，具体方式如下
 
@@ -195,16 +195,16 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 ### 2.3 代码示例
 
 ```objective-c
-// 初始化参数对象
+// 启动SDK参数对象
 SmOption *option = [[SmOption alloc] init];
 [option setOrganization: @"YOUR_ORGANIZATION"];// 必填
 [option setAppId:@"YOUR_APP_ID"];							 // 必填
 [option setPublicKey:@"YOUR_PUBLICK_KEY"];		 // 必填
 
-// 初始化
+// 启动SDK
 BOOL isOk = [[SmAntiFraud shareInstance] create:option];
 if (!isOk) {
-	// 检查option初始化参数是否设置正确
+	// 检查option启动SDK参数是否设置正确
 }
 ```
 

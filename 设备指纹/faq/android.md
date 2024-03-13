@@ -37,7 +37,7 @@ String getCurProcessName(Context context) {
 @Override
 public void onCreate() {
   super.onCreate();
-  // 只在主进程初始化 smsdk
+  // 只在主进程启动 smsdk
 	if (getPackageName().equals(getCurProcessName(context))) {
     ...
     SmAntiFraud.create(context, option);
@@ -79,4 +79,4 @@ SmAntiFraud.create(ctx, option);
 
 ### 4 手机弹窗获取“位置”权限
 
-在部分低版本 Android 系统中，初始化设备指纹会有弹窗现象，提示授权位置权限，原因是某些 ROM 修改了授权弹窗机制，只要调用 `WifiManager.getConnectionInfo` 方法，系统会自动弹窗，可以通过不采集方式，屏蔽 ssid, bssid, wifiip 字段避免调用 `WifiManager.getConnectionInfo` 方法。
+在部分低版本 Android 系统中，启动SDK设备指纹会有弹窗现象，提示授权位置权限，原因是某些 ROM 修改了授权弹窗机制，只要调用 `WifiManager.getConnectionInfo` 方法，系统会自动弹窗，可以通过不采集方式，屏蔽 ssid, bssid, wifiip 字段避免调用 `WifiManager.getConnectionInfo` 方法。
