@@ -122,7 +122,9 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
 ### 2.1 启动SDK
 
-调用SDK的 `-[SmAntiFraud create:]` 方法启动SDK。
+smsdk 是数美风控体系中的终端，主要功能包括采集设备信息和生成设备标识。当产品需要对相关业务进行风控分析时，可以通过 `SmAntiFraud` 类的 `create` 方法进行风控。**注意**调用 `create` 方法会立即采集设备信息，所以 **必须** 在同意隐私政策后且需要风控的场景下调用 `create` 方法，避免引起非合理场景采集不必要信息问题。
+
+调用 `-[SmAntiFraud create:]` 方法启动SDK。
 
 启动SDK非阻塞当前线程，会采集数据并网络传输，缓存 `deviceId`，调用时机如下
 
@@ -154,7 +156,7 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
 - 同步方式
 
-  调用SDK的 `-[SmAntiFraud getDeviceId]` 方法获取设备标识，调用时机如下
+  调用 `-[SmAntiFraud getDeviceId]` 方法获取设备标识，调用时机如下
 
   1. 调用`create` 方法启动SDK返回 `YES` 后 1～2 秒。时间供SDK收集数据和网络传输。
   2. 在业务事件时使用，比如登录、注册等关键事件中上报 `getDeviceId` 返回的字符串。
