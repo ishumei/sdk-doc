@@ -33,7 +33,7 @@
    <uses-permission android:name="android.permission.INTERNET" />
    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
    
-   <!-- 强烈建议权限 -->
+   <!-- 建议权限 -->
    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -99,10 +99,12 @@
 
 ## 2 标准接入
 
-最简启动SDK，启动成功后，会立即进行数据采集，所以需要开发者确保在 ”同意“ 隐私政策前 **不要** 调用 `create` 方法。
+smsdk 是数美风控体系中的终端，主要功能包括采集设备信息和生成设备标识。当产品需要对相关业务进行风控分析时，可以通过 `SmAntiFraud` 类的 `create` 方法进行风控。**注意**调用 `create` 方法会立即采集设备信息，所以 **必须** 在同意隐私政策后且需要风控的场景下调用 `create` 方法，避免引起非合理场景采集不必要信息问题。
+
+`create` 方法的使用方式如下所示：
 
 ```java
-// 启动SDK参数对象
+// smsdk 参数对象
 SmAntiFraud.SmOption option = new SmAntiFraud.SmOption();
 // 必填，组织标识
 option.setOrganization("YOUR_ORGANIZATION");
@@ -111,7 +113,12 @@ option.setAppId("YOUR_APP_ID");
 // 必填，加密 KEY，邮件中 android_public_key 附件内容
 option.setPublicKey("YOUR_PUBLICK_KEY"); 
 
-// 启动SDK
+// 选填，通过此方式屏蔽部分数据采集，此处以 oaid 为例，其他可控信息见下文：可控字段表
+Set<String> notCollect = new HashSet<>(); 
+notCollect.add("oaid"); // 标识不采集 oaid
+option.setNotCollect(notCollect);
+
+// 采集设备数据
 boolean isOk = SmAntiFraud.create(context, option);
 ```
 
@@ -124,32 +131,23 @@ boolean isOk = SmAntiFraud.create(context, option);
 | setConfUrl      | String        | 否       | 无                  | 代理模式、私有化模式中设置云配信息获取地址                   |
 | setCloudConf    | boolean       | 否       | true                | 是否启用云配功能，如果设置为 flase，则不会发起云网络请求     |
 | setArea         | String        | 否       | SmAntiFraud.AREA_BJ | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
-| setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段，[使用说明](https://help.ishumei.com/docs/tw/sdk/faq/android#3-android-%E5%B1%8F%E8%94%BD%E9%87%87%E9%9B%86%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5) |
+| setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段                                             |
 
-调用 `create` 方法时，smsdk 会检查传入参数是否合法，如果返回值为 `false`，则需要过滤 logcat 日志中的 `Smlog` 进行自检，注意 smsdk 3.3.0 之前版本没有返回值。
+风控场景下调用 `create` 方法时，smsdk 会检查传入参数是否合法，如果返回值为 `false`，则需要过滤 logcat 日志中的 `Smlog` 进行自检，注意 smsdk 3.3.0 之前版本没有返回值。
 
-调用`create`运行SDK时机
+`create` 方法采集数据大约需要 1 秒（低端机型会出现超出 2 秒情况），采集过程发生在子线程，不会阻塞当前线程。调用 `create` 方法返回 `true` 后，可调用 `SmAntiFraud.getDeviceId()` 方法获取标识。
 
-1. APP 首次启动，同意隐私政策后调用
-2. APP 非首次启动，且同意了隐私政策，启动时调用
-3. 只在 **主进程** 中调用，避免多进程导致频繁采集问题，参考 "常见问题 Android 如何判断主进程" 章节
-
-`create` 方法采集数据大约需要 1 秒（低端机型会出现超出 2 秒情况），采集过程发生在子线程，不会阻塞当前线程。正常启动SDK后，可调用 `SmAntiFraud.getDeviceId` 获取标识。
-
-获取标识时机：
-
-1. 在 `create` 方法返回 `true` 后调用（返回 `false` 时调用 `getDeviceId` 方法同样有 boxData 返回，但此 boxData 无法转换成设备标识）
-2. 在需要上报业务事件时使用，比如登录、注册等关键事件中上报 `getDeviceId` 返回的字符串
+获取标识时机：触发需要风控的业务事件时使用，比如登录、注册等关键事件中上报 `getDeviceId` 返回的字符串。
 
 部分开发者将 `getDeviceId` 放到所有网络请求的 Header 中，这样做会出现一些问题，需要开发者配合处理，原因及方案将参照 smsdk 时序图进行说明
 
 ![smsdk-flow](./res/smsdk-flow.png)
 
-场景一：启动SDK后，smsdk 缓存中有 boxId，如图 ”7. 应用事件“，此时调用 `getDeviceId` 会立即返回 boxId，可以将 boxId 直接放到业务请求 Header 中。此场景一般出现在启动SDK时，smsdk 已经完成过一次服务交互，从服务器获取到 boxId 并缓存成功。
+场景一：调用 `create` 方法后，smsdk 缓存中有 boxId，如图 ”7. 应用事件“，此时调用 `getDeviceId` 会立即返回 boxId，可以将 boxId 直接放到业务请求 Header 中。此场景一般出现在调用 `create` 方法时，smsdk 已经完成过一次服务交互，从服务器获取到 boxId 并缓存成功。
 
-场景二：启动SDK后，smsdk 缓存中没有 boxId 但是有 boxData，如图 ”9. 应用事件“，此时调用 `getDeviceId` 会立即返回 boxData，由于 boxData 长度较长，直接存放在业务请求 Header 中可能会出现 4K 限制，导致 boxData 被截断，处理方案见下文。此场景一般出现在启动SDK时，smsdk 采集完成后，生成 boxData，但是未完成一次服务交互，未能将 boxData 更新为 boxId。
+场景二：调用 `create` 方法后，smsdk 缓存中没有 boxId 但是有 boxData，如图 ”9. 应用事件“，此时调用 `getDeviceId` 会立即返回 boxData，由于 boxData 长度较长，直接存放在业务请求 Header 中可能会出现 4K 限制，导致 boxData 被截断，处理方案见下文。此场景一般出现在调用 `getDeviceId` 方法时，smsdk 采集完成后，生成 boxData，但是未完成一次服务交互，未能将 boxData 更新为 boxId。
 
-场景三：启动SDK后，smsdk  缓存中没有 boxId 且没有 boxData，如图中 "12. 应用事件"。此时调用 `getDeviceId` 方法会等待采集完成，并将采集数据加密生成 boxData 返回，等待过程与采集速度和`create`时机有关，假设采集耗时为 2 秒，若调用 `create` 后立即调用 `getDeviceId`，那么 `getDeviceId` 方法会阻塞当前线程 2 秒；若调用 `create`  1 秒后调用 `getDeviceId` 方法，`getDeviceId` 会阻塞当前线程 1 秒，需要开发者确保不会由于阻塞造成 ANR。此处同样有 boxData 被截断的问题。此场景一般出现在启动SDK后，smsdk 缓存中没有 boxId 且 smsdk 正在采集中时调用 `getDeviceId` 方法。
+场景三：调用 `create` 方法后，smsdk  缓存中没有 boxId 且没有 boxData，如图中 "12. 应用事件"。此时调用 `getDeviceId` 方法会等待采集完成，并将采集数据加密生成 boxData 返回，等待过程与采集速度和 `create` 时机有关，假设采集耗时为 2 秒，若调用 `create` 后立即调用 `getDeviceId`，那么 `getDeviceId` 方法会阻塞当前线程 2 秒；若调用 `create`  1 秒后调用 `getDeviceId` 方法，`getDeviceId` 会阻塞当前线程 1 秒，需要开发者确保不会由于阻塞造成 ANR。此处同样有 boxData 被截断的问题。此场景一般出现在调用 `create` 方法后，smsdk 缓存中没有 boxId 且 smsdk 正在采集中时调用 `getDeviceId` 方法。
 
 场景二和场景三所述 boxData 截断问题解决方案：与业务端同学协调，调整业务请求 Header 长度限制，建议调整到 24KB 大小；如果业务侧无法修改可以通过配置 smsdk 进行 boxData 长度调整，此方法会降低 boxData 安全性，请作为备选方案执行
 
@@ -183,7 +181,7 @@ SmAntiFraud.registerServerIdCallback(new SmAntiFraud.IServerSmidCallback() {
 | -3      | 业务异常，下发业务状态码非 1100，服务器未返回 deviceId，常见原因：参数配置错误、qps 超限、服务器异常 |
 | -4      | 其他异常                                                     |
 
-boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 boxData 直接查询设备风险。查看 ”解密工具及代理服务器说明 设备指纹标识解密“ 章节，了解如何获取明文设备标识。
+boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 boxData 直接查询设备风险。
 
 至此 smsdk 国内标准接入部分已经全部完成，如果没有定制化需求，此时已经接入完毕，建议参考 "测试" 章节自查是否接入成功。
 
@@ -222,8 +220,6 @@ boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 
    // option.setConfUrl(host + "/v3/cloudconf");
    ```
 
-由于检测机构或者应用市场对隐私政策解读不一致，导致部分字段在某些检测中被标记为风险字段，因为无法确切确定这些字段属于数据违规字段，且数美有相关策略使用到这些字段，所以将这些字段采集与否权限已交给开发者，开发者可以通过 "常见问题 Android 屏蔽采集部分字段" 章节屏蔽字段。
-
 ## 3 私有化接入
 
 主要步骤与标准接入类似，需要增加以下配置
@@ -241,7 +237,7 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场�
 
 ## 4 代理接入
 
-smsdk 端上逻辑设置与标准接入类似，需要增加以下配置
+开发者需要自行搭建代理服务器，SDK 端上逻辑设置与标准接入类似，需要增加以下配置
 
 ```java
 // 设置私有地址，将 host 替换为代理服务器的主机名（域名）
@@ -249,8 +245,6 @@ String host = "https://proxy-host";
 option.setUrl(host + "/deviceprofile/v4"); // 示例路径，需要与真实场景一致
 option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场景一致
 ```
-
-开发者需要自行搭建代理服务器，代理服务器相关处理参考 ”解密工具及代理服务器说明 代理接入“ 章节。
 
 ## 5 测试
 
@@ -262,7 +256,7 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场�
 
 ## 6 SDK 升级
 
-本文适用于 Android smsdk v2 版本升级到 Android smsdk v3 版本，smsdk v2 将于 2022 年 12 月 30 日停止维护，希望已接入客户尽快切换到 smsdk v3 版本。
+本文适用于 Android smsdk v2 版本升级到 Android smsdk v3 版本，希望已接入客户尽快切换到 smsdk v3 版本。
 
 升级步骤及注意事项
 
@@ -276,3 +270,19 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场�
 smsdk v3 版本终端不再提供明文设备标识，业务端不可以将 boxId 或 boxData 直接当做标识，获取标识方法参考 ”解密工具及代理服务器说明 设备指纹标识解密“。
 
 smsdk v3 版本首次启动直接调用 `SmAntiFraud.getDeviceId` 方法会出现阻塞当前线程问题，解决方案查看 ”Android SDK 标准接入 场景三“ 小节。
+
+## 7 可控字段表
+
+传入不采集字段名必须与下表 **字段名** 一致（字母升序）
+
+| 字段名       | 含义                        | 系统关键 API                                                 | 删除后影响                         |
+| ------------ | --------------------------- | ------------------------------------------------------------ | ---------------------------------- |
+| adid         | android_id                  | Secure#getString(Resolver, ANDROID_ID)                       | 影响设备标识稳定性                 |
+| bssid        | WIFI 热点的 MAC 地址        | WifiManager#getConnectionInfo<br />WifiInfo#getBSSID         | 影响风险设备聚集风险的识别         |
+| cell         | 基站信息                    | TelephonyManager#getCellLocation<br />GsmCellLocation#getCid<br />GsmCellLocation#getLac | 影响风险设备聚集风险的识别         |
+| network      | 手机网络链接方式            | TelephonyManager#getNetworkType                              | 影响网络状态相关的逻辑校验         |
+| oaid         | Android开发中匿名设备标识符 | 各手机厂商关键 API 不同                                      | 暂无                               |
+| operator     | 运营商编码                  | TelephonyManager#getSimOperator                              | 影响网络状态的校验                 |
+| sdCacheLimit | SD 卡缓存                   | FileInputStream、FileOutputStream                            | 低版本系统上会影响全局标识关联能力 |
+| ssid         | WIFI 名称                   | WifiManager#getConnectionInfo<br />WifiInfo#getSSID          | 影响风险设备聚集风险的识别         |
+| wifiip       | 局域网 IP 地址              | WifiManager#getConnectionInfo<br />WifiInfo#getIpAddress     | 影响风险设备聚集风险的识别         |
