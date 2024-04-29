@@ -122,6 +122,6 @@ Page({
 | mode | string  | 否  | slide  | 模式：支持slide（滑动验证码） 、select（文字点选验证码）、 icon_select(图标点选验证码)、 seq_select(成语语序验证码)、spatial_select(空间逻辑) |
 | lang | string  | 否  | zh-cn  | 模式：支持zh-cn en，分别为中文 英文。注意：成语语序和文字点选模式下，验证码图片内容默认为中文，不随语言调整而变化。 |
 | customData | object  | 否  | {} | 自定义数据 |
-| tipsMessage.sliderPlaceholder | string  | 否  | 向右滑动滑块填充拼图 | 自定义滑块样式，仅滑块验证支持自定义设置 |
+| tipsMessage.slidePlaceholder | string  | 否  | 向右滑动滑块填充拼图 | 自定义滑块样式，仅滑块验证支持自定义设置 |
 | disabled | boolean | 否  | false | 初始状态是否禁用 |
 | width | string  | 否  | 100% | 验证码宽度，单位支持rpx、%、px。验证码最小宽度200px，最大宽度600px |
