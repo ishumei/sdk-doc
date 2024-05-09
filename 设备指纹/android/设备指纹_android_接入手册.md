@@ -99,7 +99,7 @@
 
 ## 2 标准接入
 
-smsdk 是数美风控体系中的终端，主要功能包括采集设备信息和生成设备标识。当产品需要对相关业务进行风控分析时，可以通过 `SmAntiFraud` 类的 `create` 方法进行风控。**注意**调用 `create` 方法会立即采集设备信息，所以 **必须** 在同意隐私政策后且需要风控的场景下调用 `create` 方法，避免引起非合理场景采集不必要信息问题。
+smsdk 是数美风控体系中的终端，主要功能包括采集设备信息和生成设备标识。当产品需要对相关业务进行风控分析时，可以通过 `SmAntiFraud` 类的 `create` 方法进行风控。调用 `create` 方法会立即采集设备信息，所以 **必须** 在同意隐私政策后且需要风控的场景下调用 `create` 方法，避免引起非合理场景采集不必要信息问题。
 
 `create` 方法的使用方式如下所示：
 
@@ -113,7 +113,7 @@ option.setAppId("YOUR_APP_ID");
 // 必填，加密 KEY，邮件中 android_public_key 附件内容
 option.setPublicKey("YOUR_PUBLICK_KEY"); 
 
-// 选填，通过此方式屏蔽部分数据采集，此处以 oaid 为例，其他可控信息见下文：可控字段表
+// 选填，通过此方式屏蔽部分数据采集，此处以 oaid 为例，其他可控字段见合规指南《可控配置项 -> Android 端》
 Set<String> notCollect = new HashSet<>(); 
 notCollect.add("oaid"); // 标识不采集 oaid
 option.setNotCollect(notCollect);
@@ -270,19 +270,3 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场�
 smsdk v3 版本终端不再提供明文设备标识，业务端不可以将 boxId 或 boxData 直接当做标识，获取标识方法参考 ”解密工具及代理服务器说明 设备指纹标识解密“。
 
 smsdk v3 版本首次启动直接调用 `SmAntiFraud.getDeviceId` 方法会出现阻塞当前线程问题，解决方案查看 ”Android SDK 标准接入 场景三“ 小节。
-
-## 7 可控字段表
-
-传入不采集字段名必须与下表 **字段名** 一致（字母升序）
-
-| 字段名       | 含义                        | 系统关键 API                                                 | 删除后影响                         |
-| ------------ | --------------------------- | ------------------------------------------------------------ | ---------------------------------- |
-| adid         | android_id                  | Secure#getString(Resolver, ANDROID_ID)                       | 影响设备标识稳定性                 |
-| bssid        | WIFI 热点的 MAC 地址        | WifiManager#getConnectionInfo<br />WifiInfo#getBSSID         | 影响风险设备聚集风险的识别         |
-| cell         | 基站信息                    | TelephonyManager#getCellLocation<br />GsmCellLocation#getCid<br />GsmCellLocation#getLac | 影响风险设备聚集风险的识别         |
-| network      | 手机网络链接方式            | TelephonyManager#getNetworkType                              | 影响网络状态相关的逻辑校验         |
-| oaid         | Android开发中匿名设备标识符 | 各手机厂商关键 API 不同                                      | 暂无                               |
-| operator     | 运营商编码                  | TelephonyManager#getSimOperator                              | 影响网络状态的校验                 |
-| sdCacheLimit | SD 卡缓存                   | FileInputStream、FileOutputStream                            | 低版本系统上会影响全局标识关联能力 |
-| ssid         | WIFI 名称                   | WifiManager#getConnectionInfo<br />WifiInfo#getSSID          | 影响风险设备聚集风险的识别         |
-| wifiip       | 局域网 IP 地址              | WifiManager#getConnectionInfo<br />WifiInfo#getIpAddress     | 影响风险设备聚集风险的识别         |
