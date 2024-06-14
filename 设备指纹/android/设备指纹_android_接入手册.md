@@ -132,6 +132,7 @@ boolean isOk = SmAntiFraud.create(context, option);
 | setCloudConf    | boolean       | 否       | true                | 是否启用云配功能，如果设置为 flase，则不会发起云网络请求     |
 | setArea         | String        | 否       | SmAntiFraud.AREA_BJ | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
 | setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段                                             |
+| setUsingHttps   | boolean       | 否       | false               | 是否使用 https 协议网络请求                                  |
 
 风控场景下调用 `create` 方法时，smsdk 会检查传入参数是否合法，如果返回值为 `false`，则需要过滤 logcat 日志中的 `Smlog` 进行自检，注意 smsdk 3.3.0 之前版本没有返回值。
 
