@@ -77,6 +77,6 @@ SmAntiFraud.create(ctx, option);
 | ssid     | WIFI 名称                   | WifiManager#getConnectionInfo<br />WifiInfo#getSSID          | 影响风险设备聚集风险的识别                      |
 | wifiip   | 局域网 IP 地址              | WifiManager#getConnectionInfo<br />WifiInfo#getIpAddress     | 影响风险设备聚集风险的识别                      |
 
-### 4 手机弹窗获取“位置”权限
+### 4 手机弹窗获取“位置”权限或在通知栏显示定位图标
 
-在部分低版本 Android 系统中，启动SDK设备指纹会有弹窗现象，提示授权位置权限，原因是某些 ROM 修改了授权弹窗机制，只要调用 `WifiManager.getConnectionInfo` 方法，系统会自动弹窗，可以通过不采集方式，屏蔽 ssid, bssid, wifiip 字段避免调用 `WifiManager.getConnectionInfo` 方法。
+在部分 Android 系统中，初始化 smsdk 设备指纹会有弹窗现象（或在通知栏中显示定位图标），提示授权位置权限，原因是某些 ROM 修改了授权弹窗机制，只要调用 `WifiManager.getConnectionInfo` 方法，系统就会自动弹窗（或显示定位图标）。可以通过不采集方式，屏蔽 ssid, bssid, wifiip 字段避免调用 `WifiManager.getConnectionInfo` 方法。

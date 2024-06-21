@@ -149,6 +149,7 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 | delegate          | `id<ServerSmidProtocol>` | 否           | null                                            | 使用回调方法异步获取标识时，实现`ServerSmidProtocol`的对象   |
 | notCollect        | NSArray<NSString*>     | 否           | null                                            | 设置SDK不采集项，目前仅支持"idfa"                            |
 | area              | SmAntiFraudArea        | 否           | AREA_BJ                                         | 数据上传和云配的服务器机房地址。<br />AREA_BJ：北京机房<br />AREA_XJP：新加坡机房<br />AREA_FJNY：弗吉尼亚机房 |
+| useHttps | BOOL | 否 | NO | 是否使用 https 协议网络请求 |
 
 ### 2.2 获取标识
 

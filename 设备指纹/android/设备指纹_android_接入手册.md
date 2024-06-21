@@ -132,6 +132,15 @@ boolean isOk = SmAntiFraud.create(context, option);
 | setCloudConf    | boolean       | 否       | true                | 是否启用云配功能，如果设置为 flase，则不会发起云网络请求     |
 | setArea         | String        | 否       | SmAntiFraud.AREA_BJ | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
 | setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段                                             |
+| setUsingHttps   | boolean       | 否       | false               | 是否使用 https 协议网络请求                                  |
+| addSubCollectors   | SubCollector       | 否       | 无               | 子包采集数据，默认不提供子包，针对有需求客户单独提供，当前支持：<br />smsdk_ids：采集设备标识信息 |
+
+| SmAntiFraud 方法         | 参数类型            | 是否必填 | 默认值 | 说明                                                         |
+| ------------------------ | ------------------- | -------- | ------ | ------------------------------------------------------------ |
+| create                   | Context, SmOption   | 是       | 无     | smsdk 初始化方法，调用此字段会进行采集数据                   |
+| getDeviceId              | 无                  | 无       | 无     | 获取 smsdk 标识，优先获取缓存数据，如果没有缓存会等待采集完成，此过程会阻塞当前线程，注意避免 ANR 问题。 |
+| registerServerIdCallback | IServerSmidCallback | 否       | 无     | smsdk 回调方法，可以通过 onSuccess 回调获取标识，回调方法非主线程，注意避免在回调中进行 UI 操作。 |
+| startDetector            | AbsDetector         | 否       | 无     | 子包采集微行为数据，默认不提供子包，针对有需求客户单独提供，当前支持：<br />smsdk_screentouch：机器操作检测 |
 
 风控场景下调用 `create` 方法时，smsdk 会检查传入参数是否合法，如果返回值为 `false`，则需要过滤 logcat 日志中的 `Smlog` 进行自检，注意 smsdk 3.3.0 之前版本没有返回值。
 
