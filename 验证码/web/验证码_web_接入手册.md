@@ -52,7 +52,7 @@ Chrome、Firefox、Safari、Opera、IE9(包含IE9)+、主流手机浏览器、iO
 | lang | string | 否 | zh-cn（简体中文） | 模式：支持zh-cn（简体中文）、en（英文）、ph（菲律宾语）、ina（印尼语）、tha（泰语）、vn（越南语）、mys（马来语）、jp（日语）、kr(韩语)、西班牙语（es）、孟加拉语（bn）、葡萄牙语（pt）、德语（de）、法语（fr）、印地语（hi）、意大利语（it）、乌尔都语（ur）、俄语（ru）、瑞典语（sv）、土耳其语（tr）、中文繁体 （zh-tw）、阿拉伯语（ar）。注意：成语语序和文字点选模式下，验证码图片内容默认为中文，不随语言调整而变化。 |
 | useBrowserLang | boolean | 否 | false | 是否高优使用浏览器设置的语言作为验证码的语言 |
 | customData | object | 否 | {} | 自定义数据 |
-| tipsMessage.slidePlaceholder | string | 否 | 向右滑动滑块填充拼图 | 自定义滑块默认文案,仅滑块验证支持自定义设置 |
+| tipsMessage.sliderPlaceholder | string | 否 | 向右滑动滑块填充拼图 | 自定义滑块默认文案,仅滑块验证支持自定义设置 |
 | disabled  | boolean | 否 | false | 初始状态是否禁用验证码 |
 | https | boolean | 否 | true| 加载资源是否是https |
 | width | number或string | 否 | 100% | 验证码宽度，单位支持数字、%、px，建议最小宽度为300px，宽高比建议为2:1 |
