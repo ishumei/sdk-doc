@@ -74,6 +74,8 @@ SmFraud.create(optionDic: {
   SmFraud.OPTION_PUBLICKEY_ANDROID: 'YOUR_ANDROID_PUBLICK_KEY', 
   // 必填，加密 KEY
   SmFraud.OPTION_PUBLICKEY_IOS: 'YOUR_IOS_PUBLICK_KEY', 
+  // 鸿蒙App必填，加密 KEY
+  SmFraud.OPTION_PUBLICKEY_HARMONY: 'YOUR_HARMONY_PUBLICK_KEY', 
 
   //私有化或代理时必填：设置设备数据上传地址
   //SmFraud.OPTION_URL: 'YOUR_URL', 
