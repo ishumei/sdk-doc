@@ -124,8 +124,11 @@ this.captchaController.initOption(this.captchaOption)
 ### 2.3 回调方法
 
 ```typescript
+onControllerAttached: () => void = () => {
+  // 验证码内部 Web onControllerAttached 回调方法
+}
 onInit: (scc: SmCallbackContent) => void = (scc) => {
-	// web 参数初始化完成时，回调此方法
+  // web 参数初始化完成时，回调此方法
   // 通过 scc?.captchaUuid 获取 uuid，用于业务统计
 }
 onReady: (scc: SmCallbackContent) => void = (scc) => {
@@ -139,13 +142,13 @@ onSuccess: (scc: SmCallbackContent) => void = (scc) => {
   // scc?.rid 获取 rid
 }
 onError: (scc: SmCallbackContent) => void = (scc) => {
-	// 加载或验证过程中出现错误时，回调此方法，code 码见下文
+  // 加载或验证过程中出现错误时，回调此方法，code 码见下文
   // scc?.captchaUuid 获取 uuid，用于业务统计
   // scc?.code 获取错误码，code 码含义见下文
   // scc?.message 错误信息
 }
 onClose: (scc: SmCallbackContent) => void = (scc) => {
-	// 带关闭按钮样式的验证码点击关闭按钮时回调此方法
+  // 带关闭按钮样式的验证码点击关闭按钮时回调此方法
   // scc?.captchaUuid 获取 uuid，用于业务统计
 }
 ```
