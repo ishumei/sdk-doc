@@ -80,10 +80,12 @@ option.organization = "YOUR_ORGANIZATION"
 option.appId = "YOUR_APP_ID"
 // 必填，加密 KEY，邮件中 harmony_public_key 附件内容
 option.publicKey = "YOUR_PUBLICK_KEY"
+// 选填，是否启动 shortBoxData 功能，默认为 false 
+option.usingShortBoxData = false
 // 选填，通过 notCollect 取消某字段采集，支持以下字段（大小写敏感）：'bssid', 'ssid', 'wifiIp', 'sensorsData', 'sensor', 'oaid', 'battery', 'band'
 // 比如不采集 bssid 和 wifiIp 字段
 // option.notCollect = new Set(['bssid','wifiIp']) 
-// option.usingHttp = true // 使用 https 协议网络请求，默认 false
+// option.usingHttp = true // 使用 https 协议网络请求，默认 false（即默认使用 http 发起网络请求）
 // 初始化
 SmAntiFraud.create(context as common.UIAbilityContext, option).then(boxId => {
   // 成功回调，获取到 boxId
