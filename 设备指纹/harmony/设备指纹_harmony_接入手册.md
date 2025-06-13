@@ -1,4 +1,4 @@
-数美设备指纹 SDK（即 'smsdk'）compatibleSdkVersion 10
+数美设备指纹 SDK（即 'smsdk'）compatibleSdkVersion 12
 
 ## 1 工程配置
 
@@ -18,7 +18,7 @@
      "main": "",
      "version": "1.0.0",
      "dependencies": {
-       "@ohos/library": "file:./libs/smsdk_x.x.x.har" // 版本号需要与实际导入 smsdk 版本一直
+       "smsdk": "file:./libs/smsdk_x.x.x.har" // 版本号需要与实际导入 smsdk 版本一致
      }
    }
    ```
@@ -31,6 +31,10 @@
          // 联网权限，必选权限
          "name": "ohos.permission.INTERNET",
        },
+   		{
+         // 联网权限，必选权限
+         "name": "ohos.permission.GET_NETWORK_INFO",
+       },
        {
          // 加速度传感器，可选权限
          "name": "ohos.permission.ACCELEROMETER",
@@ -38,10 +42,6 @@
        {
          // 陀螺仪传感器，可选权限
          "name": "ohos.permission.GYROSCOPE",
-       },
-       {
-         // wifi 状态权限，可选权限
-         "name": "ohos.permission.GET_WIFI_INFO",
        },
        {
          // 网络状态权限，可选权限
@@ -57,15 +57,13 @@
 
    权限作用
 
-   | 权限                     | 作用                                                         |
-      | ------------------------ | ------------------------------------------------------------ |
-   | INTERNET（必选）         | 将采集数据通过网络发送到服务器                               |
-   | GET_NETWORK_INFO（必选） | 判断网络是否连接；<br/>获取 network （网络连接状态）信息，如 2g, 3g, 4g, wifi 等，运营商信息 |
-   | GET_WIFI_INFO            | 获取 bssid, ssid, band, wifiip 信息                          |
-   | ACCELEROMETER            | 获取 加速度 传感器信息                                       |
-   | GYROSCOPE                | 获取 陀螺仪 传感器信息                                       |
-   | APP_TRACKING_CONSENT     | 获取 OAID 信息                                               |
-
+   | 权限                         | 作用                                                         | 申请时机                                                     |
+   | ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+   | INTERNET（必选）             | 将采集数据通过网络发送到服务器                               | 需要在  module.json5 中声明，不需要动态申请权限              |
+   | GET_NETWORK_INFO（必选）     | 判断网络是否连接；<br/>获取 network （网络连接状态）信息，如 2g, 3g, 4g, wifi 等，运营商信息 | 需要在  module.json5 中声明，不需要动态申请权限              |
+   | ACCELEROMETER（可选）        | 获取 加速度 传感器信息                                       | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
+   | GYROSCOPE（可选）            | 获取 陀螺仪 传感器信息                                       | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
+   | APP_TRACKING_CONSENT（可选） | 获取 OAID 信息                                               | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
 
 ## 2 标准接入
 
@@ -80,10 +78,12 @@ option.organization = "YOUR_ORGANIZATION"
 option.appId = "YOUR_APP_ID"
 // 必填，加密 KEY，邮件中 harmony_public_key 附件内容
 option.publicKey = "YOUR_PUBLICK_KEY"
-// 选填，通过 notCollect 取消某字段采集，支持以下字段（大小写敏感）：'bssid', 'ssid', 'wifiIp', 'sensorsData', 'sensor', 'oaid', 'battery', 'band'
-// 比如不采集 bssid 和 wifiIp 字段
-// option.notCollect = new Set(['bssid','wifiIp']) 
-// option.usingHttp = true // 使用 https 协议网络请求，默认 false
+// 选填，是否启动 shortBoxData 功能，默认为 false 
+option.usingShortBoxData = false
+// 选填，通过 notCollect 取消某字段采集，支持以下字段（大小写敏感）：'sensorsData', 'sensor', 'oaid', 'battery'
+// 比如不采集 sensorsData 和 sensor 字段
+// option.notCollect = new Set(['sensorsData','sensor']) 
+// option.usingHttp = true // 使用 https 协议网络请求，默认 false（即默认使用 http 发起网络请求）
 // 初始化
 SmAntiFraud.create(context as common.UIAbilityContext, option).then(boxId => {
   // 成功回调，获取到 boxId
