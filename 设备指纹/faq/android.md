@@ -79,4 +79,4 @@ SmAntiFraud.create(ctx, option);
 
 ### 4 手机弹窗获取“位置”权限或在通知栏显示定位图标
 
-在部分 Android 系统中，初始化 smsdk 设备指纹会有弹窗现象（或在通知栏中显示定位图标），提示授权位置权限，原因是某些 ROM 修改了授权弹窗机制，只要调用 `WifiManager.getConnectionInfo` 方法，系统就会自动弹窗（或显示定位图标）。可以通过不采集方式，屏蔽 ssid, bssid, wifiip 字段避免调用 `WifiManager.getConnectionInfo` 方法。
+在部分 Android 系统中，初始化 smsdk 设备指纹会有弹窗现象（或在通知栏中显示定位图标），提示授权位置权限，原因是调用 `WifiManager.getConnectionInfo` 方法，系统就会自动弹窗（或显示定位图标），并非采集 GPS 信息。可以通过不采集方式，屏蔽 ssid, bssid, wifiip 字段避免调用 `WifiManager.getConnectionInfo` 方法。

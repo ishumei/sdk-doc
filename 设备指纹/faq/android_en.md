@@ -79,4 +79,4 @@ The field names to be excluded must match the **Field Name** in the table below 
 
 ### 4 Phone Popup to Get "Location" Permission or Show Location Icon in Notification Bar
 
-In some Android systems, initializing the smsdk device fingerprint will cause a popup (or show a location icon in the notification bar) prompting for location permission. The reason is that some ROMs have modified the authorization popup mechanism, and as long as the `WifiManager.getConnectionInfo` method is called, the system will automatically popup (or show the location icon). You can avoid calling the `WifiManager.getConnectionInfo` method by blocking the ssid, bssid, wifiip fields.
+In some Android systems, initializing the smsdk device fingerprint will cause a popup (or show a location icon in the notification bar) prompting for location permission. The reason is that some ROMs as long as the `WifiManager.getConnectionInfo` method is called, the system will automatically popup (or show the location icon). You can avoid calling the `WifiManager.getConnectionInfo` method by blocking the ssid, bssid, wifiip fields.

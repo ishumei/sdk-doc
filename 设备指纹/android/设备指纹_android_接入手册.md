@@ -53,7 +53,7 @@
    | WRITE_EXTERNAL_STORAGE       | 写入 SD 卡数美设备标识                                       |
    | READ_EXTERNAL_STORAGE        | 读取存储在 SD 卡中的数美设备标识                             |
 
-4. http 设置，smsdk 默认使用 http 请求，在 targetSdkVersion > 27 时， 需在 AndroidManifest.xml 中增加如下配置
+4. http 设置，smsdk 切换使用 http 请求时，需在 AndroidManifest.xml 中增加如下配置
 
    ```xml
    <application
@@ -63,30 +63,6 @@
    >
    ......
    </application>
-   ```
-
-   如果 `application` 节点有设置 `android:networkSecurityConfig` 属性，如
-
-   ```xml
-   <application
-   	......
-   	android:usesCleartextTraffic="true"
-   	android:networkSecurityConfig="@xml/network_security_config"
-   	......>
-   ......
-   </application>
-   ```
-
-   则需要向 `xml/network_security_config.xml` 文件中添加 smsdk 域名配置（代理或私有化模式需要添加对应域名）
-
-   ```xml
-   <?xml version="1.0" encoding="utf-8"?>
-   <network-security-config>
-       <!-- smsdk 域名配置 -->
-       <domain-config cleartextTrafficPermitted="true">
-           <domain includeSubdomains="true">fengkongcloud.com</domain>
-       </domain-config>
-   </network-security-config>
    ```
 
 5. 代码放混淆
@@ -115,7 +91,7 @@ option.setPublicKey("YOUR_PUBLICK_KEY");
 
 // 选填，通过此方式屏蔽部分数据采集，此处以 oaid 为例，其他可控字段见合规指南《可控配置项 -> Android 端》
 Set<String> notCollect = new HashSet<>(); 
-notCollect.add("oaid"); // 标识不采集 oaid
+notCollect.add("oaid"); // 表示不采集 oaid
 option.setNotCollect(notCollect);
 
 // 采集设备数据
