@@ -83,12 +83,13 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 // smsdk 参数对象
 SmAntiFraud.SmOption option = new SmAntiFraud.SmOption();
 // 必填，组织标识
-option.setOrganization("YOUR_ORGANIZATION");
+option.setOrganization(YOUR_ORGANIZATION);
 // 必填，应用标识，登录数美后台应用管理查看，没有合适值，可以写 "default"
-option.setAppId("YOUR_APP_ID"); 
+option.setAppId(YOUR_APP_ID); 
 // 必填，加密 KEY，邮件中 android_public_key 附件内容
-option.setPublicKey("YOUR_PUBLICK_KEY"); 
-
+option.setPublicKey(YOUR_PUBLICK_KEY); 
+// （V2，即 2.x.x 版本必填），加密 KEY，邮件中 android_ainfo_key 附件内容
+// option.setAinfoKey(YOUR_AINFO_KEY);
 // 选填，通过此方式屏蔽部分数据采集，此处以 oaid 为例，其他可控字段见合规指南《可控配置项 -> Android 端》
 Set<String> notCollect = new HashSet<>(); 
 notCollect.add("oaid"); // 表示不采集 oaid
