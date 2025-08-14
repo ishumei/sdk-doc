@@ -18,11 +18,19 @@
      "main": "",
      "version": "1.0.0",
      "dependencies": {
-       "smsdk": "file:./libs/smsdk_x.x.x.har" // 版本号需要与实际导入 smsdk 版本一致
+       "smsdk": "file:./libs/smsdk_x.x.x.har" // 版本号需要与实际导入 smsdk 版本一致，如果修改 "smsdk" 名称，防混淆时需要同步修改
      }
    }
    ```
    smsdk 包含动态库：`libsmsdk.so`，避免使用 `"excludes": ['**/**']` 语法将其移除，导致接入报错。
+   
+   项目开启混淆后，需要增加如下防混淆配置
+   
+   ```
+   -keep
+   ./oh_modules/smsdk # 此处应与引入依赖时名称一致
+   ```
+   
 3. 声明权限，在 module.json5 中添加如下权限
 
    ```xml
