@@ -18,11 +18,19 @@
      "main": "",
      "version": "1.0.0",
      "dependencies": {
-       "smsdk": "file:./libs/smsdk_x.x.x.har" // 版本号需要与实际导入 smsdk 版本一致
+       "smsdk": "file:./libs/smsdk_x.x.x.har" // 版本号需要与实际导入 smsdk 版本一致，如果修改 "smsdk" 名称，防混淆时需要同步修改
      }
    }
    ```
-
+   smsdk 包含动态库：`libsmsdk.so`，避免使用 `"excludes": ['**/**']` 语法将其移除，导致接入报错。
+   
+   项目开启混淆后，需要增加如下防混淆配置
+   
+   ```
+   -keep
+   ./oh_modules/smsdk # 此处应与引入依赖时名称一致
+   ```
+   
 3. 声明权限，在 module.json5 中添加如下权限
 
    ```xml
@@ -50,20 +58,25 @@
        {
          // 广告 ID 权限，可选权限
          "name": "ohos.permission.APP_TRACKING_CONSENT"
+       },
+       {
+         // Asset Store Kit，可选权限
+         "name": "ohos.permission.STORE_PERSISTENT_DATA"
        }
      ]
    }
    ```
-
+   
    权限作用
-
-   | 权限                         | 作用                                                         | 申请时机                                                     |
-   | ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-   | INTERNET（必选）             | 将采集数据通过网络发送到服务器                               | 需要在  module.json5 中声明，不需要动态申请权限              |
-   | GET_NETWORK_INFO（必选）     | 判断网络是否连接；<br/>获取 network （网络连接状态）信息，如 2g, 3g, 4g, wifi 等，运营商信息 | 需要在  module.json5 中声明，不需要动态申请权限              |
-   | ACCELEROMETER（可选）        | 获取 加速度 传感器信息                                       | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
-   | GYROSCOPE（可选）            | 获取 陀螺仪 传感器信息                                       | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
-   | APP_TRACKING_CONSENT（可选） | 获取 OAID 信息                                               | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
+   
+   | 权限                          | 作用                                                         | 申请时机                                                     |
+   | ----------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+   | INTERNET（必选）              | 将采集数据通过网络发送到服务器                               | 需要在  module.json5 中声明，不需要动态申请权限              |
+   | GET_NETWORK_INFO（必选）      | 判断网络是否连接；<br/>获取 network （网络连接状态）信息，如 2g, 3g, 4g, wifi 等，运营商信息 | 需要在  module.json5 中声明，不需要动态申请权限              |
+   | ACCELEROMETER（可选）         | 获取 加速度 传感器信息                                       | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
+   | GYROSCOPE（可选）             | 获取 陀螺仪 传感器信息                                       | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
+   | APP_TRACKING_CONSENT（可选）  | 获取 OAID 信息                                               | 初始化（create）sdk 之前授权，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则不采集这些信息 |
+   | STORE_PERSISTENT_DATA（可选） | 缓存数美标识                                                 | 需要在  module.json5 中声明，不需要动态申请权限，sdk 初始化时会检测当前 app 是否已经授权此权限，如果没有授权则使用 Asset Store 缓存 |
 
 ## 2 标准接入
 
