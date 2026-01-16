@@ -201,9 +201,12 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 ```objective-c
 // 启动SDK参数对象
 SmOption *option = [[SmOption alloc] init];
-[option setOrganization: @"YOUR_ORGANIZATION"];// 必填
-[option setAppId:@"YOUR_APP_ID"];							 // 必填
-[option setPublicKey:@"YOUR_PUBLICK_KEY"];		 // 必填
+[option setOrganization: @"YOUR_ORGANIZATION"];    // 必填
+[option setAppId:@"YOUR_APP_ID"];						// 必填
+[option setPublicKey:@"YOUR_PUBLICK_KEY"];		   // 必填
+
+// 选填，通过此方式屏蔽部分数据采集，此处以 IDFA 为例
+[option setNotCollect:@[@"idfa"]];
 
 // 启动SDK
 BOOL isOk = [[SmAntiFraud shareInstance] create:option];
