@@ -71,18 +71,6 @@ smsdk 3.14.0（对应2版本号2.24.0）版本以下默认使用 http 请求，�
      				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
      			</array>
      		</dict>
-     		<dict>
-     			<key>NSPrivacyCollectedDataType</key>
-     			<string>NSPrivacyCollectedDataTypeFitness</string>
-     			<key>NSPrivacyCollectedDataTypeLinked</key>
-     			<false/>
-     			<key>NSPrivacyCollectedDataTypeTracking</key>
-     			<false/>
-     			<key>NSPrivacyCollectedDataTypePurposes</key>
-     			<array>
-     				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
-     			</array>
-     		</dict>
      	</array>
      ```
   
