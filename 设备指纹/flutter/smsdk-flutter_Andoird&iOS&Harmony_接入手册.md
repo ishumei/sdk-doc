@@ -22,7 +22,7 @@
 
 ## 4 启动SDK
 
-安装后首次启动时，在用户同意隐私协议后，立即启动 SDK。避免出现用户未同意隐私协议已经采集数据问题。
+安装后首次启动时，**在用户同意隐私协议后**，立即启动 SDK。避免出现用户未同意隐私协议已经采集数据问题。
 
 后续app启动时，应在app启动后立即启动 SDK。
 
@@ -84,7 +84,16 @@ SmFraud.create(optionDic: {
   //SmFraud.OPTION_CONFURL: 'YOUR_CONF_URL', 
 
   //选填：是否使用https请求，默认不使用 
-  //SmFraud.OPTION_USE_HTTPS: false,  
+  //SmFraud.OPTION_USE_HTTPS: true,  
+
+  //选填：是否使用shortboxdata，默认不使用
+  //SmFraud.OPTION_SHORTBOXDATA: true,
+
+  //选填：设置不采集项目
+  //SmFraud.OPTION_NOTCOLLECT: ['idfa', 'cell', 'ssid'],
+
+  //选填，设置设备数据上传的机房，默认北京机房
+  //SmFraud.OPTION_AREA: SmFraud.SM_AREA_BJ,
 }); 
 ```
 
@@ -124,4 +133,4 @@ SmFraud.getDeviceId().then((value) => {
 
 ### 6.3 ios 采集 IDFA 事项
 
-iOS 的 SDK 默认采集了 IDFA（海外版本不采集），在提交 app store 审核时，若为采集 idfa 的版本，需要说明采集了 idfa。
+iOS 的 SDK 默认采集了 IDFA（海外版本不采集），在提交 app store 审核时，若为采集 IDFA 的版本，需要说明采集了 IDFA。

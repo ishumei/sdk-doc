@@ -109,7 +109,7 @@ boolean isOk = SmAntiFraud.create(context, option);
 | setCloudConf    | boolean       | 否       | true                | 是否启用云配功能，如果设置为 flase，则不会发起云网络请求     |
 | setArea         | String        | 否       | SmAntiFraud.AREA_BJ | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
 | setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段                                             |
-| setUsingHttps   | boolean       | 否       | false               | 是否使用 https 协议网络请求                                  |
+| setUsingHttps   | boolean       | 否       | 若SDK版本低于3.14.0或2.24.0，默认值为false，否则为true | 是否使用 https 协议网络请求                                  |
 | addSubCollectors   | SubCollector       | 否       | 无               | 子包采集数据，默认不提供子包，针对有需求客户单独提供，当前支持：<br />smsdk_ids：采集设备标识信息 |
 
 | SmAntiFraud 方法         | 参数类型            | 是否必填 | 默认值 | 说明                                                         |

@@ -24,7 +24,7 @@
    - `IOKit.framework`
 
 ### 1.3 http 设置
-smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
+smsdk 3.14.0（对应2版本号2.24.0）版本以下默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
 
    1. 点击项目的 Info.plist，点击 + 号，选中 App Transport Security Settings
    2. 在 App Transport Security Settings 配置项中，点击 + 号，选择 Allow Arbitrary Loads，并配置为 YES
@@ -71,18 +71,6 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
      				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
      			</array>
      		</dict>
-     		<dict>
-     			<key>NSPrivacyCollectedDataType</key>
-     			<string>NSPrivacyCollectedDataTypeFitness</string>
-     			<key>NSPrivacyCollectedDataTypeLinked</key>
-     			<false/>
-     			<key>NSPrivacyCollectedDataTypeTracking</key>
-     			<false/>
-     			<key>NSPrivacyCollectedDataTypePurposes</key>
-     			<array>
-     				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
-     			</array>
-     		</dict>
      	</array>
      ```
   
@@ -122,11 +110,12 @@ smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.
 
 ### 2.1 启动SDK
 
-smsdk 是数美风控体系中的终端，主要功能包括采集设备信息和生成设备标识。当产品需要对相关业务进行风控分析时，可以通过 `SmAntiFraud` 类的 `create` 方法进行风控。**注意**调用 `create` 方法会立即采集设备信息，所以 **必须** 在同意隐私政策后且需要风控的场景下调用 `create` 方法，避免引起非合理场景采集不必要信息问题。
+smsdk 是数美风控体系中的终端，主要功能包括采集设备信息和生成设备标识。当产品需要对相关业务进行风控分析时，可以通过 `SmAntiFraud` 类的 `create` 方法进行风控。
+**注意**：调用 `create` 方法会立即采集设备信息并发起网络请求，所以 **必须** 在同意隐私政策后且需要风控的场景下调用 `create` 方法，避免引起非合理场景采集不必要信息问题。
 
 调用 `-[SmAntiFraud create:]` 方法启动SDK。
 
-启动SDK非阻塞当前线程，会采集数据并网络传输，缓存 `deviceId`，调用时机如下
+启动SDK会非阻塞地采集设备数据，进行网络传输，并缓存服务端下发的 `deviceId`，调用此方法的时机如下
 
 1. APP 首次启动，同意隐私政策后调用。
 2. APP 非首次启动，且同意了隐私政策，启动时调用。
@@ -147,9 +136,9 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 | transport         | BOOL                   | 否           | YES                                             | 是否开启设备指纹功能，YES代表开启                            |
 | usingShortBoxData | BOOL                   | 否           | NO                                              | 是否使用较短的boxData，NO代表不使用                          |
 | delegate          | `id<ServerSmidProtocol>` | 否           | null                                            | 使用回调方法异步获取标识时，实现`ServerSmidProtocol`的对象   |
-| notCollect        | NSArray<NSString*>     | 否           | null                                            | 设置SDK不采集项，目前仅支持"idfa"                            |
+| notCollect        | NSArray<NSString*>     | 否           | null                                            | 设置SDK不采集项                            |
 | area              | SmAntiFraudArea        | 否           | AREA_BJ                                         | 数据上传和云配的服务器机房地址。<br />AREA_BJ：北京机房<br />AREA_XJP：新加坡机房<br />AREA_FJNY：弗吉尼亚机房 |
-| useHttps | BOOL | 否 | NO | 是否使用 https 协议网络请求 |
+| useHttps | BOOL | 否 | 若SDK版本低于3.14.0或2.24.0，默认值为NO，否则为YES | 是否使用 https 协议网络请求 |
 
 ### 2.2 获取标识
 
@@ -200,9 +189,12 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 ```objective-c
 // 启动SDK参数对象
 SmOption *option = [[SmOption alloc] init];
-[option setOrganization: @"YOUR_ORGANIZATION"];// 必填
-[option setAppId:@"YOUR_APP_ID"];							 // 必填
-[option setPublicKey:@"YOUR_PUBLICK_KEY"];		 // 必填
+[option setOrganization: @"YOUR_ORGANIZATION"];    // 必填
+[option setAppId:@"YOUR_APP_ID"];						// 必填
+[option setPublicKey:@"YOUR_PUBLICK_KEY"];		   // 必填
+
+// 选填，通过此方式屏蔽部分数据采集，此处以 IDFA 为例
+[option setNotCollect:@[@"idfa"]];
 
 // 启动SDK
 BOOL isOk = [[SmAntiFraud shareInstance] create:option];
