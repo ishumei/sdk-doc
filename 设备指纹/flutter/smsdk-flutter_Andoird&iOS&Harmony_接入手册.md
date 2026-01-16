@@ -84,7 +84,16 @@ SmFraud.create(optionDic: {
   //SmFraud.OPTION_CONFURL: 'YOUR_CONF_URL', 
 
   //选填：是否使用https请求，默认不使用 
-  //SmFraud.OPTION_USE_HTTPS: false,  
+  //SmFraud.OPTION_USE_HTTPS: true,  
+
+  //选填：是否使用shortboxdata，默认不使用
+  //SmFraud.OPTION_SHORTBOXDATA: true,
+
+  //选填：设置不采集项目
+  //SmFraud.OPTION_NOTCOLLECT: ['idfa', 'cell', 'ssid'],
+
+  //选填，设置设备数据上传的机房，默认北京机房
+  //SmFraud.OPTION_AREA: SmFraud.SM_AREA_BJ,
 }); 
 ```
 
