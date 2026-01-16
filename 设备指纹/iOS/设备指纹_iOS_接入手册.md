@@ -24,7 +24,7 @@
    - `IOKit.framework`
 
 ### 1.3 http 设置
-smsdk 默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
+smsdk 3.14.0（对应2版本号2.24.0）版本以下默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
 
    1. 点击项目的 Info.plist，点击 + 号，选中 App Transport Security Settings
    2. 在 App Transport Security Settings 配置项中，点击 + 号，选择 Allow Arbitrary Loads，并配置为 YES
