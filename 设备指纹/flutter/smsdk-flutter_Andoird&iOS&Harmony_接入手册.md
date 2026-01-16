@@ -133,4 +133,4 @@ SmFraud.getDeviceId().then((value) => {
 
 ### 6.3 ios 采集 IDFA 事项
 
-iOS 的 SDK 默认采集了 IDFA（海外版本不采集），在提交 app store 审核时，若为采集 idfa 的版本，需要说明采集了 idfa。
+iOS 的 SDK 默认采集了 IDFA（海外版本不采集），在提交 app store 审核时，若为采集 IDFA 的版本，需要说明采集了 IDFA。
