@@ -65,7 +65,7 @@
    </application>
    ```
 
-5. 代码放混淆
+5. 代码防混淆
 
    向 proguard-rules.pro 文件中添加 smsdk 防混淆规则，如下
 
@@ -198,7 +198,7 @@ boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 
 
    ```java
    // 用户分布范围为东南亚
-   option.setArea(SmAntiFraud.AREA_XJP)
+   option.setArea(SmAntiFraud.AREA_XJP);
    // 用户分布范围为全球，则需要开启加速功能，配置如下
    // option.setArea(SmAntiFraud.AREA_XJP);
    // String host = "http://fp-sa-it-acc.fengkongcloud.com";
@@ -256,3 +256,68 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场�
 smsdk v3 版本终端不再提供明文设备标识，业务端不可以将 boxId 或 boxData 直接当做标识，获取标识方法参考 ”解密工具及代理服务器说明 设备指纹标识解密“。
 
 smsdk v3 版本首次启动直接调用 `SmAntiFraud.getDeviceId` 方法会出现阻塞当前线程问题，解决方案查看 ”Android SDK 标准接入 场景三“ 小节。
+
+## 7 微行为接入
+
+smsdk 分为主包和子包，上述文档为主包接入文档，子包主要用于持续性监控或者检测。每个子包对应一个 aar，与 `smsdk.aar` 类似都需要导入到项目中才能使用。
+
+### 机器操控微行为 sdk
+
+sdk 包文件：`smsdk_screentouch-release.aar`。
+
+此包会收集屏幕点击、移动等事件，用于检测机器操控类操作方式，使用方式如下。
+
+主动上报类：
+
+```java
+// 初始化检测器，构造器参数
+ScreenTouchDetector mScreenTouchDetector = new ScreenTouchDetector();
+// 开始监听
+SmAntiFraud.startDetector(mScreenTouchDetector);
+
+// 在 startDetector 与 stopDetector 之间，调用 track 方法上报 MotionEvent 对象，track 参数
+// eventId：目前支持 "onTouch" 类型
+// viewId：检测 view 的 id 值，比如主页面可以使用 String.valueOf(R.layout.activity_main)
+// MotionEvent：屏幕触摸对象
+// 调用时机：在敏感位置 Activity 或 View 的 onTouchEvent、dispatchTouchEvent方法内调用
+// 比如登陆、注册、获取验证码等 view
+mScreenTouchDetector.track("onTouch", String.valueOf(R.layout.activity_main), event);
+
+// 结束监听
+SmAntiFraud.stopDetector(mScreenTouchDetector);
+```
+
+自动上报，使用 `ScreenTouchAllDetector` 类可以自动收集屏幕事件，不需要主动调用 `track` 方法
+
+```java
+// 初始化检测器
+ScreenTouchAllDetector sScreenTouchAllDetector = new ScreenTouchAllDetector(context);
+
+// 注册回调方法，此方法会监听各 activity dispatchTouchEvent 事件，但是不会收集和上报此事件
+// 此方法要早于监听的 Activity，建议在 Application 的 onCreate 方法中调用
+sScreenTouchAllDetector.registerActivityLifecycleCallback();
+
+// 开始监听，此方法会收集并在合适时机进行上报
+SmAntiFraud.startDetector(sScreenTouchAllDetector);
+// 停止监听
+SmAntiFraud.stopDetector(sScreenTouchAllDetector);
+
+// 注销回调方法
+sScreenTouchAllDetector.unregisterActivityLifecycleCallback();
+```
+
+### 内存检测微行为 sdk
+
+sdk 包文件：`smsdk_mem-release.aar`
+
+此包会检测是否存在内存扫描行为，使用方式如下：
+
+```java
+// 初始化检测器
+MemDetector mMemDetector = new MemDetector();
+
+// 开始监听
+SmAntiFraud.startDetector(mMemDetector);
+// 结束监听
+SmAntiFraud.stopDetector(mMemDetector);
+```
