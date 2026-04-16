@@ -260,9 +260,9 @@ NSString *host = @"http://private-host";
 
 主要步骤与标准接入类似，需要增加以下配置
 
-```java
+```objective-c
 // 设置私有地址，将 host 替换为代理服务器的主机名（域名）
-String host = "https://proxy-host";
+NSString* host = @"https://proxy-host";
 [option setUrl: [host stringByAppendingString:@"/deviceprofile/v4"]]; // 示例路径，需要与真实场景一致
 [option setConfUrl:[host stringByAppendingString:@"/v3/cloudconf"]]; // 示例路径，需要与真实场景一致
 ```
@@ -276,3 +276,63 @@ String host = "https://proxy-host";
 3. 查看控制台是否有 Smlog 异常输出，若有异常输出，请根据提示修改。
 4. 通过数美管理后台导航栏选择 ”设备风险趋势"，找到 “设备详情” 部分，查看是否有数据上报（可能存在延时，一般不超过 30 分钟）。
 5. 无法通过测试时，联系数美工作人员进行排查。
+
+## 7 微行为接入
+
+smsdk 分为主包和子包，上述文档为主包接入文档，子包主要用于持续性监控或者检测。每个子包对应一个 xcframework，与 `SmAntiFraud.xcframework` 类似都需要导入到项目中才能使用。
+
+### 机器操控微行为 sdk
+
+sdk 包文件：`SmAntiFraudScreenTouch.xcframework`。
+
+此包会收集屏幕点击、移动等事件，用于检测机器操控类操作方式，使用方式分为针对特定UI组件的监听和全局app监听两种，如下：
+
+针对特定UI组件的监听：
+```objective-c
+#import <SmAntiFraudScreenTouch/SmScreenTouchDetector.h>
+
+// 初始化检测器，构造器参数
+SmScreenTouchDetector* mScreenTouchDetector = [SmScreenTouchDetector shareInstance];
+
+// 在startDetector前，调用setResponders方法设置需要被监控的UI组件，被监控的UI组件需要继承自UIResponders
+[mScreenTouchDetector setResponders:@[self]];
+
+// 开始监听
+[[SmAntiFraud shareInstance] startDetector:mScreenTouchDetector]; 
+
+// 结束监听
+[[SmAntiFraud shareInstance] stopDetector:mScreenTouchDetector];
+```
+
+全局app监听：
+```objective-c
+#import <SmAntiFraudScreenTouch/SmScreenTouchAllDetector.h>
+
+// 初始化检测器
+SmScreenTouchAllDetector* sScreenTouchAllDetector = [SmScreenTouchAllDetector shareInstance];
+
+// 开始监听
+[[SmAntiFraud shareInstance] startDetector:sScreenTouchAllDetector];
+
+// 结束监听
+[[SmAntiFraud shareInstance] stopDetector:sScreenTouchAllDetector];
+```
+
+### 内存检测微行为 sdk
+
+sdk 包文件：`SmAntiFraudMem.xcframework`
+
+此包会检测是否存在内存扫描行为，使用方式如下：
+
+```objective-c
+#import <SmAntiFraudMem/SmMemDetector.h>
+
+// 初始化检测器
+SmMemDetector* mMemDetector = [[SmMemDetector alloc] init];
+
+// 开始监听
+[[SmAntiFraud shareInstance] startDetector:mMemDetector];
+
+// 结束监听
+[[SmAntiFraud shareInstance] stopDetector:mMemDetector];
+```
