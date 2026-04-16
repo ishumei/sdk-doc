@@ -63,7 +63,7 @@
 
 - 异步获取标识
 
-  1. 创建一个类，实现 SmAntiDelegate 接口的`SmOnSuccess(string)`和`SmError(int)`回调方法
+  1. 创建一个类，实现 SmAntiDelegate 接口的`SmOnSuccess(string)`和`SmOnError(int)`回调方法
   2. 初始化一个上述创建类的实例，在初始化数美 SDK 的时候，设置其为 Smoption 的 `smAntiDelegate` 属性即可
 
 ### 2.3 代码示例
@@ -100,7 +100,7 @@ xxxxxxxxxx
     }
 
     // 数美失败回调方法
-	public void SmOnError(int errorCode)
+    public void SmOnError(int errorCode)
     {
         Debug.WriteLine(errorCode);
     }
