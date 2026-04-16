@@ -279,8 +279,7 @@ NSString* host = @"https://proxy-host";
 
 ## 7 微行为接入
 
-每个微行为子SDK以独立的xcframework包形式接入，且其中的任何API都应在主包的`create` 方法之后调用。
-微行为子SDK每次被启动后，会持续性地检测，主动调用停止方法即可停止检测。
+每个微行为子SDK以独立的 xcframework 包形式接入，务必先调用设备指纹SDK的 `create` 方法再启动微行为SDK。
 
 ### 机器操控微行为 sdk
 
