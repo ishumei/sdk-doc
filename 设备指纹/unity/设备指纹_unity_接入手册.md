@@ -199,6 +199,7 @@ public class CustomApplication extends Application {
     ```
 
 ### 7.3 调用API
+**下列的API务必在设备指纹SDK的`SmAntiFraudBridge.smCreate()`方法之后调用。**
 
 调用`smStartScreenTouchDetector()`方法后，SDK开始收集用户的触摸行为数据
 
