@@ -14,13 +14,13 @@
 
 ### 2.1 导入插件
 
-将整个插件目录复制到Unity项目的`Assets`目录下，确保目录结构保持不变
+将整个插件目录复制到Unity项目的 `Assets` 目录下，确保目录结构保持不变
 
 ### 2.2 iOS端依赖配置
 
-iOS SDK依赖`IOKit.framework`，因此需要在Unity中配置依赖：
+iOS SDK依赖 `IOKit.framework`，因此需要在Unity中配置依赖：
 
-在Unity中，选中iOS 设备指纹SDK `Assets > Plugins > iOS > SmAntiFraud`，勾选右侧的`Inspector > Platform Settings > Rarely used frameworks > IOKit`
+在Unity中，选中iOS 设备指纹SDK `Assets > Plugins > iOS > SmAntiFraud`，勾选右侧的 `Inspector > Platform Settings > Rarely used frameworks > IOKit`
 
 ### 2.3 iOS端隐私文件配置
 
@@ -55,7 +55,7 @@ iOS SDK依赖`IOKit.framework`，因此需要在Unity中配置依赖：
 
 启动SDK会收集设备数据并进行网络请求，确保在用户同意隐私政策后再启动SDK
 
-调用`SmAntiFraudBridge.smCreate()`方法启动SDK前需要先调用`SmAntiFraudBridge.initSmoption()`配置初始化参数，参考如下代码：
+调用 `SmAntiFraudBridge.smCreate()` 方法启动SDK前需要先调用 `SmAntiFraudBridge.initSmoption()` 配置启动参数，参考如下代码：
 
 ```csharp
 using UnityEngine;
@@ -64,7 +64,7 @@ public class ExampleClass : MonoBehaviour
 {
     void smCreate()
     {
-        // 1. 初始化配置
+        // 1. 配置启动参数
         SmAntiFraudBridge.initSmoption();
         
         // 2. 必须项，设置组织ID
@@ -80,32 +80,34 @@ public class ExampleClass : MonoBehaviour
         SmAntiFraudBridge.optionSetAppId("your_app_id");
 
       	// 6. 可选项，配置不采集字段
-#if UNITY_IOS && !UNITY_EDITOR
-        SmAntiFraudBridge.optionAddNotCollectIOS("idfa");
-#elif UNITY_ANDROID && !UNITY_EDITOR
-        SmAntiFraudBridge.optionAddNotCollectAndroid("imei");
-        SmAntiFraudBridge.optionAddNotCollectAndroid("wifiip");
+#if UNITY_ANDROID && !UNITY_EDITOR
+    SmAntiFraudBridge.optionAddNotCollectAndroid("imei");
+    SmAntiFraudBridge.optionAddNotCollectAndroid("wifiip");
+#elif UNITY_IOS && !UNITY_EDITOR
+    SmAntiFraudBridge.optionAddNotCollectIOS("idfa");
 #endif
         
         // 7.启动SDK
         bool success = SmAntiFraudBridge.smCreate();
         if (success)
         {
-            Debug.Log("设备指纹初始化成功");
+            Debug.Log("设备指纹启动成功");
         }
         else
         {
-            // 初始化失败，须检查初始化参数是否配置正确
-            Debug.Log("设备指纹初始化失败");
+            // 启动失败，须检查启动参数是否配置正确
+            Debug.Log("设备指纹启动失败");
         }
     }
 }
 ```
 
 ## 4. 获取标识
-客户端`SmAntiFraudBridge.smGetDeviceId()`获取到标识分为 boxId 和 boxData，两者均会变化。
+务必在启动SDK后再调用获取标识的方法，建议等待2秒后再调用，以便SDK收集数据和完成网络传输
 
-务必在启动SDK后再调用获取标识的方法，建议在启动SDK的2秒之后再调用获取标识的方法，时间供SDK收集数据和网络传输
+客户端 `SmAntiFraudBridge.smGetDeviceId()` 正常情况下会获取到89位的 boxId。
+
+若获取到非boxId，需要检查启动SDK的参数和时机是否正确。
 
 ```csharp
 // 获取标识
@@ -178,17 +180,17 @@ public class CustomApplication extends Application {
 
 1. 创建自定义Application类：
 
-   - 在`Plugins/Android/`目录下创建一个Java文件，例如`CustomApplication.java`
-   - 继承自`android.app.Application`
-   - 在`onCreate()`方法中调用微行为SDK的初始化方法
+   - 在 `Plugins/Android/` 目录下创建一个Java文件，例如 `CustomApplication.java`
+   - 继承自 `android.app.Application`
+   - 在 `onCreate()` 方法中调用微行为SDK的初始化方法
 
-2. 实现代码参考上面代码示例，务必在`onCreate()`方法中调用初始化方法`initDetector(Context context)`
+2. 实现代码参考上面代码示例，务必在 `onCreate()` 方法中调用初始化方法 `initDetector(Context context)`
 
 3. 参考[Unity Manual](https://docs.unity3d.com/2022.2/Documentation/Manual/overriding-android-manifest.html)，打开**Custom Main Manifest**开关
 
 4. 指定自定义的application类名
 
-   在`Plugins/Android/AndroidManifest.xml`文件的`<application>`标签中添加`android:name`属性，指定自定义的Application类
+   在 `Plugins/Android/AndroidManifest.xml` 文件的 `<application>` 标签中添加 `android:name` 属性，指定自定义的Application类
 
 
     ```xml
@@ -202,14 +204,14 @@ public class CustomApplication extends Application {
 ### 7.3 调用API
 **下列的API务必在设备指纹SDK的 `SmAntiFraudBridge.smCreate()` 方法之后调用。**
 
-调用`smStartScreenTouchDetector()`方法后，SDK开始收集用户的触摸行为数据
+调用 `smStartScreenTouchDetector()` 方法后，SDK开始收集用户的触摸行为数据
 
 ```csharp
 // 开始触摸检测，收集用户触摸行为数据
 SmScreenTouchBridge.smStartScreenTouchDetector();
 ```
 
-调用`smStopScreenTouchDetector()`方法后，SDK停止收集用户的触摸行为数据
+调用 `smStopScreenTouchDetector()` 方法后，SDK停止收集用户的触摸行为数据
 
 ```csharp
 // 停止触摸检测
