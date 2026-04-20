@@ -20,7 +20,7 @@
 
 iOS SDK依赖`IOKit.framework`，因此需要在Unity中配置依赖：
 
-在Unity中，选中`Assets > Plugins > iOS > SmAntiFraud`，勾选右侧的`Inspector > Platform Settings > Rarely used frameworks > IOKit`
+在Unity中，选中iOS 设备指纹SDK `Assets > Plugins > iOS > SmAntiFraud`，勾选右侧的`Inspector > Platform Settings > Rarely used frameworks > IOKit`
 
 ### 2.3 iOS端隐私文件配置
 
@@ -95,6 +95,7 @@ public class ExampleClass : MonoBehaviour
         }
         else
         {
+            // 初始化失败，须检查初始化参数是否配置正确
             Debug.Log("设备指纹初始化失败");
         }
     }
@@ -120,8 +121,8 @@ string boxId = SmAntiFraudBridge.smGetDeviceId();
 | `optionSetExtraInfo` | 设置额外信息 | string |
 | `optionAddNotCollectAndroid` | 添加Android不采集项 | string |
 | `optionAddNotCollectIOS` | 添加iOS不采集项 | string |
-| `optionSetUsingShortBoxData` | 设置是否使用短数据 | bool |
-| `optionSetAutoUploadVData` | 设置是否自动上传VData | bool |
+| `optionSetUsingShortBoxData` | 设置是否使用短boxdata | bool |
+| `optionSetAutoUploadVData` | 设置是否自动上传微行为数据 | bool |
 
 ## 6. 检查接入是否成功
 
@@ -137,13 +138,13 @@ string boxId = SmAntiFraudBridge.smGetDeviceId();
 微行为/
 ├── Plugins/
 │   ├── Android/
-│   │   ├── SmScreenTouchDetector.java      # Android端触摸检测实现
+│   │   ├── SmScreenTouchDetector.java      # Android端触摸检测封装实现
 │   │   ├── smsdk_screentouch-release.aar   # 安卓平台原生微行为SDK
 │   │
 │   ├── iOS/
 │   │   ├── SmAntiFraudScreenTouch.xcframework  # iOS平台原生微行为SDK
-│   │   ├── SmScreenTouchExport.h           # iOS端导出头文件
-│   │   ├── SmScreenTouchExport.mm          # iOS端实现
+│   │   ├── SmScreenTouchExport.h           # iOS端触摸检测封装头文件
+│   │   ├── SmScreenTouchExport.mm          # iOS端触摸检测封装实现
 │   │
 ├── Scripts/
 │   ├── SmScreenTouchBridge.cs              # Unity与原生平台桥接代码
@@ -199,7 +200,7 @@ public class CustomApplication extends Application {
     ```
 
 ### 7.3 调用API
-**下列的API务必在设备指纹SDK的`SmAntiFraudBridge.smCreate()`方法之后调用。**
+**下列的API务必在设备指纹SDK的 `SmAntiFraudBridge.smCreate()` 方法之后调用。**
 
 调用`smStartScreenTouchDetector()`方法后，SDK开始收集用户的触摸行为数据
 
