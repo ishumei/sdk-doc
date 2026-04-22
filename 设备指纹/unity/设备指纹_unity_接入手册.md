@@ -67,16 +67,16 @@ public class ExampleClass : MonoBehaviour
         // 1. 配置启动参数
         SmAntiFraudBridge.initSmoption();
         
-        // 2. 必须项，设置组织ID
+        // 2. 必需项，设置组织ID
         SmAntiFraudBridge.optionSetOrganization("your_organization");
         
-        // 3. 必须项，设置Android公钥
+        // 3. 必需项，设置Android公钥
         SmAntiFraudBridge.optionSetAndroidPublicKey("android_public_key");
         
-        // 4. 必须项，设置iOS公钥
+        // 4. 必需项，设置iOS公钥
         SmAntiFraudBridge.optionSetIOSPublicKey("ios_public_key");
         
-        // 5. 必须项，设置App ID
+        // 5. 必需项，设置App ID
         SmAntiFraudBridge.optionSetAppId("your_app_id");
 
       	// 6. 可选项，配置不采集字段
