@@ -279,7 +279,15 @@ NSString* host = @"https://proxy-host";
 
 ## 7 微行为接入
 
-每个微行为子SDK以独立的 xcframework 包形式接入，务必先调用设备指纹SDK的 `create` 方法再启动微行为SDK。
+每个微行为子SDK以独立的 xcframework 包形式接入，务必先调用设备指纹SDK的 `create` 方法再调用 `-[SmAntiFraud startDetector:]` 启动微行为SDK。
+
+微行为子SDK采集的数据默认**不会**自动上传，建议在 `create` 前通过 `SmOption` 配置开启微行为自动上传：
+
+```objective-c
+// 配置开启自动上传微行为数据
+[option setAutoUploadVData:YES];
+```
+若不开启自动上传功能，则可以通过设备指纹SDK的 `-[SmAntiFraud getVData]` 方法获取微行为数据自发上传。
 
 ### 机器操控微行为 sdk
 
