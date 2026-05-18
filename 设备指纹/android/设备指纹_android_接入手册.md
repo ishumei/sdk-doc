@@ -110,6 +110,7 @@ boolean isOk = SmAntiFraud.create(context, option);
 | setArea         | String        | 否       | SmAntiFraud.AREA_BJ | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
 | setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段                                             |
 | setUsingHttps   | boolean       | 否       | 若SDK版本低于3.14.0或2.24.0，默认值为false，否则为true | 是否使用 https 协议网络请求                                  |
+| setAutoUploadVData | boolean | 否 | false | 是否允许自动上传微行为数据 |
 | addSubCollectors   | SubCollector       | 否       | 无               | 子包采集数据，默认不提供子包，针对有需求客户单独提供，当前支持：<br />smsdk_ids：采集设备标识信息 |
 
 | SmAntiFraud 方法         | 参数类型            | 是否必填 | 默认值 | 说明                                                         |
@@ -259,7 +260,16 @@ smsdk v3 版本首次启动直接调用 `SmAntiFraud.getDeviceId` 方法会出�
 
 ## 7 微行为接入
 
-每个微行为子SDK以独立的 aar 包形式接入，务必先调用设备指纹SDK的 `create` 方法再启动微行为SDK。
+每个微行为子SDK以独立的 aar 包形式接入，务必先调用设备指纹SDK的 `create` 方法再调用 `SmAntiFraud.startDetector(AbsDetector)` 启动微行为SDK。
+
+微行为子SDK采集的数据默认**不会**自动上传，建议在 `create` 前通过 `SmAntiFraud.SmOption` 配置开启微行为自动上传：
+
+```java
+// 配置开启自动上传微行为数据
+option.setAutoUploadVData(true);
+```
+
+若不开启自动上传功能，则可以通过设备指纹SDK的 `SmAntiFraud.getVData()` 方法获取微行为数据自发上传。
 
 ### 机器操控微行为 sdk
 
