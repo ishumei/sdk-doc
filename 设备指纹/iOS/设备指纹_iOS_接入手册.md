@@ -294,7 +294,7 @@ NSString* host = @"https://proxy-host";
 sdk 包文件：`SmAntiFraudScreenTouch.xcframework`。
 
 此 sdk 会收集屏幕点击、移动等事件，用于检测机器操控类操作。
-具体而言，机器操控微行为分为两类： **全局app触控事件监听** 和 **特定UI组件的触控事件监听**。
+机器操控微行为 sdk 分为两类： **全局app触控事件监听** 和 **特定UI组件的触控事件监听**。
 **建议使用全局app触控事件监听**，如下：
 
 全局app触控事件监听：
