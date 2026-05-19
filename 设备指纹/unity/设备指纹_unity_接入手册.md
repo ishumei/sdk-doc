@@ -123,8 +123,8 @@ string boxId = SmAntiFraudBridge.smGetDeviceId();
 | `optionSetExtraInfo` | 设置额外信息 | string |
 | `optionAddNotCollectAndroid` | 添加Android不采集项 | string |
 | `optionAddNotCollectIOS` | 添加iOS不采集项 | string |
-| `optionSetUsingShortBoxData` | 设置是否使用短boxdata | bool |
-| `optionSetAutoUploadVData` | 设置是否自动上传微行为数据 | bool |
+| `optionSetUsingShortBoxData` | 设置是否使用短boxdata，默认`false`。<br />如需使用短boxdata，须要设置为`true` | bool |
+| `optionSetAutoUploadVData` | 设置是否自动上传微行为数据，默认`false`。<br />建议设置为`true`，开启微行为数据自动上报 | bool |
 
 ## 6. 检查接入是否成功
 
@@ -200,8 +200,16 @@ public class CustomApplication extends Application {
         <!-- 其他组件 -->
     </application>
     ```
+### 7.3 开启自动上报
+微行为数据默认**不会**自动上传，建议在 `SmAntiFraudBridge.smCreate()` 前调用 `SmAntiFraudBridge.optionSetAutoUploadVData(true)` 方法开启自动上传：
 
-### 7.3 调用API
+```csharp
+// 开启微行为自动上传
+SmAntiFraudBridge.optionSetAutoUploadVData(true);
+```
+若不开启自动上传功能，则可以通过设备指纹SDK的 `SmAntiFraudBridge.smGetVdata()` 方法获取微行为数据自发上传。
+
+### 7.4 调用API
 **下列的API务必在设备指纹SDK的 `SmAntiFraudBridge.smCreate()` 方法之后调用。**
 
 调用 `smStartScreenTouchDetector()` 方法后，SDK开始收集用户的触摸行为数据
