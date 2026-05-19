@@ -287,15 +287,31 @@ NSString* host = @"https://proxy-host";
 // 配置开启自动上传微行为数据
 [option setAutoUploadVData:YES];
 ```
-若不开启自动上传功能，则可以通过设备指纹SDK的 `-[SmAntiFraud getVData]` 方法获取微行为数据自发上传。
+若不开启自动上传功能，则可以通过设备指纹SDK的 `-[SmAntiFraud getVData]` 方法获取微行为数据后，通过业务事件的 `data.microBehavior` 字段上报。
 
 ### 机器操控微行为 sdk
 
 sdk 包文件：`SmAntiFraudScreenTouch.xcframework`。
 
-此包会收集屏幕点击、移动等事件，用于检测机器操控类操作方式，使用方式分为针对特定UI组件的监听和全局app监听两种，如下：
+此 sdk 会收集屏幕点击、移动等事件，用于检测机器操控类操作。
+具体而言，机器操控微行为分为两类： **全局app触控事件监听** 和 **特定UI组件的触控事件监听**。
+**建议使用全局app触控事件监听**，如下：
 
-针对特定UI组件的监听：
+全局app触控事件监听：
+```objective-c
+#import <SmAntiFraudScreenTouch/SmScreenTouchAllDetector.h>
+
+// 初始化检测器
+SmScreenTouchAllDetector* sScreenTouchAllDetector = [SmScreenTouchAllDetector shareInstance];
+
+// 开始监听
+[[SmAntiFraud shareInstance] startDetector:sScreenTouchAllDetector];
+
+// 结束监听
+[[SmAntiFraud shareInstance] stopDetector:sScreenTouchAllDetector];
+```
+
+若只想针对特定UI组件的触控事件监听：
 ```objective-c
 #import <SmAntiFraudScreenTouch/SmScreenTouchDetector.h>
 
@@ -310,20 +326,6 @@ SmScreenTouchDetector* mScreenTouchDetector = [SmScreenTouchDetector shareInstan
 
 // 结束监听
 [[SmAntiFraud shareInstance] stopDetector:mScreenTouchDetector];
-```
-
-全局app监听：
-```objective-c
-#import <SmAntiFraudScreenTouch/SmScreenTouchAllDetector.h>
-
-// 初始化检测器
-SmScreenTouchAllDetector* sScreenTouchAllDetector = [SmScreenTouchAllDetector shareInstance];
-
-// 开始监听
-[[SmAntiFraud shareInstance] startDetector:sScreenTouchAllDetector];
-
-// 结束监听
-[[SmAntiFraud shareInstance] stopDetector:sScreenTouchAllDetector];
 ```
 
 ### 内存检测微行为 sdk
