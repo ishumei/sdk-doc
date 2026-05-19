@@ -289,7 +289,7 @@ NSString* host = @"https://proxy-host";
 ```
 若不开启自动上传功能，则可以通过设备指纹SDK的 `-[SmAntiFraud getVData]` 方法获取微行为数据后，通过业务事件的 `data.microBehavior` 字段上报。
 
-### 机器操控微行为 sdk
+### 7.1 机器操控微行为 sdk
 
 sdk 包文件：`SmAntiFraudScreenTouch.xcframework`。
 
@@ -328,7 +328,7 @@ SmScreenTouchDetector* mScreenTouchDetector = [SmScreenTouchDetector shareInstan
 [[SmAntiFraud shareInstance] stopDetector:mScreenTouchDetector];
 ```
 
-### 内存检测微行为 sdk
+### 7.2 内存检测微行为 sdk
 
 sdk 包文件：`SmAntiFraudMem.xcframework`
 
