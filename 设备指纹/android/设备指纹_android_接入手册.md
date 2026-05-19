@@ -269,15 +269,36 @@ smsdk v3 版本首次启动直接调用 `SmAntiFraud.getDeviceId` 方法会出�
 option.setAutoUploadVData(true);
 ```
 
-若不开启自动上传功能，则可以通过设备指纹SDK的 `SmAntiFraud.getVData()` 方法获取微行为数据自发上传。
+若不开启自动上传功能，则可以通过设备指纹SDK的 `SmAntiFraud.getVData()` 方法获取微行为数据后，通过业务事件的 `data.microBehavior` 字段上报。
 
-### 机器操控微行为 sdk
+### 7.1 机器操控微行为 sdk
 
 sdk 包文件：`smsdk_screentouch-release.aar`。
 
-此包会收集屏幕点击、移动等事件，用于检测机器操控类操作方式，使用方式如下。
+此 sdk 会收集屏幕点击、移动等事件，用于检测机器操控类操作。
+机器操控微行为 sdk 分为两类： **全局app触控事件监听** 和 **特定UI组件的触控事件监听**。
+**建议使用全局app触控事件监听**，如下：
 
-主动上报类：
+全局app触控事件监听：
+
+```java
+// 初始化检测器
+ScreenTouchAllDetector sScreenTouchAllDetector = new ScreenTouchAllDetector(context);
+
+// 注册回调方法，此方法会监听各 activity dispatchTouchEvent 事件，但是不会收集和上报此事件
+// 此方法要早于监听的 Activity，建议在 Application 的 onCreate 方法中调用
+sScreenTouchAllDetector.registerActivityLifecycleCallback();
+
+// 开始监听，此方法会收集并在合适时机进行上报
+SmAntiFraud.startDetector(sScreenTouchAllDetector);
+// 停止监听
+SmAntiFraud.stopDetector(sScreenTouchAllDetector);
+
+// 注销回调方法
+sScreenTouchAllDetector.unregisterActivityLifecycleCallback();
+```
+
+若只想针对特定UI组件的触控事件监听：
 
 ```java
 // 初始化检测器，构造器参数
@@ -299,24 +320,8 @@ SmAntiFraud.stopDetector(mScreenTouchDetector);
 
 自动上报，使用 `ScreenTouchAllDetector` 类可以自动收集屏幕事件，不需要主动调用 `track` 方法
 
-```java
-// 初始化检测器
-ScreenTouchAllDetector sScreenTouchAllDetector = new ScreenTouchAllDetector(context);
 
-// 注册回调方法，此方法会监听各 activity dispatchTouchEvent 事件，但是不会收集和上报此事件
-// 此方法要早于监听的 Activity，建议在 Application 的 onCreate 方法中调用
-sScreenTouchAllDetector.registerActivityLifecycleCallback();
-
-// 开始监听，此方法会收集并在合适时机进行上报
-SmAntiFraud.startDetector(sScreenTouchAllDetector);
-// 停止监听
-SmAntiFraud.stopDetector(sScreenTouchAllDetector);
-
-// 注销回调方法
-sScreenTouchAllDetector.unregisterActivityLifecycleCallback();
-```
-
-### 内存检测微行为 sdk
+### 7.2 内存检测微行为 sdk
 
 sdk 包文件：`smsdk_mem-release.aar`
 
