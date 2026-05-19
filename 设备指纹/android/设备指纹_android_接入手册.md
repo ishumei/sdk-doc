@@ -318,9 +318,6 @@ mScreenTouchDetector.track("onTouch", String.valueOf(R.layout.activity_main), ev
 SmAntiFraud.stopDetector(mScreenTouchDetector);
 ```
 
-自动上报，使用 `ScreenTouchAllDetector` 类可以自动收集屏幕事件，不需要主动调用 `track` 方法
-
-
 ### 7.2 内存检测微行为 sdk
 
 sdk 包文件：`smsdk_mem-release.aar`
