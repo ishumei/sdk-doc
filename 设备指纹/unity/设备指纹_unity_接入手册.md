@@ -124,7 +124,7 @@ string boxId = SmAntiFraudBridge.smGetDeviceId();
 | `optionAddNotCollectAndroid` | 添加Android不采集项 | string |
 | `optionAddNotCollectIOS` | 添加iOS不采集项 | string |
 | `optionSetUsingShortBoxData` | 设置是否使用短boxdata，默认`false`。<br />如需使用短boxdata，须要设置为`true` | bool |
-| `optionSetAutoUploadVData` | 设置是否自动上传微行为数据，默认`false`。<br />建议设置为`true`，开启微行为数据自动上报 | bool |
+| `optionSetAutoUploadVData` | 设置是否自动上传微行为数据，默认`false`。<br />建议设置为`true`，开启微行为数据自动上传 | bool |
 
 ## 6. 检查接入是否成功
 
