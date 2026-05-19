@@ -24,7 +24,7 @@
    - `IOKit.framework`
 
 ### 1.3 http 设置
-smsdk 3.14.0（对应2版本号2.24.0）版本以下默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
+smsdk 3.14.0（对应2版本号2.24.0）之前版本默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
 
    1. 点击项目的 Info.plist，点击 + 号，选中 App Transport Security Settings
    2. 在 App Transport Security Settings 配置项中，点击 + 号，选择 Allow Arbitrary Loads，并配置为 YES
@@ -279,9 +279,9 @@ NSString* host = @"https://proxy-host";
 
 ## 7 微行为接入
 
-每个微行为子SDK以独立的 xcframework 包形式接入，务必先调用设备指纹SDK的 `create` 方法再调用 `-[SmAntiFraud startDetector:]` 启动微行为SDK。
+每个微行为子SDK以独立的 xcframework 包形式接入，务必先调用设备指纹SDK的 `-[SmAntiFraud create:]` 方法再调用 `-[SmAntiFraud startDetector:]` 启动微行为SDK。
 
-微行为子SDK采集的数据默认**不会**自动上传，建议在 `create` 前通过 `SmOption` 配置开启微行为自动上传：
+微行为子SDK采集的数据默认**不会**自动上传，建议在 `-[SmAntiFraud create:]` 方法前通过 `SmOption` 配置开启微行为自动上传：
 
 ```objective-c
 // 配置开启自动上传微行为数据
