@@ -207,7 +207,7 @@ public class CustomApplication extends Application {
 // 开启微行为自动上传
 SmAntiFraudBridge.optionSetAutoUploadVData(true);
 ```
-若不开启自动上传功能，则可以通过设备指纹SDK的 `SmAntiFraudBridge.smGetVdata()` 方法获取微行为数据自发上传。
+若不开启自动上传功能，则可以通过设备指纹SDK的 `SmAntiFraudBridge.smGetVdata()` 方法获取微行为数据后，通过业务事件的data.microBehavior字段上报。
 
 ### 7.4 调用API
 **下列的API务必在设备指纹SDK的 `SmAntiFraudBridge.smCreate()` 方法之后调用。**
