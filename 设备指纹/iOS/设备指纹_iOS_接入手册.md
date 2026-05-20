@@ -84,8 +84,8 @@ smsdk 3.14.0（对应2版本号2.24.0）之前版本默认使用 http 请求，�
      			<array>
      				<string>35F9.1</string>
      			</array>
-           <key>NSPrivacyAccessedAPIType</key>
-           <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
      		</dict>
      		<dict>
      			<key>NSPrivacyAccessedAPITypeReasons</key>
