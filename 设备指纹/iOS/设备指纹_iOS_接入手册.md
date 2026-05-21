@@ -30,7 +30,7 @@ smsdk 3.14.0（对应2版本号2.24.0）之前版本默认使用 http 请求，�
    2. 在 App Transport Security Settings 配置项中，点击 + 号，选择 Allow Arbitrary Loads，并配置为 YES
 
 ### 1.4 idfa 配置
-如果 APP 之前未采集过 `IDFA` ，上架App Store时，需要根据App Connect的政策，明确app中使用`idfa`并说明原因，
+如果 APP 之前未采集过 `IDFA` ，上架App Store时，需要根据App Connect的政策，明确app中使用`IDFA`并说明原因，
 
    若不想使用 `IDFA`，可参考下面启动SDK章节，设置 `notCollect` 不采集 `IDFA`，
 
@@ -190,8 +190,8 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 // 启动SDK参数对象
 SmOption *option = [[SmOption alloc] init];
 [option setOrganization: @"YOUR_ORGANIZATION"];    // 必填
-[option setAppId:@"YOUR_APP_ID"];						// 必填
-[option setPublicKey:@"YOUR_PUBLICK_KEY"];		   // 必填
+[option setAppId:@"YOUR_APP_ID"];                  // 必填
+[option setPublicKey:@"YOUR_PUBLICK_KEY"];         // 必填
 
 // 选填，通过此方式屏蔽部分数据采集，此处以 IDFA 为例
 [option setNotCollect:@[@"idfa"]];
@@ -263,7 +263,7 @@ NSString *host = @"http://private-host";
 ```objective-c
 // 设置私有地址，将 host 替换为代理服务器的主机名（域名）
 NSString* host = @"https://proxy-host";
-[option setUrl: [host stringByAppendingString:@"/deviceprofile/v4"]]; // 示例路径，需要与真实场景一致
+[option setUrl:[host stringByAppendingString:@"/deviceprofile/v4"]]; // 示例路径，需要与真实场景一致
 [option setConfUrl:[host stringByAppendingString:@"/v3/cloudconf"]]; // 示例路径，需要与真实场景一致
 ```
 
