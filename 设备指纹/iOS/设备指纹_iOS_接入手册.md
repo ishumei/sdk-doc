@@ -32,7 +32,7 @@ smsdk 3.14.0（对应2版本号2.24.0）之前版本默认使用 http 请求，�
 ### 1.4 idfa 配置
 如果 APP 之前未采集过 `IDFA` ，上架App Store时，需要根据App Connect的政策，明确app中使用`IDFA`并说明原因，
 
-   若不想使用 `IDFA`，可参考下面启动SDK章节，设置 `notCollect` 不采集 `IDFA`，
+   若不想使用 `IDFA`，可参考下面 ["启动SDK章节"](#21-启动sdk) 中的示例代码，设置 `notCollect` 不采集 `IDFA`，
 
    若app归属于儿童类，则联系数美运营提供不包含采集 `IDFA` 相关代码的SDK。
 
@@ -142,7 +142,7 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 
 ### 2.2 获取标识
 
-客户端获取到标识分为 `boxId` 和 `boxData`，**两者都会变化**。若需要唯一不变的标识，查看 ”解密工具及代理服务器说明 设备指纹标识解密“ 章节，了解如何获取明文设备标识。
+客户端获取到标识分为 `boxId` 和 `boxData`，**两者都会变化**。若需要唯一不变的标识，查看 "解密工具及代理服务器说明 设备指纹标识解密" 章节，了解如何获取明文设备标识。
 
 - 同步方式
 
@@ -205,7 +205,7 @@ if (!isOk) {
 
 ### 2.4 接入检验
 
-参考 "测试" 章节自查是否接入SDK成功。
+参考 ["测试"](#6-测试) 章节自查是否接入SDK成功。
 
 ## 3 海外业务接入
 
@@ -254,7 +254,7 @@ NSString *host = @"http://private-host";
 [option setConfUrl:[host stringByAppendingString:@"/v3/cloudconf"]]; // 示例路径，需要与真实场景一致
 ```
 
-注意，如果传入 host 为 http 请求，如 `http://private-host`，需要确保 APP 可以发送 http 请求，参考 "工程配置" 章节 http 设置部分。私有化接入完成后，需要根据 "测试" 章节进行自测检查。
+注意，如果传入 host 为 http 请求，如 `http://private-host`，需要确保 APP 可以发送 http 请求，参考 ["http 设置"](#13-http-设置) 章节 http 设置部分。私有化接入完成后，需要根据 [测试"](#6-测试) 章节进行自测检查。
 
 ## 5 代理接入
 
@@ -267,7 +267,7 @@ NSString* host = @"https://proxy-host";
 [option setConfUrl:[host stringByAppendingString:@"/v3/cloudconf"]]; // 示例路径，需要与真实场景一致
 ```
 
-开发者需要自行搭建代理服务器，代理服务器相关处理参考 “代理服务器说明 代理接入“ 章节。
+开发者需要自行搭建代理服务器，代理服务器相关处理参考 "解密工具及代理服务器说明 代理接入" 章节。
 
 ## 6 测试
 
