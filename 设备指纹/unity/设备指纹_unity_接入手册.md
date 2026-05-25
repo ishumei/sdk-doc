@@ -3,12 +3,18 @@
 ## 1. 设备指纹插件结构
 
 插件包含以下文件：
-
-- `Plugins/Android/smsdk-x.x.x.aar` - Android 设备指纹SDK
-- `Plugins/iOS/SmAntiFraud-x.x.x.xcframework` - iOS 设备指纹SDK
-- `Plugins/iOS/SmAntiFraudExport.h` - iOS导出头文件
-- `Plugins/iOS/SmAntiFraudExport.mm` - iOS导出实现
-- `Scripts/SmAntiFraudBridge.cs` - Unity与原生SDK的桥接脚本
+```shell
+设备指纹
+├── Plugins
+│   ├── Android
+│   │   └── smsdk-3.17.0.aar      # Android 设备指纹SDK
+│   └── iOS
+│       ├── SmAntiFraud-x.x.x.xcframework # iOS 设备指纹SDK
+│       ├── SmAntiFraudExport.h   # iOS导出头文件
+│       └── SmAntiFraudExport.mm  # iOS导出实现
+└── Scripts
+    └── SmAntiFraudBridge.cs      # Unity与原生SDK的桥接脚本
+```
 
 ## 2. 工程配置
 
@@ -20,7 +26,7 @@
 
 iOS SDK依赖 `IOKit.framework`，因此需要在Unity中配置依赖：
 
-在Unity中，选中iOS 设备指纹SDK `Assets > Plugins > iOS > SmAntiFraud`，勾选右侧的 `Inspector > Platform Settings > Rarely used frameworks > IOKit`
+在 Unity 中，选中iOS 设备指纹SDK `Assets > Plugins > iOS > SmAntiFraud`，勾选右侧的 `Inspector > Platform Settings > Rarely used frameworks > IOKit`
 
 ### 2.3 iOS端隐私文件配置
 
@@ -79,15 +85,14 @@ public class ExampleClass : MonoBehaviour
         // 5. 必需项，设置App ID
         SmAntiFraudBridge.optionSetAppId("your_app_id");
 
-      	// 6. 可选项，配置不采集字段
+        // 6. 可选项，配置不采集字段
 #if UNITY_ANDROID && !UNITY_EDITOR
-    SmAntiFraudBridge.optionAddNotCollectAndroid("imei");
-    SmAntiFraudBridge.optionAddNotCollectAndroid("wifiip");
+        SmAntiFraudBridge.optionAddNotCollectAndroid("imei");
+        SmAntiFraudBridge.optionAddNotCollectAndroid("wifiip");
 #elif UNITY_IOS && !UNITY_EDITOR
-    SmAntiFraudBridge.optionAddNotCollectIOS("idfa");
+        SmAntiFraudBridge.optionAddNotCollectIOS("idfa");
 #endif
-        
-        // 7.启动SDK
+        // 7. 启动SDK
         bool success = SmAntiFraudBridge.smCreate();
         if (success)
         {
@@ -118,17 +123,17 @@ string boxId = SmAntiFraudBridge.smGetDeviceId();
 
 | 方法 | 说明 | 数据类型 |
 |------|------|---------|
-| `optionSetUrl` | 设置设备指纹URL<br />代理模式、私有化模式中须要设置设备数据上报地址 | string |
-| `optionSetConfUrl` | 设置云配URL<br />代理模式、私有化模式中须要设置请求云配的地址 | string |
+| `optionSetUrl` | 设置设备指纹URL<br />代理模式、私有化模式中需要设置设备数据上报地址 | string |
+| `optionSetConfUrl` | 设置云配URL<br />代理模式、私有化模式中需要设置请求云配的地址 | string |
 | `optionSetExtraInfo` | 设置额外信息 | string |
 | `optionAddNotCollectAndroid` | 添加Android不采集项 | string |
 | `optionAddNotCollectIOS` | 添加iOS不采集项 | string |
-| `optionSetUsingShortBoxData` | 设置是否使用短boxdata，默认`false`。<br />如需使用短boxdata，须要设置为`true` | bool |
+| `optionSetUsingShortBoxData` | 设置是否使用短boxData，默认`false`。<br />如需使用短boxData，需要设置为`true` | bool |
 | `optionSetAutoUploadVData` | 设置是否自动上传微行为数据，默认`false`。<br />建议设置为`true`，开启微行为数据自动上传 | bool |
 
 ## 6. 检查接入是否成功
 
-调用 `SmAntiFraudBridge.smCreate()` 方法获取返回值为 `true`。
+调用 `SmAntiFraudBridge.smCreate()` 方法返回 `true`。
 
 调用 `SmAntiFraudBridge.smGetDeviceId()` 方法返回值为89位的 boxId，如 `Bm21V93t5QwTNdwyQxxxxxRYuSnOuwwylqZvz8Lixxxxx17lRMqcQ1jz9RwN6qW31/Z0YYmxN8KQnrya9xxxxxx==`。
 
@@ -136,19 +141,19 @@ string boxId = SmAntiFraudBridge.smGetDeviceId();
 ## 7. 微行为接入
 
 微行为插件的目录结构如下：
-```
-微行为/
-├── Plugins/
-│   ├── Android/
+```shell
+微行为
+├── Plugins
+│   ├── Android
 │   │   ├── SmScreenTouchDetector.java      # Android端触摸检测封装实现
 │   │   ├── smsdk_screentouch-release.aar   # 安卓平台原生微行为SDK
 │   │
-│   ├── iOS/
+│   ├── iOS
 │   │   ├── SmAntiFraudScreenTouch.xcframework  # iOS平台原生微行为SDK
 │   │   ├── SmScreenTouchExport.h           # iOS端触摸检测封装头文件
 │   │   ├── SmScreenTouchExport.mm          # iOS端触摸检测封装实现
 │   │
-├── Scripts/
+├── Scripts
 │   ├── SmScreenTouchBridge.cs              # Unity与原生平台桥接代码
 ```
 
@@ -156,7 +161,7 @@ string boxId = SmAntiFraudBridge.smGetDeviceId();
 将整个微行为插件目录复制到Unity项目的`Assets`目录下，确保目录结构保持不变
 
 ### 7.2 Android端配置
-Android端接入须要在自定义Application中的`onCreate()`方法中调用插件的初始化方法`initDetector(Context context)`，如下：
+Android端接入需要在自定义Application中的`onCreate()`方法中调用插件的初始化方法`initDetector(Context context)`，如下：
 
 ```java
 package com.yourcompany.yourapp;
@@ -201,7 +206,7 @@ public class CustomApplication extends Application {
     </application>
     ```
 ### 7.3 开启自动上报
-微行为数据默认**不会**自动上传，建议在 `SmAntiFraudBridge.smCreate()` 前调用 `SmAntiFraudBridge.optionSetAutoUploadVData(true)` 方法开启自动上传：
+微行为数据默认**不会**自动上传，建议在 `SmAntiFraudBridge.initSmoption()` 之后，`SmAntiFraudBridge.smCreate()` 之前调用 `SmAntiFraudBridge.optionSetAutoUploadVData(true)` 方法开启自动上传：
 
 ```csharp
 // 开启微行为自动上传
@@ -225,4 +230,3 @@ SmScreenTouchBridge.smStartScreenTouchDetector();
 // 停止触摸检测
 SmScreenTouchBridge.smStopScreenTouchDetector();
 ```
-
