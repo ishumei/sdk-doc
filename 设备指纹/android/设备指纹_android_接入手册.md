@@ -65,7 +65,7 @@
    </application>
    ```
 
-5. 代码放混淆
+5. 代码防混淆
 
    向 proguard-rules.pro 文件中添加 smsdk 防混淆规则，如下
 
@@ -110,6 +110,7 @@ boolean isOk = SmAntiFraud.create(context, option);
 | setArea         | String        | 否       | SmAntiFraud.AREA_BJ | 标准模式中，设置数据上报请求区域，有如下值：<br />AREA_BJ：业务在国内（默认值）<br />AREA_XJP：业务在东南亚<br />AREA_FJNY：业务在欧美 |
 | setNotCollect   | `Set<String>` | 否       | 否                  | 屏蔽部分采集字段                                             |
 | setUsingHttps   | boolean       | 否       | 若SDK版本低于3.14.0或2.24.0，默认值为false，否则为true | 是否使用 https 协议网络请求                                  |
+| setAutoUploadVData | boolean | 否 | false | 是否允许自动上传微行为数据 |
 | addSubCollectors   | SubCollector       | 否       | 无               | 子包采集数据，默认不提供子包，针对有需求客户单独提供，当前支持：<br />smsdk_ids：采集设备标识信息 |
 
 | SmAntiFraud 方法         | 参数类型            | 是否必填 | 默认值 | 说明                                                         |
@@ -198,7 +199,7 @@ boxId 与 boxData 无法直接当做设备标识，但是可以使用 boxId 或 
 
    ```java
    // 用户分布范围为东南亚
-   option.setArea(SmAntiFraud.AREA_XJP)
+   option.setArea(SmAntiFraud.AREA_XJP);
    // 用户分布范围为全球，则需要开启加速功能，配置如下
    // option.setArea(SmAntiFraud.AREA_XJP);
    // String host = "http://fp-sa-it-acc.fengkongcloud.com";
@@ -256,3 +257,79 @@ option.setConfUrl(host + "/v3/cloudconf"); // 示例路径，需要与真实场�
 smsdk v3 版本终端不再提供明文设备标识，业务端不可以将 boxId 或 boxData 直接当做标识，获取标识方法参考 ”解密工具及代理服务器说明 设备指纹标识解密“。
 
 smsdk v3 版本首次启动直接调用 `SmAntiFraud.getDeviceId` 方法会出现阻塞当前线程问题，解决方案查看 ”Android SDK 标准接入 场景三“ 小节。
+
+## 7 微行为接入
+
+每个微行为子SDK以独立的 aar 包形式接入，务必先调用设备指纹SDK的 `create` 方法再调用 `SmAntiFraud.startDetector(AbsDetector)` 启动微行为SDK。
+
+微行为子SDK采集的数据默认**不会**自动上传，建议在 `create` 前通过 `SmAntiFraud.SmOption` 配置开启微行为自动上传：
+
+```java
+// 配置开启自动上传微行为数据
+option.setAutoUploadVData(true);
+```
+
+若不开启自动上传功能，则可以通过设备指纹SDK的 `SmAntiFraud.getVData()` 方法获取微行为数据后，通过业务事件的 `data.microBehavior` 字段上报。
+
+### 7.1 机器操控微行为 sdk
+
+sdk 包文件：`smsdk_screentouch-release.aar`。
+
+此 sdk 会收集屏幕点击、移动等事件，用于检测机器操控类操作。
+机器操控微行为 sdk 分为两类： **全局app触控事件监听** 和 **特定UI组件的触控事件监听**。
+**建议使用全局app触控事件监听**，如下：
+
+全局app触控事件监听：
+
+```java
+// 初始化检测器
+ScreenTouchAllDetector sScreenTouchAllDetector = new ScreenTouchAllDetector(context);
+
+// 注册回调方法，此方法会监听各 activity dispatchTouchEvent 事件，但是不会收集和上报此事件
+// 此方法要早于监听的 Activity，建议在 Application 的 onCreate 方法中调用
+sScreenTouchAllDetector.registerActivityLifecycleCallback();
+
+// 开始监听，此方法会收集并在合适时机进行上报
+SmAntiFraud.startDetector(sScreenTouchAllDetector);
+// 停止监听
+SmAntiFraud.stopDetector(sScreenTouchAllDetector);
+
+// 注销回调方法
+sScreenTouchAllDetector.unregisterActivityLifecycleCallback();
+```
+
+若只想针对特定UI组件的触控事件监听：
+
+```java
+// 初始化检测器，构造器参数
+ScreenTouchDetector mScreenTouchDetector = new ScreenTouchDetector();
+// 开始监听
+SmAntiFraud.startDetector(mScreenTouchDetector);
+
+// 在 startDetector 与 stopDetector 之间，调用 track 方法上报 MotionEvent 对象，track 参数
+// eventId：目前支持 "onTouch" 类型
+// viewId：检测 view 的 id 值，比如主页面可以使用 String.valueOf(R.layout.activity_main)
+// MotionEvent：屏幕触摸对象
+// 调用时机：在敏感位置 Activity 或 View 的 onTouchEvent、dispatchTouchEvent方法内调用
+// 比如登陆、注册、获取验证码等 view
+mScreenTouchDetector.track("onTouch", String.valueOf(R.layout.activity_main), event);
+
+// 结束监听
+SmAntiFraud.stopDetector(mScreenTouchDetector);
+```
+
+### 7.2 内存检测微行为 sdk
+
+sdk 包文件：`smsdk_mem-release.aar`
+
+此包会检测是否存在内存扫描行为，使用方式如下：
+
+```java
+// 初始化检测器
+MemDetector mMemDetector = new MemDetector();
+
+// 开始监听
+SmAntiFraud.startDetector(mMemDetector);
+// 结束监听
+SmAntiFraud.stopDetector(mMemDetector);
+```
