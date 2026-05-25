@@ -24,15 +24,15 @@
    - `IOKit.framework`
 
 ### 1.3 http 设置
-smsdk 3.14.0（对应2版本号2.24.0）版本以下默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
+smsdk 3.14.0（对应2版本号2.24.0）之前版本默认使用 http 请求，根据苹果的 ATS 标准，需要配置 Info.plist：
 
    1. 点击项目的 Info.plist，点击 + 号，选中 App Transport Security Settings
    2. 在 App Transport Security Settings 配置项中，点击 + 号，选择 Allow Arbitrary Loads，并配置为 YES
 
 ### 1.4 idfa 配置
-如果 APP 之前未采集过 `IDFA` ，上架App Store时，需要根据App Connect的政策，明确app中使用`idfa`并说明原因，
+如果 APP 之前未采集过 `IDFA` ，上架App Store时，需要根据App Connect的政策，明确app中使用`IDFA`并说明原因，
 
-   若不想使用 `IDFA`，可参考下面启动SDK章节，设置 `notCollect` 不采集 `IDFA`，
+   若不想使用 `IDFA`，可参考下面 ["启动SDK章节"](#21-启动sdk) 中的示例代码，设置 `notCollect` 不采集 `IDFA`，
 
    若app归属于儿童类，则联系数美运营提供不包含采集 `IDFA` 相关代码的SDK。
 
@@ -84,8 +84,8 @@ smsdk 3.14.0（对应2版本号2.24.0）版本以下默认使用 http 请求，�
      			<array>
      				<string>35F9.1</string>
      			</array>
-           <key>NSPrivacyAccessedAPIType</key>
-           <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+     			<key>NSPrivacyAccessedAPIType</key>
+     			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
      		</dict>
      		<dict>
      			<key>NSPrivacyAccessedAPITypeReasons</key>
@@ -142,7 +142,7 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 
 ### 2.2 获取标识
 
-客户端获取到标识分为 `boxId` 和 `boxData`，**两者都会变化**。若需要唯一不变的标识，查看 ”解密工具及代理服务器说明 设备指纹标识解密“ 章节，了解如何获取明文设备标识。
+客户端获取到标识分为 `boxId` 和 `boxData`，**两者都会变化**。若需要唯一不变的标识，查看 "解密工具及代理服务器说明 设备指纹标识解密" 章节，了解如何获取明文设备标识。
 
 - 同步方式
 
@@ -190,8 +190,8 @@ smsdk 是数美风控体系中的终端，主要功能包括采集设备信息�
 // 启动SDK参数对象
 SmOption *option = [[SmOption alloc] init];
 [option setOrganization: @"YOUR_ORGANIZATION"];    // 必填
-[option setAppId:@"YOUR_APP_ID"];						// 必填
-[option setPublicKey:@"YOUR_PUBLICK_KEY"];		   // 必填
+[option setAppId:@"YOUR_APP_ID"];                  // 必填
+[option setPublicKey:@"YOUR_PUBLICK_KEY"];         // 必填
 
 // 选填，通过此方式屏蔽部分数据采集，此处以 IDFA 为例
 [option setNotCollect:@[@"idfa"]];
@@ -205,7 +205,7 @@ if (!isOk) {
 
 ### 2.4 接入检验
 
-参考 "测试" 章节自查是否接入SDK成功。
+参考 ["测试"](#6-测试) 章节自查是否接入SDK成功。
 
 ## 3 海外业务接入
 
@@ -254,20 +254,20 @@ NSString *host = @"http://private-host";
 [option setConfUrl:[host stringByAppendingString:@"/v3/cloudconf"]]; // 示例路径，需要与真实场景一致
 ```
 
-注意，如果传入 host 为 http 请求，如 `http://private-host`，需要确保 APP 可以发送 http 请求，参考 "工程配置" 章节 http 设置部分。私有化接入完成后，需要根据 "测试" 章节进行自测检查。
+注意，如果传入 host 为 http 请求，如 `http://private-host`，需要确保 APP 可以发送 http 请求，参考 ["http 设置"](#13-http-设置) 章节 http 设置部分。私有化接入完成后，需要根据 [测试"](#6-测试) 章节进行自测检查。
 
 ## 5 代理接入
 
 主要步骤与标准接入类似，需要增加以下配置
 
-```java
+```objective-c
 // 设置私有地址，将 host 替换为代理服务器的主机名（域名）
-String host = "https://proxy-host";
-[option setUrl: [host stringByAppendingString:@"/deviceprofile/v4"]]; // 示例路径，需要与真实场景一致
+NSString* host = @"https://proxy-host";
+[option setUrl:[host stringByAppendingString:@"/deviceprofile/v4"]]; // 示例路径，需要与真实场景一致
 [option setConfUrl:[host stringByAppendingString:@"/v3/cloudconf"]]; // 示例路径，需要与真实场景一致
 ```
 
-开发者需要自行搭建代理服务器，代理服务器相关处理参考 “代理服务器说明 代理接入“ 章节。
+开发者需要自行搭建代理服务器，代理服务器相关处理参考 "解密工具及代理服务器说明 代理接入" 章节。
 
 ## 6 测试
 
@@ -276,3 +276,73 @@ String host = "https://proxy-host";
 3. 查看控制台是否有 Smlog 异常输出，若有异常输出，请根据提示修改。
 4. 通过数美管理后台导航栏选择 ”设备风险趋势"，找到 “设备详情” 部分，查看是否有数据上报（可能存在延时，一般不超过 30 分钟）。
 5. 无法通过测试时，联系数美工作人员进行排查。
+
+## 7 微行为接入
+
+每个微行为子SDK以独立的 xcframework 包形式接入，务必先调用设备指纹SDK的 `-[SmAntiFraud create:]` 方法再调用 `-[SmAntiFraud startDetector:]` 启动微行为SDK。
+
+微行为子SDK采集的数据默认**不会**自动上传，建议在 `-[SmAntiFraud create:]` 方法前通过 `SmOption` 配置开启微行为自动上传：
+
+```objective-c
+// 配置开启自动上传微行为数据
+[option setAutoUploadVData:YES];
+```
+若不开启自动上传功能，则可以通过设备指纹SDK的 `-[SmAntiFraud getVData]` 方法获取微行为数据后，通过业务事件的 `data.microBehavior` 字段上报。
+
+### 7.1 机器操控微行为 sdk
+
+sdk 包文件：`SmAntiFraudScreenTouch.xcframework`。
+
+此 sdk 会收集屏幕点击、移动等事件，用于检测机器操控类操作。
+机器操控微行为 sdk 分为两类： **全局app触控事件监听** 和 **特定UI组件的触控事件监听**。
+**建议使用全局app触控事件监听**，如下：
+
+全局app触控事件监听：
+```objective-c
+#import <SmAntiFraudScreenTouch/SmScreenTouchAllDetector.h>
+
+// 初始化检测器
+SmScreenTouchAllDetector* sScreenTouchAllDetector = [SmScreenTouchAllDetector shareInstance];
+
+// 开始监听
+[[SmAntiFraud shareInstance] startDetector:sScreenTouchAllDetector];
+
+// 结束监听
+[[SmAntiFraud shareInstance] stopDetector:sScreenTouchAllDetector];
+```
+
+若只想针对特定UI组件的触控事件监听：
+```objective-c
+#import <SmAntiFraudScreenTouch/SmScreenTouchDetector.h>
+
+// 初始化检测器，构造器参数
+SmScreenTouchDetector* mScreenTouchDetector = [SmScreenTouchDetector shareInstance];
+
+// 在startDetector前，调用setResponders方法设置需要被监控的UI组件，被监控的UI组件需要继承自UIResponders
+[mScreenTouchDetector setResponders:@[self]];
+
+// 开始监听
+[[SmAntiFraud shareInstance] startDetector:mScreenTouchDetector]; 
+
+// 结束监听
+[[SmAntiFraud shareInstance] stopDetector:mScreenTouchDetector];
+```
+
+### 7.2 内存检测微行为 sdk
+
+sdk 包文件：`SmAntiFraudMem.xcframework`
+
+此包会检测是否存在内存扫描行为，使用方式如下：
+
+```objective-c
+#import <SmAntiFraudMem/SmMemDetector.h>
+
+// 初始化检测器
+SmMemDetector* mMemDetector = [[SmMemDetector alloc] init];
+
+// 开始监听
+[[SmAntiFraud shareInstance] startDetector:mMemDetector];
+
+// 结束监听
+[[SmAntiFraud shareInstance] stopDetector:mMemDetector];
+```
