@@ -33,39 +33,38 @@
    
 3. 声明权限，在 module.json5 中添加如下权限
 
-   ```xml
-   "requestPermissions": [
-       {
-         // 联网权限，必选权限
-         "name": "ohos.permission.INTERNET",
-       },
-   		{
-         // 联网权限，必选权限
-         "name": "ohos.permission.GET_NETWORK_INFO",
-       },
-       {
-         // 加速度传感器，可选权限
-         "name": "ohos.permission.ACCELEROMETER",
-       },
-       {
-         // 陀螺仪传感器，可选权限
-         "name": "ohos.permission.GYROSCOPE",
-       },
-       {
-         // 网络状态权限，可选权限
-         "name": "ohos.permission.GET_NETWORK_INFO",
-       },
-       {
-         // 广告 ID 权限，可选权限
-         "name": "ohos.permission.APP_TRACKING_CONSENT"
-       },
-       {
-         // Asset Store Kit，可选权限
-         "name": "ohos.permission.STORE_PERSISTENT_DATA"
-       }
-     ]
-   }
-   ```
+    ```json
+    "requestPermissions": [
+      {
+        // 联网权限，必选权限
+        "name": "ohos.permission.INTERNET",
+      },
+      {
+        // 联网权限，必选权限
+        "name": "ohos.permission.GET_NETWORK_INFO",
+      },
+      {
+        // 加速度传感器，可选权限
+        "name": "ohos.permission.ACCELEROMETER",
+      },
+      {
+        // 陀螺仪传感器，可选权限
+        "name": "ohos.permission.GYROSCOPE",
+      },
+      {
+        // 网络状态权限，可选权限
+        "name": "ohos.permission.GET_NETWORK_INFO",
+      },
+      {
+        // 广告 ID 权限，可选权限
+        "name": "ohos.permission.APP_TRACKING_CONSENT"
+      },
+      {
+        // Asset Store Kit，可选权限
+        "name": "ohos.permission.STORE_PERSISTENT_DATA"
+      }
+    ]
+    ```
    
    权限作用
    

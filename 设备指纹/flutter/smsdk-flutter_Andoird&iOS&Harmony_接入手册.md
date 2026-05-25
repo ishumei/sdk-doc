@@ -18,7 +18,7 @@
 
 ## 3 更新依赖
 
-在 Flutter 项目根目录下执行：`Flutter pub get`
+在 flutter 项目根目录下执行：`flutter pub get`
 
 ## 4 启动SDK
 
@@ -56,6 +56,40 @@ import 'package:sm_fraud/sm_fraud.dart';
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+```
+4. HarmonyOS 需要配置权限，在 module.json5 中添加如下权限
+
+```json
+"requestPermissions": [
+  {
+    // 联网权限，必选权限
+    "name": "ohos.permission.INTERNET",
+  },
+  {
+    // 联网权限，必选权限
+    "name": "ohos.permission.GET_NETWORK_INFO",
+  },
+  {
+    // 加速度传感器，可选权限
+    "name": "ohos.permission.ACCELEROMETER",
+  },
+  {
+    // 陀螺仪传感器，可选权限
+    "name": "ohos.permission.GYROSCOPE",
+  },
+  {
+    // 网络状态权限，可选权限
+    "name": "ohos.permission.GET_NETWORK_INFO",
+  },
+  {
+    // 广告 ID 权限，可选权限
+    "name": "ohos.permission.APP_TRACKING_CONSENT"
+  },
+  {
+    // Asset Store Kit，可选权限
+    "name": "ohos.permission.STORE_PERSISTENT_DATA"
+  }
+]
 ```
 
 ### 4.3 调用 plugin 的 create 方法启动 SDK
