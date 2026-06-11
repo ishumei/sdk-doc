@@ -1,129 +1,355 @@
 # windows端数美设备指纹SDK接入手册
 
-## 1. 工程配置
+## 1. 适用范围
 
-### 1.1 导入SDK包
+本文说明 Windows Native SDK 的两类常见接入方式：
 
-在Visual Studio中，选择需要接入SDK的工程
+- 普通 C++ 程序接入
+- Unity C# 程序通过 P/Invoke 接入
 
-1. 右键工程的“依赖项”选项，选择“添加项目引用”，弹出“引用管理器”
-2. 在“引用管理器”的底部，选择"浏览"项，选择数美的.dll库，SmAntiFraud.dll
+SDK 交付产物包括：
 
-### 1.2 添加依赖
+```text
+include/SmAntiFraud.h
+bin/<x86_md|x86_mt|x64_md|x64_mt>/SmAntiFraud.dll
+lib/<x86_md|x86_mt|x64_md|x64_mt>/SmAntiFraud.lib
+CSharp/SmAntiFraudBridge_win.cs
+```
 
-数美的库文件依赖如下库，需要使用 NuGet 搜索并添加以下项目引用
+## 2. 接口概览
 
-1. System.Text.Json， 6.0.0版本
-2. System.Management，8.0.0版本
-3. BouncyCastle.Cryptography，2.4.0版本
+### 2.1 C++ 包装类接口
 
-## 2. 标准接入
+C++ 包装类定义在 `namespace smantifraud` 中，内部调用 C ABI，但对 `std::string` 和 `std::vector<std::string>` 做了封装。
 
-### 2.1 启动SDK
+| 接口 | 参数 | 参数类型 | 返回类型 | 说明 | 同步/异步 |
+|---|---|---|---|---|---|
+| `smantifraud::SmAntiFraud::Create` | `options` | `const smantifraud::Options&` | `bool` | 初始化 SDK，并启动后台采集和上传 | 接口同步返回，上传异步执行 |
+| `smantifraud::SmAntiFraud::GetDeviceId` | 无 | 无 | `std::string` | 获取 deviceId；失败时返回空字符串 | 同步 |
+| `smantifraud::SmAntiFraud::GetSDKVersion` | 无 | 无 | `std::string` | 获取 SDK 版本号；失败时返回空字符串 | 同步 |
 
-1. 在需要的文件中，使用 `using` 关键字，导入数美命名空间。
+### 2.2 Unity C# P/Invoke 接口
 
-   ```c#
-   using SmAntiFraud;
-   ```
+Unity 脚本底层通过 P/Invoke 调用 C ABI。
 
-2. 启动SDK需要 `Smoption` 实例，具体参数如下
+| C# 声明 | Native 导出名 | 参数 | 参数类型 | 返回类型 | 说明 |
+|---|---|---|---|---|---|
+| `SmAntiFraudCreate_C` | `SmAntiFraudCreate_C` | `option` | `ref SmAntiOption` | `int` | 初始化 SDK |
+| `SmAntiFraudGetDeviceId_C` | `SmAntiFraudGetDeviceId_C` | `buffer`, `bufferSize` | `StringBuilder`, `int` | `int` | 获取 deviceId |
+| `SmAntiFraudGetSDKVersion_C` | `SmAntiFraudGetSDKVersion_C` | `buffer`, `bufferSize` | `StringBuilder`, `int` | `int` | 获取 SDK 版本号 |
 
-   | 字段           | 数据类型              | 是否必填 | 字段说明                                                     |
-   | -------------- | --------------------- | -------- | ------------------------------------------------------------ |
-   | organization   | string                | 是       | 数美分配的公司标识                                           |
-   | appid          | string                | 是       | 应用标识                                                     |
-   | publicKey      | string                | 是       | 公钥                                                         |
-   | url            | string                | 否       | 设备数据上传的服务器url                                      |
-   | extraInfo      | string                | 否       | 额外信息                                                     |
-   | channel        | string                | 否       | 渠道                                                         |
-   | https          | bool                  | 否       | 是否使用https，若使用https须配置此项为true<br />默认使用http请求 |
-   | notCollect     | `List<string>`        | 否       | 不采集项                                                     |
-   | smAntiDelegate | object:SmAntiDelegate | 否       | 使用回调方式获取设备标识或错误码时，需要设置此参数。<br />该参数需要继承自SmAntiDelegate类，并实现SmOnSuccess和SmOnError方法 |
+回调：
 
-3. 调用SDK的 `SmAntiFraud.ShareInstance().Create(Smoption)` 方法启动SDK
+| 回调 | C/C++ 类型 | Unity C# 类型 | 说明 |
+|---|---|---|---|
+| `onSuccess` | `SmAntiSuccessCallback` | `SuccessCallback` | 服务端返回成功并下发 deviceId 后触发 |
+| `onError` | `SmAntiErrorCallback` | `ErrorCallback` | 参数、网络、加密、响应解析等失败时触发 |
 
-   ```C#
-   bool createRes = SmAntiFraud.SmAntiFraud.ShareInstance().Create(smoption);
-   ```
+注意：`onSuccess` 和 `onError` 在 SDK 工作线程中触发，不在 UI 主线程中触发。
 
-### 2.2 获取标识
 
-客户端获取到的标识分为 `boxId` 和 `boxData` ，`boxId` 的长度是89，`boxData`  长度不固定，约为 1.5 KB。
+## 3. 参数说明
 
-客户端有同步和异步的方式，其中异步获取的方式只会获取到 `boxId` 
+### 3.1 C++ 参数：`smantifraud::Options`
 
-- 同步获取标识
+| 字段 | 参数类型 | 必填 | 默认值 | 说明 |
+|---|---|---:|---|---|
+| `organization` | `std::string` | 是 | 空字符串 | 数美分配的 organization |
+| `appid` | `std::string` | 否 | `"default"` | 应用 ID |
+| `publicKey` | `std::string` | 是 | 空字符串 | RSA 公钥 PEM 字符串 |
+| `url` | `std::string` | 否 | 空字符串，使用 SDK 默认地址 | 服务端地址 |
+| `extraInfo` | `std::string` | 否 | 空字符串 | 业务扩展信息，最大 1024 字节 |
+| `channel` | `std::string` | 否 | 空字符串 | 渠道信息 |
+| `https` | `bool` | 否 | `false` | 是否将默认 http 地址切换为 https |
+| `notCollect` | `std::vector<std::string>` | 否 | 空数组 | 不采集字段，例如 `a9`、`a10` |
+| `onSuccess` | `SmAntiSuccessCallback` | 否 | `0` | 成功回调 |
+| `onError` | `SmAntiErrorCallback` | 否 | `0` | 失败回调 |
+| `userData` | `void*` | 否 | `0` | 透传用户数据，SDK 只保存并回传，不解析 |
 
-  调用SDK的 `SmAntiFraud.ShareInstance().GetDeviceId()` 方法获取
+### 3.2 Unity C# 参数：P/Invoke `SmAntiOption`
 
-  ```c#
-  string did = SmAntiFraud.SmAntiFraud.ShareInstance().GetDeviceId();
-  ```
+C# 结构体需要与 Native `SmAntiOption` 字段顺序保持一致。字符串按 ANSI `LPStr` 传入，BOOL 字段使用 `int` 表达。
 
-- 异步获取标识
+| 字段 | C# 参数类型 | Native 参数类型 | 必填 | 默认值 | 说明 |
+|---|---|---|---:|---|---|
+| `organization` | `string` | `const char*` | 是 | `null` | 数美分配的 organization |
+| `appId` | `string` | `const char*` | 否 | `null`，SDK 内部按 `default` 处理 | 应用 ID |
+| `publicKey` | `string` | `const char*` | 是 | `null` | RSA 公钥 PEM 字符串 |
+| `url` | `string` | `const char*` | 否 | `null`，使用 SDK 默认地址 | 服务端地址 |
+| `extraInfo` | `string` | `const char*` | 否 | `null` | 业务扩展信息，最大 1024 字节 |
+| `channel` | `string` | `const char*` | 否 | `null` | 渠道信息 |
+| `https` | `int`，按 BOOL 使用 | `int` | 否 | `0`，表示 `false` | `0=false`，非 `0=true` |
+| `notCollectCsv` | `string` | `const char*` | 否 | `null` | 不采集字段，逗号分隔 |
+| `onSuccess` | `SuccessCallback` | `SmAntiSuccessCallback` | 否 | `null` | 成功回调；需要在 C# 侧持有委托引用，避免被 GC 回收 |
+| `onError` | `ErrorCallback` | `SmAntiErrorCallback` | 否 | `null` | 失败回调；需要在 C# 侧持有委托引用，避免被 GC 回收 |
+| `userData` | `IntPtr` | `void*` | 否 | `IntPtr.Zero` | 透传用户数据，SDK 只保存并回传，不解析 |
 
-  1. 创建一个类，实现 SmAntiDelegate 接口的`SmOnSuccess(string)`和`SmOnError(int)`回调方法
-  2. 初始化一个上述创建类的实例，在初始化数美 SDK 的时候，设置其为 Smoption 的 `smAntiDelegate` 属性即可
 
-### 2.3 代码示例
+## 4. 普通 C++ 接入
 
-```c#
-using SmAntiFraud;
+### 4.1 拷贝 SDK 文件
 
-class ExampleClass : SmAntiDelegate
+以 x64 + MT 为例：
+
+```text
+YourApp/
+  include/
+    SmAntiFraud.h
+  lib/
+    SmAntiFraud.lib
+  bin/
+    SmAntiFraud.dll
+```
+
+对应 SDK 文件：
+
+```text
+smsdk_windows_build_out/include/SmAntiFraud.h
+smsdk_windows_build_out/lib/x64_mt/SmAntiFraud.lib
+smsdk_windows_build_out/bin/x64_mt/SmAntiFraud.dll
+```
+
+### 4.2 配置 Visual Studio
+
+项目属性中配置：
+
+```text
+C/C++ -> 常规 -> 附加包含目录:
+  <YourApp>/include
+
+链接器 -> 常规 -> 附加库目录:
+  <YourApp>/lib
+
+链接器 -> 输入 -> 附加依赖项:
+  SmAntiFraud.lib
+```
+
+运行时需要保证 `SmAntiFraud.dll` 能被程序找到。常见方式：
+
+- 放到 exe 同目录
+- 放到系统 PATH 中
+- 启动前把 DLL 所在目录加入 DLL 搜索路径
+
+推荐放到 exe 同目录。
+
+### 4.3 使用 C++ 包装类接入
+
+```cpp
+#include "SmAntiFraud.h"
+
+#include <iostream>
+#include <string>
+
+void SMANTI_CALL OnSuccess(const char* deviceId, void* userData) {
+    std::cout << "SmAntiFraud success: "
+              << (deviceId == 0 ? "" : deviceId)
+              << std::endl;
+}
+
+void SMANTI_CALL OnError(int errorCode, void* userData) {
+    std::cout << "SmAntiFraud error: " << errorCode << std::endl;
+}
+
+int main() {
+    smantifraud::Options options;
+    options.organization = "your_organization";
+    options.appid = "default";
+    options.publicKey =
+        "-----BEGIN PUBLIC KEY-----\n"
+        "your_public_key\n"
+        "-----END PUBLIC KEY-----\n";
+    options.url = "https://your_server/deviceprofile/v4";
+    options.channel = "default";
+    options.extraInfo = "{\"scene\":\"login\"}";
+    options.notCollect.push_back("a17");
+    options.onSuccess = &OnSuccess;
+    options.onError = &OnError;
+
+    smantifraud::SmAntiFraud sdk;
+    if (!sdk.Create(options)) {
+        std::cout << "Create failed" << std::endl;
+        return 1;
+    }
+
+    std::string deviceId = sdk.GetDeviceId();
+    std::cout << "GetDeviceId: " << deviceId << std::endl;
+
+    return 0;
+}
+```
+
+### 4.4 使用 C ABI 接入
+
+如果不使用 C++ 包装类，可以直接使用 C ABI。
+
+```cpp
+#include "SmAntiFraud.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+void SMANTI_CALL OnSuccess(const char* deviceId, void* userData) {
+    std::cout << "success: " << (deviceId ? deviceId : "") << std::endl;
+}
+
+void SMANTI_CALL OnError(int errorCode, void* userData) {
+    std::cout << "error: " << errorCode << std::endl;
+}
+
+std::string ReadDeviceId() {
+    int required = SmAntiFraudGetDeviceId_C(0, 0);
+    if (required <= 0) {
+        return std::string();
+    }
+
+    std::vector<char> buffer(static_cast<size_t>(required) + 1);
+    int written = SmAntiFraudGetDeviceId_C(&buffer[0], static_cast<int>(buffer.size()));
+    if (written < 0) {
+        return std::string();
+    }
+    return std::string(&buffer[0], static_cast<size_t>(written));
+}
+
+int main() {
+    SmAntiOption option;
+    memset(&option, 0, sizeof(option));
+
+    option.organization = "your_organization";
+    option.appid = "default";
+    option.publicKey =
+        "-----BEGIN PUBLIC KEY-----\n"
+        "your_public_key\n"
+        "-----END PUBLIC KEY-----\n";
+    option.url = "https://your_server/deviceprofile/v4";
+    option.https = 1;
+    option.notCollectCsv = "a17";
+    option.onSuccess = &OnSuccess;
+    option.onError = &OnError;
+
+    int ret = SmAntiFraudCreate_C(&option);
+    if (ret != SMANTI_SUCCESS) {
+        std::cout << "SmAntiFraudCreate_C failed: " << ret << std::endl;
+        return 1;
+    }
+
+    std::cout << "deviceId: " << ReadDeviceId() << std::endl;
+    return 0;
+}
+```
+
+## 5. Unity C# 接入
+
+Unity 使用手动接入方式。SDK 构建后会把 C# P/Invoke 封装脚本复制到输出目录，客户根据自己的 Unity Player 架构选择对应 DLL 放入 Unity 工程。
+
+### 5.1 拷贝 C# 脚本
+
+将 SDK 交付包中的 `SmAntiFraudBridge_win.cs` 脚本复制到 Unity 工程，例如：
+
+```text
+Assets/Scripts/SmAntiFraudBridge_win.cs
+```
+
+`SmAntiFraudBridge_win.cs` 包含：
+
+| 类型 | 说明 |
+|---|---|
+| `SmAntiFraudBridge_win` | 静态封装类，内部声明并调用 Native C ABI |
+| `SmAntiFraudBridge_win.Options` | 对应 Native `SmAntiOption` 的 C# 参数结构 |
+| `SmAntiFraudBridge_win.Create` | 初始化 SDK，并注册成功/失败回调 |
+| `SmAntiFraudBridge_win.GetDeviceId` | 获取 deviceId |
+| `SmAntiFraudBridge_win.GetSDKVersion` | 获取 SDK 版本号 |
+
+### 5.2 拷贝 Native DLL
+
+根据 Unity Player 架构选择 DLL。推荐优先使用 MT 版本，减少客户工程对 VC++ 运行库的额外依赖。
+
+| Unity Player 架构 | SDK DLL | Unity 目标路径 |
+|---|---|---|
+| Windows x64 | `smsdk_windows_build_out/bin/x64_mt/SmAntiFraud.dll` | `Assets/Plugins/x64/SmAntiFraud.dll` |
+| Windows x86 | `smsdk_windows_build_out/bin/x86_mt/SmAntiFraud.dll` | `Assets/Plugins/x86/SmAntiFraud.dll` |
+
+`SmAntiFraudBridge_win.cs` 中通过 `DllImport("SmAntiFraud")` 调用 Native 接口，DLL 文件名必须保持为 `SmAntiFraud.dll`。
+
+
+### 5.3 Unity 调用示例
+
+```csharp
+using System;
+using System.Runtime.InteropServices;
+using UnityEngine;
+
+public class YourSmAntiFraudBehaviour : MonoBehaviour
 {
-    static void initSm(){
-        // 1. 设置 Smoption 参数
-        Smoption opt = new Smoption
-        {
-            organization = "xxxxxx",
-            appid = "default",
-            publicKey = @"------BEGIN PUBLIC KEY------
-xxxxxxxxxx
-------END PUBLIC KEY------
-",
-            smAntiDelegate = this,
-            https = true,
-        };
-        // 2. 启动SDK
-        bool createRes = SmAntiFraud.SmAntiFraud.ShareInstance().Create(opt);
-        
-        // 3. 主动获取标识
-        string did = SmAntiFraud.SmAntiFraud.ShareInstance().GetDeviceId();
-    }
-    
-    // 数美成功回调方法
-    public void SmOnSuccess(string boxid)
+    private void Start()
     {
-        Debug.WriteLine(boxid);
+        var options = new SmAntiFraudBridge_win.Options
+        {
+            organization = "your_organization",
+            appId = "default",
+            publicKey =
+                "-----BEGIN PUBLIC KEY-----\n" +
+                "your_public_key\n" +
+                "-----END PUBLIC KEY-----\n",
+            url = "https://your_server/deviceprofile/v4",
+            extraInfo = "{\"scene\":\"unity\"}",
+            channel = "unity",
+            https = 1, // 0=false, non-zero=true
+            notCollectCsv = "a17",
+            userData = IntPtr.Zero
+        };
+
+        int ret = SmAntiFraudBridge_win.Create(options, OnSuccess, OnError);
+        Debug.Log("SmAntiFraudBridge_win.Create ret=" + ret);
+        Debug.Log("SmAntiFraudBridge_win.GetDeviceId=" + SmAntiFraudBridge_win.GetDeviceId());
     }
 
-    // 数美失败回调方法
-    public void SmOnError(int errorCode)
+    private static void OnSuccess(IntPtr deviceIdPtr, IntPtr userData)
     {
-        Debug.WriteLine(errorCode);
+        string deviceId = Marshal.PtrToStringAnsi(deviceIdPtr) ?? string.Empty;
+        Debug.Log("SmAntiFraud success: " + deviceId);
+    }
+
+    private static void OnError(int errorCode, IntPtr userData)
+    {
+        Debug.LogError("SmAntiFraud error: " + errorCode);
     }
 }
 ```
 
-### 2.4 测试
+### 5.4 Unity 线程注意事项
 
-通过以下判断，检测SDK是否接入成功
+SDK 回调不保证在 Unity 主线程执行。Unity API 大多只能在主线程调用。
 
-1. 调用 `SmAntiFraud.SmAntiFraud.ShareInstance().Create(opt)` 方法获取的返回值为 `true`
-2. 调用 `SmAntiFraud.SmAntiFraud.ShareInstance().GetDeviceId()` 方法或者`SmOnSuccess(string)`回调中获取到长度为 89 位的 `boxid`
+更稳妥的方式是：
 
-### 2.5 错误码
+- 回调里只保存数据或投递事件
+- 在 `Update()` 中从队列取出结果，再操作 Unity 对象
 
-| 错误码 | 原因                 | 排查                               |
-| ------ | -------------------- | ---------------------------------- |
-| 1901   | qps 超限             |                                    |
-| 1902   | 服务端解密错误       | 排查 org 和 publickey 是否填写正确 |
-| 1903   | 服务端错误           | 联系数美人员                       |
-| 9101   | org 错误或服务未开通 | 联系数美人员                       |
-| 2001   | 网络错误             | 检查网络                           |
-| 2002   | SDK 内部加密错误     | 排查 publickey 是否填写正确        |
+示例：
 
+```csharp
+private readonly object _lock = new object();
+private readonly System.Collections.Generic.Queue<string> _events =
+    new System.Collections.Generic.Queue<string>();
 
+private void OnSuccess(IntPtr deviceIdPtr, IntPtr userData)
+{
+    string deviceId = Marshal.PtrToStringAnsi(deviceIdPtr) ?? string.Empty;
+    lock (_lock)
+    {
+        _events.Enqueue("success:" + deviceId);
+    }
+}
 
+private void Update()
+{
+    lock (_lock)
+    {
+        while (_events.Count > 0)
+        {
+            Debug.Log(_events.Dequeue());
+        }
+    }
+}
+```
