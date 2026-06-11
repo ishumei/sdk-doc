@@ -154,14 +154,11 @@ int main() {
     smantifraud::Options options;
     options.organization = "your_organization";
     options.appid = "default";
-    options.publicKey =
-        "-----BEGIN PUBLIC KEY-----\n"
-        "your_public_key\n"
-        "-----END PUBLIC KEY-----\n";
+    options.publicKey = "your_public_key";
     options.url = "https://your_server/deviceprofile/v4";
     options.channel = "default";
     options.extraInfo = "{\"scene\":\"login\"}";
-    options.notCollect.push_back("a17");
+    options.notCollect.push_back("axx");
     options.onSuccess = &OnSuccess;
     options.onError = &OnError;
 
@@ -217,13 +214,10 @@ int main() {
 
     option.organization = "your_organization";
     option.appid = "default";
-    option.publicKey =
-        "-----BEGIN PUBLIC KEY-----\n"
-        "your_public_key\n"
-        "-----END PUBLIC KEY-----\n";
+    option.publicKey = "your_public_key";
     option.url = "https://your_server/deviceprofile/v4";
     option.https = 1;
-    option.notCollectCsv = "a17";
+    option.notCollectCsv = "a01,a02,a03";
     option.onSuccess = &OnSuccess;
     option.onError = &OnError;
 
@@ -287,10 +281,7 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
         {
             organization = "your_organization",
             appId = "default",
-            publicKey =
-                "-----BEGIN PUBLIC KEY-----\n" +
-                "your_public_key\n" +
-                "-----END PUBLIC KEY-----\n",
+            publicKey = "your_public_key",
             url = "https://your_server/deviceprofile/v4",
             extraInfo = "{\"scene\":\"unity\"}",
             channel = "unity",
