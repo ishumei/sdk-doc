@@ -34,18 +34,16 @@ Unity 脚本通过 `SmAntiFraudBridge_win` 调用 SDK。
 
 | C# 接口 | 参数 | 参数类型 | 返回类型 | 说明 |
 |---|---|---|---|---|
-| `SmAntiFraudBridge_win.Create` | `option`, `smOnSuccess`, `smOnError` | `SmAntiFraudBridge_win.SmOption`, `SmSuccessCallback`, `SmErrorCallback` | `int` | 初始化 SDK，并注册成功/失败回调 |
+| `SmAntiFraudBridge_win.Create` | `option` | `SmAntiFraudBridge_win.SmOption` | `int` | 初始化 SDK，并注册成功/失败回调 |
 | `SmAntiFraudBridge_win.GetDeviceId` | 无 | 无 | `string` | 获取 deviceId |
 | `SmAntiFraudBridge_win.GetSDKVersion` | 无 | 无 | `string` | 获取 SDK 版本号 |
 
-Unity 接入方只需要调用 `SmAntiFraudBridge_win` 提供的 C# 方法，不需要直接声明或调用 Native C 接口。
-
 回调：
 
-| 回调 | C/C++ 类型 | Unity C# 类型 | 说明 |
-|---|---|---|---|
-| `smOnSuccess` | `SmAntiSuccessCallback` | `SmSuccessCallback` | 服务端返回成功并下发 deviceId 后触发 |
-| `smOnError` | `SmAntiErrorCallback` | `SmErrorCallback` | 参数、网络、加密、响应解析等失败时触发 |
+| 回调 |  Unity C# 类型 | 说明 |
+|---|---|---|
+| `smOnSuccess` | `SmSuccessCallback` | 服务端返回成功并下发 deviceId 后触发 |
+| `smOnError` | `SmErrorCallback` | 参数、网络、加密、响应解析等失败时触发 |
 
 注意：`smOnSuccess` 和 `smOnError` 在 SDK 工作线程中触发，不在 UI 主线程中触发。
 
@@ -70,22 +68,21 @@ Unity 接入方只需要调用 `SmAntiFraudBridge_win` 提供的 C# 方法，不
 
 ### 3.2 Unity C# 参数：P/Invoke `SmAntiOption`
 
-C# 结构体需要与 Native `SmAntiOption` 字段顺序保持一致。字符串按 ANSI `LPStr` 传入，BOOL 字段使用 `int` 表达。
+Unity 接入方通过 `SmAntiFraudBridge_win.SmOption` 配置 SDK。字符串按普通 C# `string` 传入，BOOL 字段使用 `int` 表达。
 
-| 字段 | C# 参数类型 | Native 参数类型 | 必填 | 默认值 | 说明 |
-|---|---|---|---:|---|---|
-| `organization` | `string` | `const char*` | 是 | `null` | 数美分配的 organization |
-| `appId` | `string` | `const char*` | 否 | `null`，SDK 内部按 `default` 处理 | 应用 ID |
-| `publicKey` | `string` | `const char*` | 是 | `null` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
-| `url` | `string` | `const char*` | 否 | `null`，使用 SDK 默认地址 | 服务端地址 |
-| `extraInfo` | `string` | `const char*` | 否 | `null` | 业务扩展信息，最大 1024 字节 |
-| `channel` | `string` | `const char*` | 否 | `null` | 渠道信息 |
-| `https` | `int`，按 BOOL 使用 | `int` | 否 | `0`，表示 `false` | `0=false`，非 `0=true` |
-| `notCollectCsv` | `string` | `const char*` | 否 | `null` | 不采集字段，逗号分隔 |
-| `smOnSuccess` | `SmSuccessCallback` | `SmAntiSuccessCallback` | 否 | `null` | 成功回调；需要在 C# 侧持有委托引用，避免被 GC 回收 |
-| `smOnError` | `SmErrorCallback` | `SmAntiErrorCallback` | 否 | `null` | 失败回调；需要在 C# 侧持有委托引用，避免被 GC 回收 |
-| `userData` | `IntPtr` | `void*` | 否 | `IntPtr.Zero` | 透传用户数据，SDK 只保存并回传，不解析 |
-
+| 字段 | C# 参数类型 | 必填 | 默认值 | 说明 |
+|---|---|---:|---|---|
+| `organization` | `string` | 是 | `null` | 数美分配的 organization |
+| `appId` | `string` | 否 | `null`，SDK 内部按 `default` 处理 | 应用 ID |
+| `publicKey` | `string` | 是 | `null` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
+| `url` | `string` | 否 | `null`，使用 SDK 默认地址 | 服务端地址 |
+| `extraInfo` | `string` | 否 | `null` | 业务扩展信息，最大 1024 字节 |
+| `channel` | `string` | 否 | `null` | 渠道信息 |
+| `https` | `int`，按 BOOL 使用 | 否 | `0`，表示 `false` | `0=false`，非 `0=true` |
+| `notCollectCsv` | `string` | 否 | `null` | 不采集字段，逗号分隔 |
+| `smOnSuccess` | `SmSuccessCallback` | 否 | `null` | 成功回调；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
+| `smOnError` | `SmErrorCallback` | 否 | `null` | 失败回调；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
+| `userData` | `IntPtr` | 否 | `IntPtr.Zero` | 透传用户数据，SDK 只保存并回传，不解析 |
 
 ## 4. 普通 C++ 接入
 
