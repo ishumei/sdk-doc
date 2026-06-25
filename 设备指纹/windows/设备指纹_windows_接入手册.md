@@ -30,13 +30,15 @@ C++ 包装类定义在 `namespace smantifraud` 中，内部调用 C ABI，但对
 
 ### 2.2 Unity C# P/Invoke 接口
 
-Unity 脚本底层通过 P/Invoke 调用 C ABI。
+Unity 脚本通过 `SmAntiFraudBridge_win` 调用 SDK。
 
-| C# 声明 | Native 导出名 | 参数 | 参数类型 | 返回类型 | 说明 |
-|---|---|---|---|---|---|
-| `SmAntiFraudBridge_win.Create` | `SmAntiFraudCreate_C` | `option`, `smOnSuccess`, `smOnError` | `SmAntiFraudBridge_win.Options`, `SmSuccessCallback`, `SmErrorCallback` | `int` | 初始化 SDK，并注册成功/失败回调 |
-| `SmAntiFraudBridge_win.GetDeviceId` | `SmAntiFraudGetDeviceId_C` | 无 | 无 | `string` | 获取 deviceId |
-| `SmAntiFraudBridge_win.GetSDKVersion` | `SmAntiFraudGetSDKVersion_C` | 无 | 无 | `string` | 获取 SDK 版本号 |
+| C# 接口 | 参数 | 参数类型 | 返回类型 | 说明 |
+|---|---|---|---|---|
+| `SmAntiFraudBridge_win.Create` | `option`, `smOnSuccess`, `smOnError` | `SmAntiFraudBridge_win.SmOption`, `SmSuccessCallback`, `SmErrorCallback` | `int` | 初始化 SDK，并注册成功/失败回调 |
+| `SmAntiFraudBridge_win.GetDeviceId` | 无 | 无 | `string` | 获取 deviceId |
+| `SmAntiFraudBridge_win.GetSDKVersion` | 无 | 无 | `string` | 获取 SDK 版本号 |
+
+Unity 接入方只需要调用 `SmAntiFraudBridge_win` 提供的 C# 方法，不需要直接声明或调用 Native C 接口。
 
 回调：
 
@@ -236,7 +238,7 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 | 类型 | 说明 |
 |---|---|
 | `SmAntiFraudBridge_win` | 静态封装类，内部声明并调用 Native C ABI |
-| `SmAntiFraudBridge_win.Options` | 对应 Native `SmAntiOption` 的 C# 参数结构 |
+| `SmAntiFraudBridge_win.SmOption` | 对应 Native `SmAntiOption` 的 C# 参数结构 |
 | `SmAntiFraudBridge_win.Create` | 初始化 SDK，并注册成功/失败回调 |
 | `SmAntiFraudBridge_win.GetDeviceId` | 获取 deviceId |
 | `SmAntiFraudBridge_win.GetSDKVersion` | 获取 SDK 版本号 |
@@ -264,7 +266,7 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
 {
     private void Start()
     {
-        var option = new SmAntiFraudBridge_win.Options
+        var option = new SmAntiFraudBridge_win.SmOption
         {
             organization = "your_organization",
             appId = "default",
@@ -274,10 +276,12 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
             channel = "unity",
             https = 1, // 0=false, non-zero=true
             notCollectCsv = "a01,a02",
+            smOnSuccess = smOnSuccess,
+            smOnError = smOnError,
             userData = IntPtr.Zero
         };
 
-        int ret = SmAntiFraudBridge_win.Create(option, smOnSuccess, smOnError);
+        int ret = SmAntiFraudBridge_win.Create(option);
         Debug.Log("SmAntiFraudBridge_win.Create ret=" + ret);
         Debug.Log("SmAntiFraudBridge_win.GetDeviceId=" + SmAntiFraudBridge_win.GetDeviceId());
     }
