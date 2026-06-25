@@ -24,7 +24,7 @@ C++ 包装类定义在 `namespace smantifraud` 中，内部调用 C ABI，但对
 
 | 接口 | 参数 | 参数类型 | 返回类型 | 说明 | 同步/异步 |
 |---|---|---|---|---|---|
-| `smantifraud::SmAntiFraud::Create` | `option` | `const smantifraud::smOption&` | `bool` | 初始化 SDK，并启动后台采集和上传 | 接口同步返回，上传异步执行 |
+| `smantifraud::SmAntiFraud::Create` | `option` | `const smantifraud::smOption&` | `bool` | 初始化 SDK，并启动后台采集和上传 | 接口同步返回，采集和网络上传异步执行 |
 | `smantifraud::SmAntiFraud::GetDeviceId` | 无 | 无 | `std::string` | 获取 deviceId；失败时返回空字符串 | 同步 |
 | `smantifraud::SmAntiFraud::GetSDKVersion` | 无 | 无 | `std::string` | 获取 SDK 版本号；失败时返回空字符串 | 同步 |
 
@@ -335,4 +335,3 @@ private void Update()
     }
 }
 ```
-
