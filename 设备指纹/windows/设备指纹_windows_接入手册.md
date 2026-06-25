@@ -1,4 +1,4 @@
-﻿# windows端数美设备指纹SDK接入手册
+# windows端数美设备指纹SDK接入手册
 
 ## 1. 适用范围
 
@@ -35,8 +35,8 @@ Unity 脚本底层通过 P/Invoke 调用 C ABI。
 | C# 声明 | Native 导出名 | 参数 | 参数类型 | 返回类型 | 说明 |
 |---|---|---|---|---|---|
 | `SmAntiFraudBridge_win.Create` | `SmAntiFraudCreate_C` | `option`, `smOnSuccess`, `smOnError` | `SmAntiFraudBridge_win.Options`, `SmSuccessCallback`, `SmErrorCallback` | `int` | 初始化 SDK，并注册成功/失败回调 |
-| `SmAntiFraudGetDeviceId_C` | `SmAntiFraudGetDeviceId_C` | `buffer`, `bufferSize` | `StringBuilder`, `int` | `int` | 获取 deviceId |
-| `SmAntiFraudGetSDKVersion_C` | `SmAntiFraudGetSDKVersion_C` | `buffer`, `bufferSize` | `StringBuilder`, `int` | `int` | 获取 SDK 版本号 |
+| `SmAntiFraudBridge_win.GetDeviceId` | `SmAntiFraudGetDeviceId_C` | 无 | 无 | `string` | 获取 deviceId |
+| `SmAntiFraudBridge_win.GetSDKVersion` | `SmAntiFraudGetSDKVersion_C` | 无 | 无 | `string` | 获取 SDK 版本号 |
 
 回调：
 
@@ -56,7 +56,7 @@ Unity 脚本底层通过 P/Invoke 调用 C ABI。
 |---|---|---:|---|---|
 | `organization` | `std::string` | 是 | 空字符串 | 数美分配的 organization |
 | `appId` | `std::string` | 否 | `"default"` | 应用 ID |
-| `publicKey` | `std::string` | 是 | 空字符串 | RSA 公钥 PEM 字符串 |
+| `publicKey` | `std::string` | 是 | 空字符串 | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
 | `url` | `std::string` | 否 | 空字符串，使用 SDK 默认地址 | 服务端地址 |
 | `extraInfo` | `std::string` | 否 | 空字符串 | 业务扩展信息，最大 1024 字节 |
 | `channel` | `std::string` | 否 | 空字符串 | 渠道信息 |
@@ -74,7 +74,7 @@ C# 结构体需要与 Native `SmAntiOption` 字段顺序保持一致。字符串
 |---|---|---|---:|---|---|
 | `organization` | `string` | `const char*` | 是 | `null` | 数美分配的 organization |
 | `appId` | `string` | `const char*` | 否 | `null`，SDK 内部按 `default` 处理 | 应用 ID |
-| `publicKey` | `string` | `const char*` | 是 | `null` | RSA 公钥 PEM 字符串 |
+| `publicKey` | `string` | `const char*` | 是 | `null` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
 | `url` | `string` | `const char*` | 否 | `null`，使用 SDK 默认地址 | 服务端地址 |
 | `extraInfo` | `string` | `const char*` | 否 | `null` | 业务扩展信息，最大 1024 字节 |
 | `channel` | `string` | `const char*` | 否 | `null` | 渠道信息 |
