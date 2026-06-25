@@ -24,7 +24,7 @@ C++ 包装类定义在 `namespace smantifraud` 中，内部调用 C ABI，但对
 
 | 接口 | 参数 | 参数类型 | 返回类型 | 说明 | 同步/异步 |
 |---|---|---|---|---|---|
-| `smantifraud::SmAntiFraud::Create` | `options` | `const smantifraud::smOption&` | `bool` | 初始化 SDK，并启动后台采集和上传 | 接口同步返回，上传异步执行 |
+| `smantifraud::SmAntiFraud::Create` | `option` | `const smantifraud::smOption&` | `bool` | 初始化 SDK，并启动后台采集和上传 | 接口同步返回，上传异步执行 |
 | `smantifraud::SmAntiFraud::GetDeviceId` | 无 | 无 | `std::string` | 获取 deviceId；失败时返回空字符串 | 同步 |
 | `smantifraud::SmAntiFraud::GetSDKVersion` | 无 | 无 | `std::string` | 获取 SDK 版本号；失败时返回空字符串 | 同步 |
 
@@ -34,7 +34,7 @@ Unity 脚本底层通过 P/Invoke 调用 C ABI。
 
 | C# 声明 | Native 导出名 | 参数 | 参数类型 | 返回类型 | 说明 |
 |---|---|---|---|---|---|
-| `SmAntiFraudBridge_win.Create` | `SmAntiFraudCreate_C` | `options`, `smOnSuccess`, `smOnError` | `SmAntiFraudBridge_win.Options`, `SmSuccessCallback`, `SmErrorCallback` | `int` | 初始化 SDK，并注册成功/失败回调 |
+| `SmAntiFraudBridge_win.Create` | `SmAntiFraudCreate_C` | `option`, `smOnSuccess`, `smOnError` | `SmAntiFraudBridge_win.Options`, `SmSuccessCallback`, `SmErrorCallback` | `int` | 初始化 SDK，并注册成功/失败回调 |
 | `SmAntiFraudGetDeviceId_C` | `SmAntiFraudGetDeviceId_C` | `buffer`, `bufferSize` | `StringBuilder`, `int` | `int` | 获取 deviceId |
 | `SmAntiFraudGetSDKVersion_C` | `SmAntiFraudGetSDKVersion_C` | `buffer`, `bufferSize` | `StringBuilder`, `int` | `int` | 获取 SDK 版本号 |
 
@@ -139,19 +139,19 @@ void SMANTI_CALL smOnError(int errorCode, void* userData) {
 }
 
 int main() {
-    smantifraud::smOption options;
-    options.organization = "your_organization";
-    options.appId = "default";
-    options.publicKey = "your_public_key";
-    options.url = "https://your_server/deviceprofile/v4";
-    options.channel = "default";
-    options.extraInfo = "{\"scene\":\"login\"}";
-    options.notCollect.push_back("a01");
-    options.smOnSuccess = &smOnSuccess;
-    options.smOnError = &smOnError;
+    smantifraud::smOption option;
+    option.organization = "your_organization";
+    option.appId = "default";
+    option.publicKey = "your_public_key";
+    option.url = "https://your_server/deviceprofile/v4";
+    option.channel = "default";
+    option.extraInfo = "{\"scene\":\"login\"}";
+    option.notCollect.push_back("a01");
+    option.smOnSuccess = &smOnSuccess;
+    option.smOnError = &smOnError;
 
     smantifraud::SmAntiFraud sdk;
-    if (!sdk.Create(options)) {
+    if (!sdk.Create(option)) {
         std::cout << "Create failed" << std::endl;
         return 1;
     }
@@ -264,7 +264,7 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
 {
     private void Start()
     {
-        var options = new SmAntiFraudBridge_win.Options
+        var option = new SmAntiFraudBridge_win.Options
         {
             organization = "your_organization",
             appId = "default",
@@ -277,7 +277,7 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
             userData = IntPtr.Zero
         };
 
-        int ret = SmAntiFraudBridge_win.Create(options, smOnSuccess, smOnError);
+        int ret = SmAntiFraudBridge_win.Create(option, smOnSuccess, smOnError);
         Debug.Log("SmAntiFraudBridge_win.Create ret=" + ret);
         Debug.Log("SmAntiFraudBridge_win.GetDeviceId=" + SmAntiFraudBridge_win.GetDeviceId());
     }
@@ -331,3 +331,4 @@ private void Update()
     }
 }
 ```
+
