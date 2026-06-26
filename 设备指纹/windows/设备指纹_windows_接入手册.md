@@ -56,7 +56,7 @@ C/C++ -> 常规 -> 附加包含目录:
 ### 2.2 启动SDK
 调用SDK的 `bool smantifraud::SmAntiFraud::Create(const smantifraud::smOption&)` 方法启动SDK  
 Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，并将检测结果同步返回  
-若检测成功，则返回 `true` 并且启动异步任务在后台进行完成设备数据采集、加密、网络请求，并缓存服务端下发的标识的任务  
+若检测成功，则返回 `true`，SDK 会启动后台任务，异步完成设备数据采集、加密、网络请求，并缓存服务端下发的标识  
 若检测失败，即返回 `false`，需要检查参数是否配置正确
 
 以下是 `smantifraud::smOption` 中具体的配置项说明：
@@ -168,7 +168,7 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 ### 3.2 启动SDK
 调用SDK的 `int SmAntiFraudBridge_win.Create(SmAntiFraudBridge_win.SmOption)` 方法启动SDK  
 `Create` 方法检测 `SmAntiFraudBridge_win.SmOption` 中的必传参数是否设置，并将检测结果同步返回  
-若检测成功，则返回0并且启动异步任务在后台进行完成设备数据采集、加密、网络请求，并缓存服务端下发的标识的任务  
+若检测成功，则返回 `0`，SDK 会启动后台任务，异步完成设备数据采集、加密、网络请求，并缓存服务端下发的标识  
 若检测失败，即返回非 0，需要检查参数是否配置正确
 
 以下是 `SmAntiFraudBridge_win.SmOption` 中具体的配置项说明：
@@ -240,12 +240,12 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
     private static void smOnSuccess(IntPtr deviceIdPtr, IntPtr userData)
     {
         string deviceId = Marshal.PtrToStringAnsi(deviceIdPtr) ?? string.Empty;
-        Debug.Log("SmAntiFraud success: " + deviceId);
+        // 保存 deviceId
     }
 
     private static void smOnError(int errorCode, IntPtr userData)
     {
-        Debug.LogError("SmAntiFraud error: " + errorCode);
+        // errorCode错误码
     }
 }
 ```
