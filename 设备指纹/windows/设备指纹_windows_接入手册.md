@@ -56,8 +56,8 @@ C/C++ -> 常规 -> 附加包含目录:
 ### 2.2 启动SDK
 调用SDK的 `bool smantifraud::SmAntiFraud::Create(const smantifraud::smOption&)` 方法启动SDK  
 Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，并将检测结果同步返回  
-若检测成功，则返回0并且启动异步任务在后台进行完成设备数据采集、加密、网络请求，并缓存服务端下发的标识的任务  
-若检测失败，即返回非 0，需要检查参数是否配置正确
+若检测成功，则返回 `true` 并且启动异步任务在后台进行完成设备数据采集、加密、网络请求，并缓存服务端下发的标识的任务  
+若检测失败，即返回 `false`，需要检查参数是否配置正确
 
 以下是 `smantifraud::smOption` 中具体的配置项说明：
 
