@@ -1,4 +1,4 @@
-# windows端数美设备指纹SDK接入手册
+﻿# windows端数美设备指纹SDK接入手册
 
 ## 1. 适用范围
 
@@ -73,7 +73,6 @@ Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，�
 | `notCollect` | `std::vector<std::string>` | 否 | 空数组 | 不采集字段，例如 `a9`、`a10` |
 | `smOnSuccess` | `SmAntiSuccessCallback` | 否 | `0` | 成功回调 |
 | `smOnError` | `SmAntiErrorCallback` | 否 | `0` | 失败回调 |
-| `userData` | `void*` | 否 | `0` | 透传用户数据，SDK 只保存并回传，不解析 |
 
 ### 2.3 获取标识
 调用SDK的 `std::string smantifraud::SmAntiFraud::GetDeviceId()` 方法同步获取设备标识  
@@ -91,13 +90,13 @@ Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，�
 #include <string>
 #include <thread>
 
-void SMANTI_CALL smOnSuccess(const char* deviceId, void* userData) {
+void SMANTI_CALL smOnSuccess(const char* deviceId) {
     std::cout << "SmAntiFraud success: "
               << (deviceId == 0 ? "" : deviceId)
               << std::endl;
 }
 
-void SMANTI_CALL smOnError(int errorCode, void* userData) {
+void SMANTI_CALL smOnError(int errorCode) {
     std::cout << "SmAntiFraud error: " << errorCode << std::endl;
 }
 
@@ -149,7 +148,7 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 | 类型 | 说明 |
 |---|---|
 | `SmAntiFraudBridge_win` | 静态封装类，内部声明并调用 Native C ABI |
-| `SmAntiFraudBridge_win.SmOption` | 对应 Native `SmAntiOption` 的 C# 参数结构 |
+| `SmAntiFraudBridge_win.SmOption` | 面向 Unity 的 C# 封装参数结构，脚本内部会转换为 Native C ABI 结构 |
 | `SmAntiFraudBridge_win.Create` | 初始化 SDK，并注册成功/失败回调 |
 | `SmAntiFraudBridge_win.GetDeviceId` | 获取 deviceId |
 | `SmAntiFraudBridge_win.GetSDKVersion` | 获取 SDK 版本号 |
@@ -176,16 +175,15 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 | 字段 | C# 参数类型 | 必填 | 默认值 | 说明 |
 |---|---|---:|---|---|
 | `organization` | `string` | 是 | `null` | 数美分配的 organization |
-| `appId` | `string` | 否 | `null`，SDK 内部按 `default` 处理 | 应用 ID |
+| `appId` | `string` | 否 |  `default` | 应用 ID |
 | `publicKey` | `string` | 是 | `null` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
 | `url` | `string` | 否 | `null`，使用 SDK 默认地址 | 服务端地址 |
 | `extraInfo` | `string` | 否 | `null` | 业务扩展信息，最大 1024 字节 |
 | `channel` | `string` | 否 | `null` | 渠道信息 |
-| `https` | `int`，按 BOOL 使用 | 否 | `0`，表示 `false` | `0=false`，非 `0=true` |
+| `https` | `int`，按 BOOL 使用 | 否 | `0`，表示 `false` | `0=false`，非 `0=true`；为兼容 Native C ABI 保持 `int` |
 | `notCollectCsv` | `string` | 否 | `null` | 不采集字段，逗号分隔 |
-| `smOnSuccess` | `SmSuccessCallback` | 否 | `null` | 成功回调；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
-| `smOnError` | `SmErrorCallback` | 否 | `null` | 失败回调；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
-| `userData` | `IntPtr` | 否 | `IntPtr.Zero` | 透传用户数据，SDK 只保存并回传，不解析 |
+| `smOnSuccess` | `SmSuccessCallback` | 否 | `null` | 成功回调，签名为 `void Callback(string deviceId)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
+| `smOnError` | `SmErrorCallback` | 否 | `null` | 失败回调，签名为 `void Callback(int errorCode)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
 
 ### 3.3 获取标识
 调用SDK的 `string SmAntiFraudBridge_win.GetDeviceId()` 方法同步获取设备标识  
@@ -198,7 +196,6 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 ```csharp
 using System;
 using System.Collections;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class YourSmAntiFraudBehaviour : MonoBehaviour
@@ -216,8 +213,7 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
             https = 1, // 0=false, non-zero=true
             notCollectCsv = "a01,a02",
             smOnSuccess = smOnSuccess,
-            smOnError = smOnError,
-            userData = IntPtr.Zero
+            smOnError = smOnError
         };
 
         int ret = SmAntiFraudBridge_win.Create(option);
@@ -237,13 +233,12 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
         Debug.Log("SmAntiFraudBridge_win.GetDeviceId=" + SmAntiFraudBridge_win.GetDeviceId());
     }
 
-    private static void smOnSuccess(IntPtr deviceIdPtr, IntPtr userData)
+    private static void smOnSuccess(string deviceId)
     {
-        string deviceId = Marshal.PtrToStringAnsi(deviceIdPtr) ?? string.Empty;
         // 保存 deviceId
     }
 
-    private static void smOnError(int errorCode, IntPtr userData)
+    private static void smOnError(int errorCode)
     {
         // errorCode错误码
     }
