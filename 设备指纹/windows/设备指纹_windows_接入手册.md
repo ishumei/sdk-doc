@@ -66,13 +66,24 @@ Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，�
 | `organization` | `std::string` | 是 | 空字符串 | 数美分配的 organization |
 | `appId` | `std::string` | 否 | `"default"` | 应用 ID |
 | `publicKey` | `std::string` | 是 | 空字符串 | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
-| `url` | `std::string` | 否 | 空字符串，使用 SDK 默认地址 | 服务端地址 |
+| `area` | `std::string` | 否 | `"bj"` | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
+| `url` | `std::string` | 否 | 空字符串，按 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
 | `extraInfo` | `std::string` | 否 | 空字符串 | 业务扩展信息，最大 1024 字节 |
 | `channel` | `std::string` | 否 | 空字符串 | 渠道信息 |
-| `https` | `bool` | 否 | `false` | 是否将默认 http 地址切换为 https |
+| `https` | `bool` | 否 | `true` | 影响 `area` 默认地址和无 scheme 的自定义 `url`；`true` 使用 `https://`，`false` 使用 `http://` |
 | `notCollect` | `std::vector<std::string>` | 否 | 空数组 | 不采集字段，例如 `a9`、`a10` |
 | `smOnSuccess` | `SmAntiSuccessCallback` | 否 | `0` | 成功回调 |
 | `smOnError` | `SmAntiErrorCallback` | 否 | `0` | 失败回调 |
+
+默认服务地址按 `area` 生成，只有 `url` 为空时才生效；默认使用 HTTPS：
+
+| `area` | 默认请求地址 |
+|---|---|
+| `bj` | `https://fp-it.fengkongcloud.com/deviceprofile/v4` |
+| `xjp` | `https://fp-sa-it.fengkongcloud.com/deviceprofile/v4` |
+| `fjny` | `https://fp-na-it-acc.fengkongcloud.com/deviceprofile/v4` |
+
+如果显式传入 `url`，SDK 会优先使用 `url`。当 `url` 不带 `http://` 或 `https://` 前缀时，SDK 会根据 `https` 配置自动补全 scheme。C++ 中设置 `https=false`，或 Unity 中设置 `https=-1` 时，`area` 默认地址和无 scheme 的自定义 `url` 都会使用 HTTP。
 
 ### 2.3 获取标识
 调用SDK的 `std::string smantifraud::SmAntiFraud::GetDeviceId()` 方法同步获取设备标识  
@@ -105,7 +116,9 @@ int main() {
     option.organization = "your_organization";  // 必填参数
     option.appId = "default";
     option.publicKey = "your_public_key";       // 必填参数
-    option.url = "https://your_server/deviceprofile/v4";
+    option.area = "bj";
+    // url 为空时按 area 生成默认地址；也可以显式设置自定义地址。
+    // option.url = "https://your_server/deviceprofile/v4";
     option.channel = "default";
     option.extraInfo = "{\"scene\":\"login\"}";
     option.notCollect.push_back("a01");
@@ -177,10 +190,11 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 | `organization` | `string` | 是 | `null` | 数美分配的 organization |
 | `appId` | `string` | 否 |  `default` | 应用 ID |
 | `publicKey` | `string` | 是 | `null` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
-| `url` | `string` | 否 | `null`，使用 SDK 默认地址 | 服务端地址 |
+| `area` | `string` | 否 | `null`，SDK 内部按 `bj` 处理 | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
+| `url` | `string` | 否 | `null`，按 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
 | `extraInfo` | `string` | 否 | `null` | 业务扩展信息，最大 1024 字节 |
 | `channel` | `string` | 否 | `null` | 渠道信息 |
-| `https` | `int`，按 BOOL 使用 | 否 | `0`，表示 `false` | `0=false`，非 `0=true`；为兼容 Native C ABI 保持 `int` |
+| `https` | `int`，三态配置 | 否 | `0`，表示 SDK 默认 HTTPS | 影响 `area` 默认地址和无 scheme 的自定义 `url`：`0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP`；为兼容 Native C ABI 保持 `int` |
 | `notCollectCsv` | `string` | 否 | `null` | 不采集字段，逗号分隔 |
 | `smOnSuccess` | `SmSuccessCallback` | 否 | `null` | 成功回调，签名为 `void Callback(string deviceId)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
 | `smOnError` | `SmErrorCallback` | 否 | `null` | 失败回调，签名为 `void Callback(int errorCode)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
@@ -207,10 +221,12 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
             organization = "your_organization", // 必填参数
             appId = "default",
             publicKey = "your_public_key",      // 必填参数
-            url = "https://your_server/deviceprofile/v4",
+            area = "bj",
+            // url 为空时按 area 生成默认地址；也可以显式设置自定义地址。
+            // url = "https://your_server/deviceprofile/v4",
             extraInfo = "{\"scene\":\"unity\"}",
             channel = "unity",
-            https = 1, // 0=false, non-zero=true
+            https = 0, // 0=SDK默认HTTPS，1=强制HTTPS，-1=强制HTTP
             notCollectCsv = "a01,a02",
             smOnSuccess = smOnSuccess,
             smOnError = smOnError
