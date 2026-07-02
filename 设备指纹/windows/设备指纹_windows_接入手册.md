@@ -4,7 +4,7 @@
 
 本文说明 Windows Native SDK 的两类常见接入方式：
 
-- 普通 C++ 程序接入
+- 普通 C++ 程序通过 C++ 或者 C API接入
 - Unity C# 程序通过 P/Invoke 接入
 
 SDK 交付产物包括：
@@ -54,6 +54,8 @@ C/C++ -> 常规 -> 附加包含目录:
 推荐放到 exe 同目录。
 
 ### 2.2 启动SDK
+
+#### 2.2.1 C++ API
 调用SDK的 `bool smantifraud::SmAntiFraud::Create(const smantifraud::smOption&)` 方法启动SDK  
 Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，并将检测结果同步返回  
 若检测成功，则返回 `true`，SDK 会启动后台任务，异步完成设备数据采集、加密、网络请求，并缓存服务端下发的标识  
@@ -67,10 +69,10 @@ Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，�
 | `appId` | `std::string` | 否 | `"default"` | 应用 ID |
 | `publicKey` | `std::string` | 是 | 空字符串 | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
 | `area` | `std::string` | 否 | `"bj"` | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
-| `url` | `std::string` | 否 | 空字符串，按 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
+| `url` | `std::string` | 否 | 依据 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
 | `extraInfo` | `std::string` | 否 | 空字符串 | 业务扩展信息，最大 1024 字节 |
 | `channel` | `std::string` | 否 | 空字符串 | 渠道信息 |
-| `https` | `bool` | 否 | `true` | 影响 `area` 默认地址和无 scheme 的自定义 `url`；`true` 使用 `https://`，`false` 使用 `http://` |
+| `https` | `bool` | 否 | `true` | `true` 使用 `https://`，`false` 使用 `http://` |
 | `notCollect` | `std::vector<std::string>` | 否 | 空数组 | 不采集字段，例如 `a9`、`a10` |
 | `smOnSuccess` | `SmAntiSuccessCallback` | 否 | `0` | 成功回调 |
 | `smOnError` | `SmAntiErrorCallback` | 否 | `0` | 失败回调 |
@@ -85,13 +87,82 @@ Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，�
 
 如果显式传入 `url`，SDK 会优先使用 `url`。当 `url` 不带 `http://` 或 `https://` 前缀时，SDK 会根据 `https` 配置自动补全 scheme。C++ 中设置 `https=false`，或 Unity 中设置 `https=-1` 时，`area` 默认地址和无 scheme 的自定义 `url` 都会使用 HTTP。
 
+#### 2.2.2 C API
+
+调用 SDK 的 `int SmAntiFraudCreate_C(const SmAntiOption*)` 方法启动 SDK。  
+`SmAntiFraudCreate_C` 会同步检测 `SmAntiOption` 中的必传参数是否设置。  
+若检测成功，则返回 `SMANTI_SUCCESS`，SDK 会启动后台任务，异步完成设备数据采集、加密、网络请求，并缓存服务端下发的标识。  
+若检测失败，则返回非 `SMANTI_SUCCESS`，需要检查参数是否配置正确。
+
+使用 C API 时，调用方需要先将 `SmAntiOption` 清零，再填写参数：
+
+```cpp
+SmAntiOption option;
+memset(&option, 0, sizeof(option));
+```
+
+以下是 `SmAntiOption` 中具体的配置项说明：
+
+| 字段 | 参数类型 | 必填 | 默认值 | 说明 |
+|---|---|---:|---|---|
+| `organization` | `const char*` | 是 | `NULL` | 数美分配的 organization |
+| `appId` | `const char*` | 否 | `NULL`，SDK 内部按 `default` 处理 | 应用 ID |
+| `publicKey` | `const char*` | 是 | `NULL` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
+| `area` | `const char*` | 否 | `NULL`，SDK 内部按 `bj` 处理 | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
+| `url` | `const char*` | 否 | `NULL`，依据 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
+| `extraInfo` | `const char*` | 否 | `NULL` | 业务扩展信息，最大 1024 字节 |
+| `channel` | `const char*` | 否 | `NULL` | 渠道信息 |
+| `https` | `int` | 否 | `0`，表示 SDK 默认 HTTPS | `0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP` |
+| `notCollectCsv` | `const char*` | 否 | `NULL` | 不采集字段，多个字段用英文逗号分隔 |
+| `smOnSuccess` | `SmAntiSuccessCallback` | 否 | `NULL` | 成功回调 |
+| `smOnError` | `SmAntiErrorCallback` | 否 | `NULL` | 失败回调 |
+
+C API 的 `url`、`area`、`https` 规则和 C++ API 一致：当 `url` 为空时按 `area` 生成默认地址；当 `url` 不带 `http://` 或 `https://` 前缀时，SDK 会根据 `https` 配置自动补全 scheme。设置 `https=-1` 时，`area` 默认地址和无 scheme 的自定义 `url` 都会使用 HTTP。
+
+
 ### 2.3 获取标识
+
+#### 2.3.1 C++ API
 调用SDK的 `std::string smantifraud::SmAntiFraud::GetDeviceId()` 方法同步获取设备标识  
 该方法首先会尝试获取设备缓存的'B'开头的boxId，若获取失败，则会**阻塞地**采集数据并返回'D'开头，长度较长的boxdata  
 
 **注意：** 不要在启动SDK后立即获取标识，因为启动SDK后的异步任务需要时间，建议在启动SDK后2秒后再调用
 
-### 2.4 代码示例
+#### 2.3.2 C API
+
+调用 SDK 的 `int SmAntiFraudGetDeviceId_C(char* buffer, int bufferSize)` 方法同步获取设备标识。  
+该方法首先会尝试获取设备缓存的'B'开头的boxId，若获取失败，则会**阻塞地**采集数据并返回'D'开头，长度较长的boxdata。
+
+C API 需要由调用方提供字符串缓冲区。推荐分两次调用：
+
+1. 第一次传入 `0, 0`，获取所需字符串长度。
+2. 根据返回长度分配 `length + 1` 字节缓冲区。
+3. 第二次传入缓冲区，读取完整字符串。
+
+返回值说明：
+
+| 返回值 | 说明 |
+|---|---|
+| `> 0` | deviceId 字符串长度，不包含结尾 `\0` |
+| `SMANTI_ERROR_BUFFER_TOO_SMALL` | 传入的 buffer 太小 |
+| 其他负数 | 获取失败，参考 `SmAntiResult` |
+
+示例：
+
+```cpp
+int required = SmAntiFraudGetDeviceId_C(0, 0);
+if (required > 0) {
+    std::vector<char> buffer(static_cast<size_t>(required) + 1);
+    int written = SmAntiFraudGetDeviceId_C(&buffer[0], static_cast<int>(buffer.size()));
+    if (written > 0) {
+        std::string deviceId(&buffer[0], static_cast<size_t>(written));
+    }
+}
+```
+
+**注意：** 不要在启动 SDK 后立即获取标识，因为启动 SDK 后的异步任务需要时间，建议在启动 SDK 后 2 秒后再调用。
+
+### 2.4 C++ API 接入代码示例
 
 ```cpp
 #include "SmAntiFraud.h"
@@ -119,7 +190,6 @@ int main() {
     option.area = "bj";
     // url 为空时按 area 生成默认地址；也可以显式设置自定义地址。
     // option.url = "https://your_server/deviceprofile/v4";
-    option.channel = "default";
     option.extraInfo = "{\"scene\":\"login\"}";
     option.notCollect.push_back("a01");
     option.smOnSuccess = &smOnSuccess;
@@ -141,7 +211,70 @@ int main() {
 }
 ```
 
-### 2.5 C++ 线程注意事项
+### 2.5 C API 接入代码示例
+
+```cpp
+#include "SmAntiFraud.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <chrono>
+#include <thread>
+
+void SMANTI_CALL OnSuccess(const char* deviceId) {
+    std::cout << "success: " << (deviceId ? deviceId : "") << std::endl;
+}
+
+void SMANTI_CALL OnError(int errorCode) {
+    std::cout << "error: " << errorCode << std::endl;
+}
+
+std::string ReadDeviceId() {
+    int required = SmAntiFraudGetDeviceId_C(0, 0);
+    if (required <= 0) {
+        return std::string();
+    }
+
+    std::vector<char> buffer(static_cast<size_t>(required) + 1);
+    int written = SmAntiFraudGetDeviceId_C(&buffer[0], static_cast<int>(buffer.size()));
+    if (written < 0) {
+        return std::string();
+    }
+    return std::string(&buffer[0], static_cast<size_t>(written));
+}
+
+int main() {
+    SmAntiOption option;
+    memset(&option, 0, sizeof(option));
+
+    option.organization = "your_organization";
+    option.appId = "default";
+    option.publicKey = "your_public_key";
+    option.area = "bj";
+    // url 为空时按 area 生成默认地址；也可以显式设置自定义地址。
+    // option.url = "https://your_server/deviceprofile/v4";
+    option.notCollectCsv = "a17";
+    option.smOnSuccess = &OnSuccess;
+    option.smOnError = &OnError;
+
+    int ret = SmAntiFraudCreate_C(&option);
+    if (ret != SMANTI_SUCCESS) {
+        std::cout << "SmAntiFraudCreate_C failed: " << ret << std::endl;
+        return 1;
+    }
+
+    // 2秒后再调用获取设备标识的方法
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    
+    std::cout << "deviceId: " << ReadDeviceId() << std::endl;
+    return 0;
+}
+
+```
+
+### 2.6 线程注意事项
 SDK 的成功和失败回调不在主线程触发，不要在回调中直接操作 UI 控件；如需更新 UI，应切回应用主线程。
 
 ## 3. Unity C#接入
@@ -190,11 +323,11 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 | `organization` | `string` | 是 | `null` | 数美分配的 organization |
 | `appId` | `string` | 否 |  `default` | 应用 ID |
 | `publicKey` | `string` | 是 | `null` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
-| `area` | `string` | 否 | `null`，SDK 内部按 `bj` 处理 | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
-| `url` | `string` | 否 | `null`，按 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
+| `area` | `string` | 否 |  `bj` | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
+| `url` | `string` | 否 | 依据 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
 | `extraInfo` | `string` | 否 | `null` | 业务扩展信息，最大 1024 字节 |
 | `channel` | `string` | 否 | `null` | 渠道信息 |
-| `https` | `int`，三态配置 | 否 | `0`，表示 SDK 默认 HTTPS | 影响 `area` 默认地址和无 scheme 的自定义 `url`：`0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP`；为兼容 Native C ABI 保持 `int` |
+| `https` | `int`，三态配置 | 否 | `0`，表示 SDK 默认 HTTPS | `0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP`；为兼容 Native C ABI 保持 `int` |
 | `notCollectCsv` | `string` | 否 | `null` | 不采集字段，逗号分隔 |
 | `smOnSuccess` | `SmSuccessCallback` | 否 | `null` | 成功回调，签名为 `void Callback(string deviceId)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
 | `smOnError` | `SmErrorCallback` | 否 | `null` | 失败回调，签名为 `void Callback(int errorCode)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
@@ -225,8 +358,6 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
             // url 为空时按 area 生成默认地址；也可以显式设置自定义地址。
             // url = "https://your_server/deviceprofile/v4",
             extraInfo = "{\"scene\":\"unity\"}",
-            channel = "unity",
-            https = 0, // 0=SDK默认HTTPS，1=强制HTTPS，-1=强制HTTP
             notCollectCsv = "a01,a02",
             smOnSuccess = smOnSuccess,
             smOnError = smOnError
