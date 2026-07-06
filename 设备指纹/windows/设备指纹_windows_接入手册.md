@@ -407,4 +407,4 @@ SDK 的回调不在 Unity 主线程触发，而 Unity API 大多只能在主线�
 | `2001` |  网络请求失败 |
 | `2002` |  设备信息封装或加密失败 |
 
-以上错误码会通过 `smOnError` 回调返回。C++ 接入时对应 `smOption.smOnError`，Unity 接入时对应 `SmOption.smOnError`。
+以上错误码会通过 `smOnError` 失败回调返回
