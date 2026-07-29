@@ -1,10 +1,10 @@
-﻿# windows端数美设备指纹SDK接入手册
+# windows端数美设备指纹SDK接入手册
 
 ## 1. 适用范围
 
 本文说明 Windows Native SDK 的两类常见接入方式：
 
-- 普通 C++程序通过 C++ 或者 C API接入
+- 普通 C++ 程序通过 C++ 或者 C API接入
 - Unity C# 程序通过 P/Invoke 接入
 
 SDK 交付产物包括：
