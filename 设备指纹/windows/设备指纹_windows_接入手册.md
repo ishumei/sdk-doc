@@ -4,7 +4,7 @@
 
 本文说明 Windows Native SDK 的两类常见接入方式：
 
-- 普通 C++ 程序通过 C++ 或者 C API接入
+- 普通 C++程序通过 C++ 或者 C API接入
 - Unity C# 程序通过 P/Invoke 接入
 
 SDK 交付产物包括：
@@ -56,34 +56,42 @@ C/C++ -> 常规 -> 附加包含目录:
 ### 2.2 启动SDK
 
 #### 2.2.1 C++ API
+
 调用SDK的 `bool smantifraud::SmAntiFraud::Create(const smantifraud::smOption&)` 方法启动SDK  
-Create 方法检测 ` smantifraud::smOption` 中的必传参数是否设置，并将检测结果同步返回  
+Create 方法检测  `smantifraud::smOption` 中的必传参数是否设置，并将检测结果同步返回  
 若检测成功，则返回 `true`，SDK 会启动后台任务，异步完成设备数据采集、加密、网络请求，并缓存服务端下发的标识  
 若检测失败，即返回 `false`，需要检查参数是否配置正确
 
 以下是 `smantifraud::smOption` 中具体的配置项说明：
 
-| 字段 | 参数类型 | 必填 | 默认值 | 说明 |
-|---|---|---:|---|---|
-| `organization` | `std::string` | 是 | 空字符串 | 数美分配的 organization |
-| `appId` | `std::string` | 否 | `"default"` | 应用 ID |
-| `publicKey` | `std::string` | 是 | 空字符串 | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
-| `area` | `std::string` | 否 | `"bj"` | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
-| `url` | `std::string` | 否 | 依据 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
-| `extraInfo` | `std::string` | 否 | 空字符串 | 业务扩展信息，最大 1024 字节 |
-| `channel` | `std::string` | 否 | 空字符串 | 渠道信息 |
-| `https` | `bool` | 否 | `true` | `true` 使用 `https://`，`false` 使用 `http://` |
-| `notCollect` | `std::vector<std::string>` | 否 | 空数组 | 不采集字段，例如 `a9`、`a10` |
-| `smOnSuccess` | `SmAntiSuccessCallback` | 否 | `0` | 成功回调 |
-| `smOnError` | `SmAntiErrorCallback` | 否 | `0` | 失败回调 |
 
-默认服务地址按 `area` 生成，只有 `url` 为空时才生效；默认使用 HTTPS：
+| 字段             | 参数类型                       | 必填  | 默认值              | 说明                                            |
+| -------------- | -------------------------- | ---: | ---------------- | --------------------------------------------- |
+| `organization` | `std::string`              | 是   | 空字符串             | 数美分配的 organization                            |
+| `appId`        | `std::string`              | 否   | `"default"`      | 应用 ID                                         |
+| `publicKey`    | `std::string`              | 是   | 空字符串             | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
+| `area`         | `std::string`              | 否   | `"bj"`           | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny`      |
+| `url`          | `std::string`              | 否   | 依据 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area`                         |
+| `confurl`      | `std::string`              | 否   | 依据 `area` 生成默认地址 | 云配服务地址；显式设置后优先于 `area`                         |
+| `extraInfo`    | `std::string`              | 否   | 空字符串             | 业务扩展信息，最大 1024 字节                             |
+| `channel`      | `std::string`              | 否   | 空字符串             | 渠道信息                                          |
+| `https`        | `bool`                     | 否   | `true`           | `true` 使用 `https://`，`false` 使用 `http://`     |
+| `cloudconf`    | `bool`                     | 否   | `true`           | 默认请求云配，`true` 代表请求     |
+| `listenClick`  | `bool`                     | 否   | `false`           | 是否允许自动化点击监听；true 代表开启                       |
+| `notCollect`   | `std::vector<std::string>` | 否   | 空数组              | 不采集字段，例如 `a9`、`a10`                           |
+| `smOnSuccess`  | `SmAntiSuccessCallback`    | 否   | `0`              | 成功回调                                          |
+| `smOnError`    | `SmAntiErrorCallback`      | 否   | `0`              | 失败回调                                          |
 
-| `area` | 默认请求地址 |
-|---|---|
-| `bj` | `https://fp-it.fengkongcloud.com/deviceprofile/v4` |
-| `xjp` | `https://fp-sa-it.fengkongcloud.com/deviceprofile/v4` |
+
+默认`url`服务地址按 `area` 生成，只有 `url` 为空时才生效；默认使用 HTTPS：
+
+
+| `area` | 默认请求地址                                                    |
+| ------ | --------------------------------------------------------- |
+| `bj`   | `https://fp-it.fengkongcloud.com/deviceprofile/v4`        |
+| `xjp`  | `https://fp-sa-it.fengkongcloud.com/deviceprofile/v4`     |
 | `fjny` | `https://fp-na-it-acc.fengkongcloud.com/deviceprofile/v4` |
+
 
 如果显式传入 `url`，SDK 会优先使用 `url`。当 `url` 不带 `http://` 或 `https://` 前缀时，SDK 会根据 `https` 配置自动补全 scheme。C++ 中设置 `https=false`，或 Unity 中设置 `https=-1` 时，`area` 默认地址和无 scheme 的自定义 `url` 都会使用 HTTP。
 
@@ -103,26 +111,31 @@ memset(&option, 0, sizeof(option));
 
 以下是 `SmAntiOption` 中具体的配置项说明：
 
-| 字段 | 参数类型 | 必填 | 默认值 | 说明 |
-|---|---|---:|---|---|
-| `organization` | `const char*` | 是 | `NULL` | 数美分配的 organization |
-| `appId` | `const char*` | 否 | `NULL`，SDK 内部按 `default` 处理 | 应用 ID |
-| `publicKey` | `const char*` | 是 | `NULL` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
-| `area` | `const char*` | 否 | `NULL`，SDK 内部按 `bj` 处理 | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
-| `url` | `const char*` | 否 | `NULL`，依据 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
-| `extraInfo` | `const char*` | 否 | `NULL` | 业务扩展信息，最大 1024 字节 |
-| `channel` | `const char*` | 否 | `NULL` | 渠道信息 |
-| `https` | `int` | 否 | `0`，表示 SDK 默认 HTTPS | `0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP` |
-| `notCollectCsv` | `const char*` | 否 | `NULL` | 不采集字段，多个字段用英文逗号分隔 |
-| `smOnSuccess` | `SmAntiSuccessCallback` | 否 | `NULL` | 成功回调 |
-| `smOnError` | `SmAntiErrorCallback` | 否 | `NULL` | 失败回调 |
+
+| 字段              | 参数类型                    | 必填  | 默认值                         | 说明                                            |
+| --------------- | ----------------------- | ---: | --------------------------- | --------------------------------------------- |
+| `organization`  | `const char*`           | 是   | `NULL`                      | 数美分配的 organization                            |
+| `appId`         | `const char*`           | 否   | `NULL`，SDK 内部按 `default` 处理 | 应用 ID                                         |
+| `publicKey`     | `const char*`           | 是   | `NULL`                      | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
+| `area`          | `const char*`           | 否   | `NULL`，SDK 内部按 `bj` 处理      | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny`      |
+| `url`           | `const char*`           | 否   | `NULL`，依据 `area` 生成默认地址     | 服务端地址；显式设置后优先于 `area`                         |
+| `confurl`       | `const char*`           | 否   | `NULL`，依据 `area` 生成默认地址     | 云配服务地址；显式设置后优先于`area`                         |
+| `extraInfo`     | `const char*`           | 否   | `NULL`                      | 业务扩展信息，最大 1024 字节                             |
+| `channel`       | `const char*`           | 否   | `NULL`                      | 渠道信息                                          |
+| `https`         | `int`                   | 否   | `0`，表示 SDK 默认 HTTPS         | `0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP`           |
+| `cloudconf`     | `int`                   | 否   | `0`        | 是否请求云配；`0=默认开启`，`1=强制开启`，`-1=关闭`           |
+| `listenClick`   | `int`                   | 否   | `0`                         | 是否允许自动化点击监听；0=关闭，非 0 开启                       |
+| `notCollectCsv` | `const char*`           | 否   | `NULL`                      | 不采集字段，多个字段用英文逗号分隔                             |
+| `smOnSuccess`   | `SmAntiSuccessCallback` | 否   | `NULL`                      | 成功回调                                          |
+| `smOnError`     | `SmAntiErrorCallback`   | 否   | `NULL`                      | 失败回调                                          |
+
 
 C API 的 `url`、`area`、`https` 规则和 C++ API 一致：当 `url` 为空时按 `area` 生成默认地址；当 `url` 不带 `http://` 或 `https://` 前缀时，SDK 会根据 `https` 配置自动补全 scheme。设置 `https=-1` 时，`area` 默认地址和无 scheme 的自定义 `url` 都会使用 HTTP。
-
 
 ### 2.3 获取标识
 
 #### 2.3.1 C++ API
+
 调用SDK的 `std::string smantifraud::SmAntiFraud::GetDeviceId()` 方法同步获取设备标识  
 该方法首先会尝试获取设备缓存的'B'开头的boxId，若获取失败，则会**阻塞地**采集数据并返回'D'开头，长度较长的boxdata  
 
@@ -141,11 +154,13 @@ C API 需要由调用方提供字符串缓冲区。推荐分两次调用：
 
 返回值说明：
 
-| 返回值 | 说明 |
-|---|---|
-| `> 0` | deviceId 字符串长度，不包含结尾 `\0` |
-| `SMANTI_ERROR_BUFFER_TOO_SMALL` | 传入的 buffer 太小 |
-| 其他负数 | 获取失败，参考 `SmAntiResult` |
+
+| 返回值                             | 说明                        |
+| ------------------------------- | ------------------------- |
+| `> 0`                           | deviceId 字符串长度，不包含结尾 `\0` |
+| `SMANTI_ERROR_BUFFER_TOO_SMALL` | 传入的 buffer 太小             |
+| 其他负数                            | 获取失败，参考 `SmAntiResult`    |
+
 
 示例：
 
@@ -275,6 +290,7 @@ int main() {
 ```
 
 ### 2.6 线程注意事项
+
 SDK 的成功和失败回调不在主线程触发，不要在回调中直接操作 UI 控件；如需更新 UI，应切回应用主线程。
 
 ## 3. Unity C#接入
@@ -291,26 +307,33 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 
 `SmAntiFraudBridge_win.cs` 暴露以下接口：
 
-| 类型 | 说明 |
-|---|---|
-| `SmAntiFraudBridge_win` | 静态封装类，内部声明并调用 Native C ABI |
-| `SmAntiFraudBridge_win.SmOption` | 面向 Unity 的 C# 封装参数结构，脚本内部会转换为 Native C ABI 结构 |
-| `SmAntiFraudBridge_win.Create` | 初始化 SDK，并注册成功/失败回调 |
-| `SmAntiFraudBridge_win.GetDeviceId` | 获取 deviceId |
-| `SmAntiFraudBridge_win.GetSDKVersion` | 获取 SDK 版本号 |
+
+| 类型                                    | 说明                                            |
+| ------------------------------------- | --------------------------------------------- |
+| `SmAntiFraudBridge_win`               | 静态封装类，内部声明并调用 Native C ABI                    |
+| `SmAntiFraudBridge_win.SmOption`      | 面向 Unity 的 C# 封装参数结构，脚本内部会转换为 Native C ABI 结构 |
+| `SmAntiFraudBridge_win.Create`        | 初始化 SDK，并注册成功/失败回调                            |
+| `SmAntiFraudBridge_win.GetDeviceId`   | 获取 deviceId                                   |
+| `SmAntiFraudBridge_win.StartClickListen` | 开启点击监听                                    |
+| `SmAntiFraudBridge_win.StopClickListen` | 关闭点击监听                                   |
+| `SmAntiFraudBridge_win.GetSDKVersion` | 获取 SDK 版本号                                    |
+
 
 #### 3.1.2 拷贝 Native DLL
 
 根据 Unity Player 架构选择对应的 DLL。推荐优先使用 MT 版本，减少客户工程对 VC++ 运行库的额外依赖。
 
-| Unity Player 架构 | SDK DLL | Unity 目标路径 |
-|---|---|---|
-| Windows x64 | `bin/x64_mt/SmAntiFraud.dll` | `Assets/Plugins/x64/SmAntiFraud.dll` |
-| Windows x86 | `bin/x86_mt/SmAntiFraud.dll` | `Assets/Plugins/x86/SmAntiFraud.dll` |
+
+| Unity Player 架构 | SDK DLL                      | Unity 目标路径                           |
+| --------------- | ---------------------------- | ------------------------------------ |
+| Windows x64     | `bin/x64_mt/SmAntiFraud.dll` | `Assets/Plugins/x64/SmAntiFraud.dll` |
+| Windows x86     | `bin/x86_mt/SmAntiFraud.dll` | `Assets/Plugins/x86/SmAntiFraud.dll` |
+
 
 `SmAntiFraudBridge_win.cs` 中通过 `DllImport("SmAntiFraud")` 调用 Native 接口，DLL 文件名必须保持为 `SmAntiFraud.dll`。
 
 ### 3.2 启动SDK
+
 调用SDK的 `int SmAntiFraudBridge_win.Create(SmAntiFraudBridge_win.SmOption)` 方法启动SDK  
 `Create` 方法检测 `SmAntiFraudBridge_win.SmOption` 中的必传参数是否设置，并将检测结果同步返回  
 若检测成功，则返回 `0`，SDK 会启动后台任务，异步完成设备数据采集、加密、网络请求，并缓存服务端下发的标识  
@@ -318,21 +341,27 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 
 以下是 `SmAntiFraudBridge_win.SmOption` 中具体的配置项说明：
 
-| 字段 | C# 参数类型 | 必填 | 默认值 | 说明 |
-|---|---|---:|---|---|
-| `organization` | `string` | 是 | `null` | 数美分配的 organization |
-| `appId` | `string` | 否 |  `default` | 应用 ID |
-| `publicKey` | `string` | 是 | `null` | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容 |
-| `area` | `string` | 否 |  `bj` | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny` |
-| `url` | `string` | 否 | 依据 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area` |
-| `extraInfo` | `string` | 否 | `null` | 业务扩展信息，最大 1024 字节 |
-| `channel` | `string` | 否 | `null` | 渠道信息 |
-| `https` | `int`，三态配置 | 否 | `0`，表示 SDK 默认 HTTPS | `0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP`；为兼容 Native C ABI 保持 `int` |
-| `notCollectCsv` | `string` | 否 | `null` | 不采集字段，逗号分隔 |
-| `smOnSuccess` | `SmSuccessCallback` | 否 | `null` | 成功回调，签名为 `void Callback(string deviceId)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
-| `smOnError` | `SmErrorCallback` | 否 | `null` | 失败回调，签名为 `void Callback(int errorCode)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
+
+| 字段              | C# 参数类型             | 必填  | 默认值                 | 说明                                                                                     |
+| --------------- | ------------------- | ---: | ------------------- | -------------------------------------------------------------------------------------- |
+| `organization`  | `string`            | 是   | `null`              | 数美分配的 organization                                                                     |
+| `appId`         | `string`            | 否   | `default`           | 应用 ID                                                                                  |
+| `publicKey`     | `string`            | 是   | `null`              | RSA 公钥，支持完整 PEM，也支持只传 BEGIN/END 中间的 base64 内容                                          |
+| `area`          | `string`            | 否   | `bj`                | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny`                                               |
+| `url`           | `string`            | 否   | 依据 `area` 生成默认地址    | 服务端地址；显式设置后优先于 `area`                                                                  |
+| `confurl`       | `string`            | 否   | 依据 `area` 生成默认地址    | 云配服务地址；显式设置后优先于 `area`                                                                  |
+| `extraInfo`     | `string`            | 否   | `null`              | 业务扩展信息，最大 1024 字节                                                                      |
+| `channel`       | `string`            | 否   | `null`              | 渠道信息                                                                                   |
+| `https`         | `int`，三态配置          | 否   | `0`，表示 SDK 默认 HTTPS | `0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP`；为兼容 Native C ABI 保持 `int`                          |
+| `cloudconf`     | `int`，三态配置          | 否   | `0` | 是否请求云配；`0=默认开启`，`1=强制开启`，`-1=关闭`  |
+| `listenClick`   | `int`               | 否   | `0`                 | 是否允许自动化点击监听；0=关闭，非 0 开启                                                                |
+| `notCollectCsv` | `string`            | 否   | `null`              | 不采集字段，逗号分隔                                                                             |
+| `smOnSuccess`   | `SmSuccessCallback` | 否   | `null`              | 成功回调，签名为 `void Callback(string deviceId)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收 |
+| `smOnError`     | `SmErrorCallback`   | 否   | `null`              | 失败回调，签名为 `void Callback(int errorCode)`；由 `SmAntiFraudBridge_win` 内部持有委托引用，避免被 GC 回收   |
+
 
 ### 3.3 获取标识
+
 调用SDK的 `string SmAntiFraudBridge_win.GetDeviceId()` 方法同步获取设备标识  
 该方法首先会尝试获取设备缓存的'B'开头的boxId，若获取失败，则会**阻塞地**采集数据并返回'D'开头，长度较长的boxdata  
 
@@ -393,6 +422,7 @@ public class YourSmAntiFraudBehaviour : MonoBehaviour
 ```
 
 ### 3.5 Unity 线程注意事项
+
 SDK 的回调不在 Unity 主线程触发，而 Unity API 大多只能在主线程调用。
 
 因此，`smOnSuccess` 和 `smOnError` 回调中不要直接操作场景对象、UI 组件、`GameObject`、`Transform` 等 Unity 对象。如果需要更新界面或游戏对象，建议在回调中只保存结果或错误码，然后在 `Update()`、协程或项目已有的主线程派发器中处理。
@@ -401,10 +431,53 @@ SDK 的回调不在 Unity 主线程触发，而 Unity API 大多只能在主线�
 
 ### 4.1 回调错误码
 
-| 返回码/错误码 |  说明 |
-|---|---|
-| `1903` |  服务端响应异常或响应内容无法解析 |
-| `2001` |  网络请求失败 |
-| `2002` |  设备信息封装或加密失败 |
+
+| 返回码/错误码 | 说明               |
+| ------- | ---------------- |
+| `1903`  | 服务端响应异常或响应内容无法解析 |
+| `2001`  | 网络请求失败           |
+| `2002`  | 设备信息封装或加密失败      |
+
 
 以上错误码会通过 `smOnError` 失败回调返回
+
+## 5. 模拟点击微行为
+
+SDK提供API监听鼠标点击、滑动事件，用于检测模拟点击行为。此功能需要启动SDK时，开启 `listenClick` 开关
+
+在一次开始和结束的监听期间，SDK只会采集刚开始的数条行为信息，而不会无限制的收集。  
+务必先 `StopClickListen()` 关闭上一次监听，再 `StartClickListen()`，才会创建新的采集周期。  
+
+注意需要在调用 `Create` 方法启动SDK后，才能调用以下API
+
+### 5.1 C++ API
+
+```cpp
+// 开始监听，返回true则开启监听成功
+bool smantifraud::SmAntiFraud::StartClickListen() const;
+
+// 结束监听
+bool smantifraud::SmAntiFraud::StopClickListen() const;
+```
+
+### 5.2 C API
+
+```cpp
+// 开始监听，返回0则开启监听成功
+// 返回值说明： -2：没有启动SDK；3002：smoption中的 listenClick 开关没有打开；3003：内部监听线程启动失败
+int SmAntiFraudStartClickListen_C(void);
+
+// 结束监听
+int SmAntiFraudStopClickListen_C(void);
+```
+
+### 5.3 C# API
+
+```csharp
+// 开始监听，返回0则开启监听成功。
+public static int StartClickListen();
+
+// 结束监听
+public static int StopClickListen();   
+```
+
