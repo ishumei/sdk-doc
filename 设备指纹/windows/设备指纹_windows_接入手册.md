@@ -11,8 +11,8 @@ SDK 交付产物包括：
 
 ```text
 include/SmAntiFraud.h
-bin/<x86_md|x86_mt|x64_md|x64_mt>/SmAntiFraud.dll
-lib/<x86_md|x86_mt|x64_md|x64_mt>/SmAntiFraud.lib
+bin/<x86_mt|x64_mt>/SmAntiFraud.dll
+lib/<x86_mt|x64_mt>/SmAntiFraud.lib
 CSharp/SmAntiFraudBridge_win.cs
 ```
 
