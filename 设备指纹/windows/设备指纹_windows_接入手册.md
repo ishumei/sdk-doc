@@ -18,7 +18,7 @@ CSharp/SmAntiFraudBridge_win.cs
 
 
 
-注意：C++升级必须同时替换 .h、.lib 和 .dll；Unity升级必须同时替换 .dll 和 SmAntiFraudBridge_win.cs。不允许混用不同版本组件。
+**注意：C++升级必须同时替换 .h、.lib 和 .dll；Unity升级必须同时替换 .dll 和 SmAntiFraudBridge_win.cs。不允许混用不同版本组件。**
 
 ## 2. C++接入
 
