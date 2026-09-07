@@ -314,19 +314,13 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 `SmAntiFraudBridge_win.cs` 暴露以下接口：
 
 
-| 类型                                       | 说明                                            |
-| ---------------------------------------- | --------------------------------------------- |
-| `SmAntiFraudBridge_win`                  | 静态封装类，内部声明并调用 Native C ABI                    |
-| `SmAntiFraudBridge_win.SmOption`         | 面向 Unity 的 C# 封装参数结构，脚本内部会转换为 Native C ABI 结构 |
-| `SmAntiFraudBridge_win.Create`           | 初始化 SDK，并注册成功/失败回调                            |
-| `SmAntiFraudBridge_win.GetDeviceId`      | 获取 deviceId                                   |
-| `SmAntiFraudBridge_win.StartClickListen` | 开启点击监听                                        |
-| `SmAntiFraudBridge_win.StopClickListen`  | 关闭点击监听                                        |
-| `SmAntiFraudBridge_win.StartTimeListen`  | 开启加速器监听                                       |
-| `SmAntiFraudBridge_win.StopTimeListen`   | 关闭加速器监听                                       |
-| `SmAntiFraudBridge_win.StartMemListen`   | 开启内存篡改监听                                      |
-| `SmAntiFraudBridge_win.StopMemListen`    | 关闭内存篡改监听                                      |
-| `SmAntiFraudBridge_win.GetSDKVersion`    | 获取 SDK 版本号                                    |
+| 类型                                    | 说明                                            |
+| ------------------------------------- | --------------------------------------------- |
+| `SmAntiFraudBridge_win`               | 静态封装类，内部声明并调用 Native C ABI                    |
+| `SmAntiFraudBridge_win.SmOption`      | 面向 Unity 的 C# 封装参数结构，脚本内部会转换为 Native C ABI 结构 |
+| `SmAntiFraudBridge_win.Create`        | 初始化 SDK，并注册成功/失败回调                            |
+| `SmAntiFraudBridge_win.GetDeviceId`   | 获取 deviceId                                   |
+| `SmAntiFraudBridge_win.GetSDKVersion` | 获取 SDK 版本号                                    |
 
 
 #### 3.1.2 拷贝 Native DLL
