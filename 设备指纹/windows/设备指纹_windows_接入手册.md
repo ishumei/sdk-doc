@@ -77,7 +77,7 @@ Create 方法检测  `smantifraud::smOption` 中的必传参数是否设置，�
 | `area`         | `std::string`              | 否   | `"bj"`           | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny`      |
 | `url`          | `std::string`              | 否   | 依据 `area` 生成默认地址 | 服务端地址；显式设置后优先于 `area`                         |
 | `confurl`      | `std::string`              | 否   | 依据 `area` 生成默认地址 | 云配服务地址；显式设置后优先于 `area`                        |
-| `extraInfo`    | `std::string`              | 否   | 空字符串             | 业务扩展信息，最大 1024 字节                             |
+| `extraInfo`    | `std::string`              | 否   | 空字符串             | 业务扩展信息，最大 1024 字节，超出部分将被截断                    |
 | `channel`      | `std::string`              | 否   | 空字符串             | 渠道信息                                          |
 | `https`        | `bool`                     | 否   | `true`           | `true` 使用 `https://`，`false` 使用 `http://`     |
 | `cloudconf`    | `bool`                     | 否   | `true`           | 默认请求云配，`true` 代表请求                            |
@@ -125,7 +125,7 @@ memset(&option, 0, sizeof(option));
 | `area`          | `const char*`           | 否   | `NULL`，SDK 内部按 `bj` 处理      | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny`      |
 | `url`           | `const char*`           | 否   | `NULL`，依据 `area` 生成默认地址     | 服务端地址；显式设置后优先于 `area`                         |
 | `confurl`       | `const char*`           | 否   | `NULL`，依据 `area` 生成默认地址     | 云配服务地址；显式设置后优先于`area`                         |
-| `extraInfo`     | `const char*`           | 否   | `NULL`                      | 业务扩展信息，最大 1024 字节                             |
+| `extraInfo`     | `const char*`           | 否   | `NULL`                      | 业务扩展信息，最大 1024 字节，超出部分将被截断                    |
 | `channel`       | `const char*`           | 否   | `NULL`                      | 渠道信息                                          |
 | `https`         | `int`                   | 否   | `0`，表示 SDK 默认 HTTPS         | `0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP`           |
 | `cloudconf`     | `int`                   | 否   | `0`                         | 是否请求云配；`0=默认开启`，`1=强制开启`，`-1=关闭`              |
@@ -360,7 +360,7 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 | `area`          | `string`            | 否   | `bj`                | 服务区域；仅当 `url` 为空时生效，支持 `bj`、`xjp`、`fjny`                                               |
 | `url`           | `string`            | 否   | 依据 `area` 生成默认地址    | 服务端地址；显式设置后优先于 `area`                                                                  |
 | `confurl`       | `string`            | 否   | 依据 `area` 生成默认地址    | 云配服务地址；显式设置后优先于 `area`                                                                 |
-| `extraInfo`     | `string`            | 否   | `null`              | 业务扩展信息，最大 1024 字节                                                                      |
+| `extraInfo`     | `string`            | 否   | `null`              | 业务扩展信息，最大 1024 字节，超出部分将被截断                                                             |
 | `channel`       | `string`            | 否   | `null`              | 渠道信息                                                                                   |
 | `https`         | `int`，三态配置          | 否   | `0`，表示 SDK 默认 HTTPS | `0=默认HTTPS`，`1=强制HTTPS`，`-1=强制HTTP`；为兼容 Native C ABI 保持 `int`                          |
 | `cloudconf`     | `int`，三态配置          | 否   | `0`                 | 是否请求云配；`0=默认开启`，`1=强制开启`，`-1=关闭`                                                       |
@@ -374,7 +374,7 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 调用SDK的 `string SmAntiFraudBridge_win.GetDeviceId()` 方法同步获取设备标识  
 该方法首先会尝试获取设备缓存的'B'开头的boxId，若获取失败，则会**阻塞地**采集数据并返回'D'开头，长度较长的boxdata  
 
-**注意：** 不要在启动SDK后立即获取标识，因为启动SDK后的异步任务需要时间，建议在启动SDK后2秒后再调用
+**注意：** 不要在启动SDK后立即获取标识，因为启动SDK后的异步任务需要时间，建议在启动 SDK 的2秒后再调用
 
 ### 3.4 Unity 调用示例
 
