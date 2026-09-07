@@ -322,8 +322,8 @@ Assets/Scripts/SmAntiFraudBridge_win.cs
 | `SmAntiFraudBridge_win.GetDeviceId`      | 获取 deviceId                                   |
 | `SmAntiFraudBridge_win.StartClickListen` | 开启点击监听                                        |
 | `SmAntiFraudBridge_win.StopClickListen`  | 关闭点击监听                                        |
-| `SmAntiFraudBridge_win.StartTimeListen`  | 开启变速器监听                                       |
-| `SmAntiFraudBridge_win.StopTimeListen`   | 关闭变速器监听                                       |
+| `SmAntiFraudBridge_win.StartTimeListen`  | 开启加速器监听                                       |
+| `SmAntiFraudBridge_win.StopTimeListen`   | 关闭加速器监听                                       |
 | `SmAntiFraudBridge_win.StartMemListen`   | 开启内存篡改监听                                      |
 | `SmAntiFraudBridge_win.StopMemListen`    | 关闭内存篡改监听                                      |
 | `SmAntiFraudBridge_win.GetSDKVersion`    | 获取 SDK 版本号                                    |
@@ -491,9 +491,9 @@ public static void StopClickListen();
 
 
 
-## 6. 变速器识别
+## 6. 加速器识别
 
-SDK提供API监听一段时间内，使用如Cheat Engine实现的变速行为。
+SDK提供API监听一段时间内，使用如Cheat Engine实现的加速行为。
 
 在调用 `StartTimeListen`  以后，SDK 内部会启动定时器，轮询检测加速情况，并进行打点上报。
 
