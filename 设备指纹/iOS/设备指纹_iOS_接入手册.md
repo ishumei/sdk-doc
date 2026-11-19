@@ -346,3 +346,23 @@ SmMemDetector* mMemDetector = [[SmMemDetector alloc] init];
 // 结束监听
 [[SmAntiFraud shareInstance] stopDetector:mMemDetector];
 ```
+
+
+### 7.3 时间加速微行为 sdk
+
+sdk 包文件：`SmAntiFraudTime.xcframework`
+
+此包会检测是否存在时间加速行为，使用方式如下：
+
+```objective-c
+#import <SmAntiFraudTime/SmAntiFraudTime.h>
+
+// 初始化检测器
+SmTimeDetector* mTimeDetector = [[SmTimeDetector alloc] init];
+
+// 开始监听
+[[SmAntiFraud shareInstance] startDetector:mTimeDetector];
+
+// 结束监听
+[[SmAntiFraud shareInstance] stopDetector:mTimeDetector];
+```
